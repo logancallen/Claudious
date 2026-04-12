@@ -1,3 +1,16 @@
 # Evaluator processed findings log — append only
 # Format: [DATE] [FINDING-ID] [DISPOSITION: QUEUED|PROPOSED|REDUNDANT|CONFLICT]
 # Finding ID format: [scout-date]-[title-slug]
+2026-04-12 2026-04-12-agent-teams-shared-tasklist REDUNDANT
+2026-04-12 2026-04-12-subagent-model-env-var REDUNDANT
+2026-04-12 2026-04-12-split-merge-worktree-batch PROPOSED
+2026-04-12 2026-04-12-compact-warm-cache-timing QUEUED
+2026-04-12 2026-04-12-1m-context-ga CONFLICT
+2026-04-12 2026-04-12-claudemd-token-cost-pruning PROPOSED
+2026-04-12 2026-04-12-perplexity-computer-agent PROPOSED
+2026-04-12 2026-04-12-plugin-hooks-yaml-fix QUEUED
+2026-04-12 2026-04-12-universal-skill-format REDUNDANT
+2026-04-12 2026-04-12-frontend-design-skill-official QUEUED
+2026-04-12 2026-04-12-commit-subagents-to-repo PROPOSED
+2026-04-12 2026-04-12-mcp-prompt-caching-tools REDUNDANT
+2026-04-12 2026-04-12-context-buffer-reserve REDUNDANT

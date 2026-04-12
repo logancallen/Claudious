@@ -7,3 +7,6 @@
 2026-04-12 HIGH SCOUT Agent Teams (shared task list, parallel sessions) — Enable with CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1; strongest pattern for multi-layer feature builds and competing-hypothesis debugging.
 2026-04-12 HIGH SCOUT CLAUDE_CODE_SUBAGENT_MODEL env var — Run Sonnet on sub-agents while keeping Opus on main session; 50-70% cost reduction on delegated work.
 2026-04-12 HIGH SCOUT 1M context window GA (no price premium) — Opus and Sonnet now support 1M tokens at standard pricing; adjust compaction cadence and token budgets.
+
+### 2026-04-12 — CRITICAL — AUTODREAM
+AutoDream is now available in phased rollout (started late March 2026). Feature consolidates Claude Code memory files automatically — prunes stale entries, merges duplicates, resolves contradictions, converts relative dates to absolute. Activates when 24hrs since last org + 5 new records. Check Claude Code `/memory` settings on all projects to confirm enablement.

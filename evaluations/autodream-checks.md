@@ -1,0 +1,1 @@
+2026-04-12 — AVAILABLE (phased rollout) — AutoDream began phased rollout late March 2026 for Claude Code users. Feature activates automatically when 24hrs since last org + 5 new conversation records. Cannot confirm account-level enablement from Cowork session. Logan should check Claude Code `/memory` settings directly.
