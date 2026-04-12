@@ -1,0 +1,3 @@
+# Evaluator processed findings log — append only
+# Format: [DATE] [FINDING-ID] [DISPOSITION: QUEUED|PROPOSED|REDUNDANT|CONFLICT]
+# Finding ID format: [scout-date]-[title-slug]

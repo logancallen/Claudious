@@ -1,0 +1,7 @@
+.DS_Store
+*.log.local
+.claude/handoff.md
+.env
+.env.local
+node_modules/
+.claude/settings.local.json

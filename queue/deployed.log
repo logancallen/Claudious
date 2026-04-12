@@ -1,0 +1,3 @@
+# Pioneer/Evaluator deployed improvements log
+# Format: [DATE-DEPLOYED] [IMPROVEMENT-NAME] [RESULT: WORKING|BROKE|UNCLEAR] [NOTES]
+# Logan adds one line here after deploying any queued improvement
