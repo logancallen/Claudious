@@ -1,23 +1,23 @@
 # Config Backup — 2026-04-12
 
 ## Files Captured: 5
-- claudious_alerts.md (1.2 KB)
-- claudious_learnings_techniques.md (4.6 KB)
-- claudious_learnings_patterns.md (2.5 KB)
-- claudious_learnings_gotchas.md (3.6 KB)
-- claudious_skills_index.md (1.2 KB)
+- alerts.md
+- learnings/techniques.md
+- learnings/patterns.md
+- learnings/gotchas.md
+- skills/index.md
 
 ## Files Missing: 8 — Not accessible from Cowork sandbox (Windows filesystem)
-- global_CLAUDE.md (~/.claude/CLAUDE.md)
-- global_MEMORY.md (~/.claude/MEMORY.md)
-- global_settings.json (~/.claude/settings.json)
-- asf_CLAUDE.md (Projects/asf-graphics-app/CLAUDE.md)
-- asf_MEMORY.md (Projects/asf-graphics-app/MEMORY.md)
-- asf_.claude_hooks_post-commit
-- asf_.claude_hooks_session-start
-- asf_.claude_hooks_session-end
+- C:\Users\logan\.claude\CLAUDE.md
+- C:\Users\logan\.claude\MEMORY.md
+- C:\Users\logan\.claude\settings.json
+- C:\Users\logan\Projects\asf-graphics-app\CLAUDE.md
+- C:\Users\logan\Projects\asf-graphics-app\MEMORY.md
+- C:\Users\logan\Projects\asf-graphics-app\.claude\hooks\post-commit
+- C:\Users\logan\Projects\asf-graphics-app\.claude\hooks\session-start
+- C:\Users\logan\Projects\asf-graphics-app\.claude\hooks\session-end
 
-## Total Snapshot Size: ~13 KB
+## Total Snapshot Size: ~4 KB
 
 ## Notes
-Global Claude config and ASF Graphics files are on the Windows filesystem and not accessible from the Cowork sandbox environment. These files can only be backed up from a Claude Code terminal session with direct filesystem access. Consider running `scripts/backup-config.sh` from a local terminal to capture the full set.
+Global Claude config and ASF Graphics files are on the Windows filesystem and not accessible from the Cowork sandbox. Only Claudious repo files within the mounted workspace were captured. To capture the full set, run `scripts/backup-config.sh` from a local Claude Code terminal session.
