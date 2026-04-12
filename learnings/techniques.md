@@ -24,8 +24,20 @@
 ### 2026-04-11 — TECHNIQUE — Env Var Layer for Claude Code Tuning
 **Severity:** HIGH
 **Context:** Discovered via March 2026 source leak — Claude Code has internal controls exposed as env vars.
-**Learning:** Add to shell profile: CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1 (fixes April 2026 quality nerf), CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000 (extends auto-compact threshold), CLAUDE_CODE_SUBAGENT_MODEL=claude-sonnet-4-6 (pins sub-agents to 1M context vs Opus 200k cap), CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=true (enables team coordination), CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK=1 (prevents retry double-work).
+**Learning:** Add to shell profile: CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1 (fixes April 2026 quality nerf), CLAUDE_CODE_AUTO_COMPACT_WINDOW=400000 (extends auto-compact threshold), CLAUDE_CODE_SUBAGENT_MODEL=claude-sonnet-4-6 (50-70% cost savings on delegated work; Opus 1M now available if quality needed), CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=true (enables team coordination), CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK=1 (prevents retry double-work).
 **Applies to:** All Claude Code sessions globally — add to shell profile on both Mac and PC
+
+### 2026-04-12 — TECHNIQUE — Context Buffer: 33K-45K Reserved Internally
+**Severity:** HIGH
+**Context:** Scout finding from claudefa.st architecture documentation.
+**Learning:** Claude Code reserves 33K-45K tokens from the context window for internal operations (tool definitions, system prompts, safety). Usable context is ~955K, not the full 1M. Plan compaction triggers at ~900K to leave headroom. Sub-agents have the same reduction — factor into task sizing.
+**Applies to:** All Claude Code sessions — compaction timing and token budget planning
+
+### 2026-04-12 — TECHNIQUE — /compact with Warm Cache Timing (70%+ Token Savings)
+**Severity:** HIGH
+**Context:** Source: mindstudio.ai token management guide. Calling /compact within cache window slashes cost.
+**Learning:** Call `/compact` within 5 minutes of your last message to hit the prompt cache discount. Can shrink 80K-token histories to 12K while preserving critical context. Use every 10-15 turns (or ~25 with 1M context). Always provide a focus string: `/compact Focus on [what matters]` — e.g. "code samples, API patterns, and architecture decisions" or "schema changes and migration state". Expected result: 70%+ total token reduction over a multi-hour session.
+**Applies to:** All Claude Code sessions — especially long builds and multi-hour debugging
 
 ### 2026-04-11 — TECHNIQUE — Skill YAML Full Spec
 **Severity:** HIGH

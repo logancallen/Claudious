@@ -3,6 +3,7 @@
 **Date:** 2026-04-12
 **Priority:** CRITICAL
 **Status:** Action Required
+**Note:** Requires manual deployment — outside Implementer scope. Must open each Claude Code project and run `/memory` to check/enable AutoDream.
 
 ## Background
 AutoDream began phased rollout late March 2026. It automatically consolidates Claude Code memory files — pruning stale entries, merging duplicates, resolving contradictions, and converting relative dates to absolute timestamps.

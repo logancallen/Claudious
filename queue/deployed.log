@@ -1,3 +1,10 @@
 # Pioneer/Evaluator deployed improvements log
 # Format: [DATE-DEPLOYED] [IMPROVEMENT-NAME] [RESULT: WORKING|BROKE|UNCLEAR] [NOTES]
 # Logan adds one line here after deploying any queued improvement
+2026-04-12 add-context-buffer-learning.md DEPLOYED Added 33K-45K context buffer reserve technique to learnings/techniques.md
+2026-04-12 compact-warm-cache-timing.md DEPLOYED Added /compact warm cache timing technique to learnings/techniques.md
+2026-04-12 update-subagent-rationale-techniques.md DEPLOYED Updated subagent model rationale from context-size to cost-savings in learnings/techniques.md
+2026-04-12 clean-stale-alerts.md DEPLOYED Removed 2 stale SCOUT alerts (subagent model, 1M context GA) from alerts.md
+2026-04-12 enable-autodream.md MOVED-TO-PROPOSALS Requires manual /memory check on each Claude Code project
+2026-04-12 frontend-design-skill-official.md MOVED-TO-PROPOSALS Requires manual claude skills add in CLI
+2026-04-12 plugin-hooks-yaml-fix.md MOVED-TO-PROPOSALS Requires manual claude update in CLI
