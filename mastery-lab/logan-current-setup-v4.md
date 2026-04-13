@@ -29,7 +29,7 @@
 | Project | Purpose | Knowledge Source | Status |
 |---|---|---|---|
 | **ASF Graphics** | Primary business app (job tracking, scheduling, invoicing, design) | GitHub sync — 18 files from docs/ + MEMORY.md + pvo_vehicle_sqft.json | Active — primary build |
-| **Courtside Pro** | SaaS product for sports flooring industry intel | GitHub sync — 70 RAG-split files in docs/kb/ | ON HOLD — fully automated, post-sale reactivation |
+| **Courtside Pro** | SaaS product for sports flooring industry intel | GitHub sync — 70 RAG-split files in docs/kb/ | Active — primary focus, demos scheduled |
 | **Court Designer** | Standalone SVG court design tool | Manual uploads | Active — maintenance |
 | **GE Diesel Performance** | Client ecommerce build | Pending | Blocked — awaiting founder interview |
 | **Forensic Investigation** | Family member divorce asset investigation | Manual uploads | Active — sensitive, no Claude Code |

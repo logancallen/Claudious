@@ -116,7 +116,7 @@
 **What changed:** Post-commit hook, session-start/end hooks, sync-knowledge.sh, path-scoped rules (.claude/rules/), 3 skills with full YAML spec, CLAUDE.local.md, MEMORY.md, docs/kb/ (70 RAG-split files from 162KB knowledge-base.md), docs/learnings.md cleaned.
 **Result:** POSITIVE
 **Measured impact:** Fully autonomous knowledge sync loop. Zero manual maintenance needed.
-**Notes:** ON HOLD status — automation in place for reactivation.
+**Notes:** Status upgraded to ACTIVE 2026-04-12 — demos/meetings with contractors and manufacturers scheduled. Automation carried over from post-sale phase.
 
 ### Claudious Repo Built
 **Applied to:** Global (all projects)

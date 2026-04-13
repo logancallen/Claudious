@@ -946,7 +946,7 @@ SKILL.md body:
 | Project | Handles | Repo | Status |
 |---|---|---|---|
 | ASF Graphics | ASF app code, schema, deploys, components, migrations | asf-graphics-app | Active |
-| Courtside Pro | Courtside app, flooring intel | courtside-pro | ON HOLD — no new features |
+| Courtside Pro | Courtside app, flooring intel | courtside-pro | Active — demos scheduled |
 | Court Designer | SVG court design tool, integration planning | court-designer | Active — maintenance |
 | GE Diesel Performance | Client ecommerce build | ge-diesel | Blocked — awaiting founder |
 | Genesis Framework | Cross-project strategy, architecture, bootstrapping | none | Active |

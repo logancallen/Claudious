@@ -19,6 +19,7 @@ Session-on-top of the April 11 build. Captures changes made the following day �
 - **Two-layer role scheme documented as GOTCHA** — `ops_manager` (DB/RLS layer) vs. `ops` (frontend grouping). Conflating them is the root cause of repeated role-docs errors. Captured in Claudious learnings.md.
 - **Cowork sandbox limitations identified** — can't git push (identity workaround added), can't access files outside the working folder (Config Backup + Auto-Harvest partially blocked), permission prompts on every file op (no disable — Cowork is research preview).
 - **ChatGPT Pro Deep Research DISTILL pass confirmed complete** — both 7-section and 13-section reports were processed during Sprint 3 (April 11). Gap #8 marked resolved.
+- **Courtside Pro status upgraded to ACTIVE** — demos/meetings with contractors and manufacturers scheduled in coming weeks.
 
 ---
 
@@ -35,7 +36,7 @@ Session-on-top of the April 11 build. Captures changes made the following day �
 | Genesis Framework | Meta-framework, cross-project coordination | Active |
 | ASF Graphics | Primary SaaS build (React/FastAPI/Supabase) | Active — primary |
 | Court Designer | SVG court design tool | Active — maintenance |
-| Courtside Pro | Sports flooring SaaS | ON HOLD — post-sale |
+| Courtside Pro | Sports flooring SaaS | Active — primary focus, demos scheduled |
 | GE Diesel Performance | Client ecommerce | Blocked — awaiting founder |
 | Forensic Investigation | Divorce asset investigation | Active — sensitive |
 | Claude Mastery Lab | Claude optimization intelligence | Active |
