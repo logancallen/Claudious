@@ -8,3 +8,4 @@
 2026-04-12 enable-autodream.md MOVED-TO-PROPOSALS Requires manual /memory check on each Claude Code project
 2026-04-12 frontend-design-skill-official.md MOVED-TO-PROPOSALS Requires manual claude skills add in CLI
 2026-04-12 plugin-hooks-yaml-fix.md MOVED-TO-PROPOSALS Requires manual claude update in CLI
+2026-04-12 | proposals-cleanup | Deleted 7 stale/resolved proposals, approved 3 graduation candidates | CLEANUP
