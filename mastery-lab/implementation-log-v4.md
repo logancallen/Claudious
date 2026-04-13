@@ -171,6 +171,24 @@
 **What changed:** First drift report generated. Found 17 discrepancies: 11 migrations (020-030) undocumented, 8 new tables not in schema-state.md, 15+ undocumented columns, designer financial model documentation wrong everywhere.
 **Result:** POSITIVE — system working as designed, catching real drift.
 
+### Implementer First Run
+**Applied to:** Claudious queue/ → global config
+**What changed:** Implementer daily task executed first autonomous deploy cycle. 4 SAFE items deployed from queue/ (written to deployed.log), 3 judgment-required items moved to proposals/ for Logan review.
+**Result:** POSITIVE — closes the autonomous loop (Scout → Evaluator → Implementer → Pioneer feedback).
+**Measured impact:** First end-to-end proof that the pipeline deploys without human intervention for SAFE-tier improvements.
+
+### Designer Financial Access Documentation Corrected
+**Applied to:** asf-graphics-app (docs/)
+**What changed:** Designer role financial access corrected across 3 files — CLAUDE.md, business-rules.md, operating-framework.md. Prior docs incorrectly described designers as having broader financial visibility than the RLS policies actually allow.
+**Result:** POSITIVE — docs now match implementation; Drift Detector flagged this on first run.
+**Notes:** Triggered by Drift Detector output. Fix revealed a two-layer role scheme that was previously undocumented (see GOTCHA below).
+
+### Two-Layer Role Scheme Documented as GOTCHA
+**Applied to:** Claudious learnings.md
+**What changed:** Added GOTCHA entry documenting ASF's two-layer role model — `ops_manager` at the database/RLS layer vs. `ops` at the frontend layer. The frontend role is a display-level grouping; the DB role is the actual permission boundary. Conflating them has caused repeated documentation errors (including the designer financial access bug).
+**Result:** POSITIVE — durable capture of a non-obvious architectural detail.
+**Propagate to:** Reference when reasoning about any permission or role logic in ASF.
+
 ---
 
 ## Rejected After Testing

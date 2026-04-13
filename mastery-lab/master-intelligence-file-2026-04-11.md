@@ -6,6 +6,21 @@
 
 ---
 
+## April 12 Update
+
+Session-on-top of the April 11 build. Captures changes made the following day — anything below this section is the April 11 baseline and may be stale where it conflicts with this update.
+
+- **Mastery Lab knowledge files moved to `Claudious/mastery-lab/` and connected via GitHub sync** — no more manual uploads; 8 files now version-controlled with the rest of Claudious.
+- **All 10 Cowork scheduled tasks deployed and manually verified** — Scout, Evaluator, Implementer, Drift Detector, Retrospective, Pioneer, Digest, Config Backup, Auto-Harvest, AutoDream Check.
+- **Implementer task added** — closes the autonomous loop (Scout → Evaluator → Implementer → Pioneer). First run deployed 4 SAFE items and routed 3 to proposals/.
+- **AutoDream confirmed live on Logan's account** — auto-memory: on. CC-008 upgraded from PARTIAL to POSITIVE.
+- **ASF Graphics docs updated** — schema-state.md, codebase-state.md, living-system-state.md corrected against Drift Detector's 17-discrepancy report.
+- **Designer financial access documentation corrected across 3 files** — CLAUDE.md, business-rules.md, operating-framework.md. Prior docs overstated designer financial visibility relative to actual RLS policies.
+- **Two-layer role scheme documented as GOTCHA** — `ops_manager` (DB/RLS layer) vs. `ops` (frontend grouping). Conflating them is the root cause of repeated role-docs errors. Captured in Claudious learnings.md.
+- **Cowork sandbox limitations identified** — can't git push (identity workaround added), can't access files outside the working folder (Config Backup + Auto-Harvest partially blocked), permission prompts on every file op (no disable — Cowork is research preview).
+
+---
+
 ## WHAT WE ARE (Current Stack — April 11, 2026)
 
 **Subscription:** Claude Max ($100/month)

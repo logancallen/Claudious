@@ -34,7 +34,7 @@
 | **GE Diesel Performance** | Client ecommerce build | Pending | Blocked — awaiting founder interview |
 | **Forensic Investigation** | Family member divorce asset investigation | Manual uploads | Active — sensitive, no Claude Code |
 | **Genesis Framework** | Meta-framework for bootstrapping, auditing, and advising projects | Manual uploads + MEMORY.md | Active — framework design & advisory |
-| **Claude Mastery Lab** | THIS PROJECT — Claude optimization intelligence | Manual uploads + MEMORY.md | Active |
+| **Claude Mastery Lab** | THIS PROJECT — Claude optimization intelligence | GitHub sync — 8 files from Claudious/mastery-lab/ + MEMORY.md | Active |
 | **Claudious** | Global intelligence repo — connected to all projects | GitHub sync | Active — fully built and operational |
 
 ---
@@ -189,11 +189,11 @@ Scout discovers → Evaluator triages → queue/ → Implementer deploys → dep
 | 2 | Design Library upload bug | OPEN — files upload but don't display |
 | 3 | Cowork sandbox can't git push autonomously | Limitation — git identity lines added as workaround |
 | 4 | Config Backup + Auto-Harvest limited by sandbox | Partial — rely on Claude Code hooks as primary |
-| 5 | Claudious not connected as knowledge source to all 7 projects | Pending — only ASF and Claudious itself connected |
+| 5 | Claudious not connected as knowledge source to remaining 5 projects | Pending — ASF, Claudious, and Mastery Lab connected; 5 remaining |
 | 6 | Session opener not added to project system instructions | Pending |
 | 7 | Mac Studio env vars not set | Pending — do when at office |
 | 8 | ChatGPT Pro Deep Research DISTILL pass | Pending |
-| 9 | Mastery Lab files not in git (still manual uploads) | Future — move to Claudious/mastery-lab/ |
+| 9 | Mastery Lab files not in git (still manual uploads) | ✅ Resolved April 12 — moved to Claudious/mastery-lab/, GitHub sync connected (8 files) |
 
 ---
 
