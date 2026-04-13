@@ -11,7 +11,7 @@ Living intelligence system for discovering, evaluating, and implementing Claude 
 - research-prompt-kit.md — Grok/ChatGPT research prompt templates
 - task-routing-table.md — platform routing decisions
 - master-intelligence-file-2026-04-11.md — consolidated state from April 11 sprint
-- cowork-scheduled-tasks-guide.md — all 10 Cowork task prompts and setup
+- cowork-scheduled-tasks-guide.md — all 7 Cowork task prompts and setup
 
 ## Processing Pipeline
 - DISTILL mode: raw inputs → technique extraction → cross-reference → playbook entry
@@ -22,9 +22,9 @@ Living intelligence system for discovering, evaluating, and implementing Claude 
 ## Implementation Status (as of April 12, 2026)
 - Sprint 1 (April 7): CC-001 through CC-018 — CLAUDE.md optimization, skills, plugins, hooks, MCP audit
 - Sprint 2 (April 8): CC-019 through CC-025 — env vars, Codex plugin, subagents
-- Sprint 3 (April 11-12): Claudious repo built, Courtside Pro automated, ASF Graphics knowledge consolidated, 10 Cowork scheduled tasks deployed, Implementer closed the loop, AutoDream confirmed live
-- Completed: User Preferences rewrite (PR-003), 6 MCPs disconnected, 4 MEMORY.md files placed, 10 Cowork scheduled tasks deployed, Implementer closed the loop, AutoDream confirmed live, Mastery Lab moved to GitHub sync
-- Pending: connect Claudious to remaining 5 projects, fix migrations 026-028
+- Sprint 3 (April 11-12): Claudious repo built, Courtside Pro automated, ASF Graphics knowledge consolidated, 7 Cowork scheduled tasks deployed, Implementer closed the loop, AutoDream confirmed live
+- Completed: User Preferences rewrite (PR-003), 6 MCPs disconnected, 4 MEMORY.md files placed, 7 Cowork scheduled tasks deployed, Implementer closed the loop, AutoDream confirmed live, Mastery Lab moved to GitHub sync, Cowork reduced to 7 tasks (removed Config Backup, Auto-Harvest, AutoDream Check), .01% additions (pre-push hooks, parallel-build skill, Codex deploy gate) applied to ASF and Courtside Pro
+- Pending: connect Claudious to remaining 5 projects, fix migrations 026-028, GeometryEngine test failures (5 tests, Court Designer)
 
 ## Credibility Hierarchy
 OFFICIAL (Anthropic) > VERIFIED (tested with evidence) > COMMUNITY (widely reported) > ANECDOTAL (single claim)

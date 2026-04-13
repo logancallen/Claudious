@@ -20,6 +20,11 @@ Session-on-top of the April 11 build. Captures changes made the following day �
 - **Cowork sandbox limitations identified** — can't git push (identity workaround added), can't access files outside the working folder (Config Backup + Auto-Harvest partially blocked), permission prompts on every file op (no disable — Cowork is research preview).
 - **ChatGPT Pro Deep Research DISTILL pass confirmed complete** — both 7-section and 13-section reports were processed during Sprint 3 (April 11). Gap #8 marked resolved.
 - **Courtside Pro status upgraded to ACTIVE** — demos/meetings with contractors and manufacturers scheduled in coming weeks.
+- **Cowork tasks reduced from 10 to 7** — removed Config Backup (can't reach external files), Auto-Harvest (can't reach project repos), AutoDream Check (monitoring complete). All 7 remaining tasks updated with git lock cleanup prefix and staggered schedule.
+- **.01% gap closure** — pre-push hooks, parallel-build skill, and Codex-in-deploy-checklist applied to both ASF Graphics and Courtside Pro.
+- **Courtside Pro cloned to PC** at `~/Projects/courtside-pro/` — was previously only on Mac.
+- **GeometryEngine 5 test failures** discovered by new pre-push hook — pre-existing on main, added to fix list.
+- **11 proposals triaged** — 7 deleted (resolved/skipped), 3 graduation candidates approved (skill-triggering-guide, claudemd-optimizer, knowledge-sync-setup), 1 pioneer report archived to retrospectives/.
 
 ---
 

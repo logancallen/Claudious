@@ -13,7 +13,7 @@
 - **Models available:** Opus 4.6, Sonnet 4.6, Haiku 4.5
 - **Context window:** 1M tokens (GA as of March 13, 2026)
 - **Claude Code:** v2.1.104, Opus 4.6, 1M context
-- **Features enabled:** Projects, Artifacts, Memory, Web Search, Deep Research, Code Execution, Skills, MCP Integrations, Cowork (active — 10 scheduled tasks)
+- **Features enabled:** Projects, Artifacts, Memory, Web Search, Deep Research, Code Execution, Skills, MCP Integrations, Cowork (active — 7 scheduled tasks)
 - **AutoDream:** ✅ LIVE — Auto-memory: on, confirmed April 12, 2026
 - **NOT available on Max:** Auto mode (CC-009) — Team/Enterprise/API only
 
@@ -39,7 +39,7 @@
 
 ---
 
-## Custom Skills (7 Claude.ai + 4 Claude Code Global + 3 ASF Project)
+## Custom Skills (7 Claude.ai + 4 Claude Code Global + 4 ASF Project + 2 Courtside Pro Project)
 
 ### Claude.ai Skills (User-level, `/mnt/skills/user/`)
 
@@ -69,6 +69,14 @@
 | `deploy-checklist.md` | 6-step pre-deploy verification | ✅ |
 | `schema-migration.md` | Migration naming, RLS, rollback conventions | ✅ |
 | `component-build.md` | React component patterns, mobile-first | ✅ |
+| `parallel-build.md` | Parallel execution patterns (Agent Teams, split-merge, /batch) | ✅ |
+
+### Courtside Pro Project Skills (.claude/skills/)
+
+| Skill | What It Does | Status |
+|---|---|---|
+| `parallel-build.md` | Parallel execution patterns (Agent Teams, split-merge, /batch) | ✅ |
+| `deploy.md` | Deploy checklist with Codex review gate | ✅ |
 
 ---
 
@@ -133,20 +141,17 @@
 **Local:** C:\Users\logan\OneDrive\Documents\GitHub\Claudious (PC)
 **Connected to:** ALL 8 Claude Projects as knowledge source
 
-### Automated Components (10 Cowork Scheduled Tasks)
+### Automated Components (7 Cowork Scheduled Tasks)
 
 | Task | Frequency | What It Does |
 |---|---|---|
-| Scout | Weekly Sun | 6-search web sweep for new techniques |
-| Evaluator | Weekly Mon | Triages Scout findings → queue/ or proposals/ |
-| Implementer | Daily 2am | Auto-deploys SAFE items from queue/ |
-| Drift Detector | Weekly Wed | Compares schema docs vs actual migrations |
-| Retrospective | Weekly Fri | Prunes, validates, graduates knowledge |
-| Pioneer | Weekly Fri | Analyzes config, proposes improvements |
-| Digest | Weekly Fri | Compiles weekly summary for Logan |
-| Config Backup | Weekly Sat | Snapshots all config files (partial — sandbox limited) |
-| Auto-Harvest | Daily 11pm | Catches missed session learnings (sandbox limited) |
-| AutoDream Check | Weekly Sun | Monitors Anthropic feature rollout |
+| Scout | Weekly Sun 8:45am | 6-search web sweep for new techniques |
+| Evaluator | Weekly Sun 10:40am | Triages Scout findings → queue/ or proposals/ |
+| Implementer | Daily 7:45am | Auto-deploys SAFE items from queue/ |
+| Drift Detector | Weekly Sun 10:10am | Compares schema docs vs actual migrations |
+| Retrospective | Weekly Sun 11:10am | Prunes, validates, graduates knowledge |
+| Pioneer | Weekly Sun 12:30pm | Analyzes config, proposes improvements |
+| Digest | Weekly Sun 9:35pm | Compiles weekly summary for Logan |
 
 ### Closed Loop
 Scout discovers → Evaluator triages → queue/ → Implementer deploys → deployed.log → Pioneer verifies → feeds back to queue/
@@ -154,7 +159,7 @@ Scout discovers → Evaluator triages → queue/ → Implementer deploys → dep
 ### Logan's Time Commitment
 - Weekly: Read Digest (~2 min), review queue/ (~5 min)
 - Monthly: Review proposals/ (~10 min)
-- Total: ~30 min/month
+- Total: ~30 min/month across 7 scheduled tasks
 
 ---
 
@@ -194,6 +199,7 @@ Scout discovers → Evaluator triages → queue/ → Implementer deploys → dep
 | 7 | Mac Studio env vars not set | Pending — do when at office |
 | 8 | ChatGPT Pro Deep Research DISTILL pass | ✅ Resolved April 11 — both 7-section and 13-section reports processed in Sprint 3 |
 | 9 | Mastery Lab files not in git (still manual uploads) | ✅ Resolved April 12 — moved to Claudious/mastery-lab/, GitHub sync connected (8 files) |
+| 10 | GeometryEngine test failures (5 tests) in Court Designer | OPEN — pre-existing, blocks pre-push hook |
 
 ---
 

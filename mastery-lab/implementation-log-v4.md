@@ -191,6 +191,35 @@
 
 ---
 
+### April 12, 2026 — .01% Gap Closure Sprint
+
+**Pre-Push Hook (ASF + Courtside Pro)**
+Applied to: asf-graphics-app, courtside-pro
+What changed: Git pre-push hook blocks push if build or tests fail. Guarded tsc behind tsconfig.json existence check for portability.
+Result: POSITIVE — immediately caught 5 pre-existing GeometryEngine test failures on ASF main.
+
+**Codex Review in Deploy Checklist (ASF + Courtside Pro)**
+Applied to: asf-graphics-app (.claude/skills/deploy-checklist.md), courtside-pro (.claude/skills/deploy.md)
+What changed: /codex:review added as mandatory step before deploy.
+Result: PENDING — not yet used in production deploy.
+
+**Parallel-Build Skill (ASF + Courtside Pro)**
+Applied to: Both repos (.claude/skills/parallel-build.md)
+What changed: New skill documenting 3 parallel execution patterns. CLAUDE.md one-liner added.
+Result: PENDING — first production use planned for migrations 026-028 fix.
+
+**Cowork Tasks Reduced 10 → 7**
+Applied to: Cowork scheduled tasks
+What changed: Removed Config Backup, Auto-Harvest, AutoDream Check. All 7 remaining updated with git lock cleanup prefix. Drift Detector got dedup logic. Schedule staggered 60+ min gaps.
+Result: POSITIVE — eliminates 3 no-value tasks, prevents git lock collisions.
+
+**Proposals Cleanup**
+Applied to: Claudious proposals/
+What changed: 7 resolved/stale proposals deleted, 3 graduation candidates moved to skills/graduated/, pioneer report archived to retrospectives/.
+Result: POSITIVE — proposals/ reduced from 12 to 5 active items.
+
+---
+
 ## Rejected After Testing
 
 ### CC-009: Auto Mode Permissions
