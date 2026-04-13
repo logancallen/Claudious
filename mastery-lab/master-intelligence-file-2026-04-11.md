@@ -18,6 +18,7 @@ Session-on-top of the April 11 build. Captures changes made the following day �
 - **Designer financial access documentation corrected across 3 files** — CLAUDE.md, business-rules.md, operating-framework.md. Prior docs overstated designer financial visibility relative to actual RLS policies.
 - **Two-layer role scheme documented as GOTCHA** — `ops_manager` (DB/RLS layer) vs. `ops` (frontend grouping). Conflating them is the root cause of repeated role-docs errors. Captured in Claudious learnings.md.
 - **Cowork sandbox limitations identified** — can't git push (identity workaround added), can't access files outside the working folder (Config Backup + Auto-Harvest partially blocked), permission prompts on every file op (no disable — Cowork is research preview).
+- **ChatGPT Pro Deep Research DISTILL pass confirmed complete** — both 7-section and 13-section reports were processed during Sprint 3 (April 11). Gap #8 marked resolved.
 
 ---
 

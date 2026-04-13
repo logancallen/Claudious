@@ -192,7 +192,7 @@ Scout discovers → Evaluator triages → queue/ → Implementer deploys → dep
 | 5 | Claudious not connected as knowledge source to remaining 5 projects | Pending — ASF, Claudious, and Mastery Lab connected; 5 remaining |
 | 6 | Session opener not added to project system instructions | Pending |
 | 7 | Mac Studio env vars not set | Pending — do when at office |
-| 8 | ChatGPT Pro Deep Research DISTILL pass | Pending |
+| 8 | ChatGPT Pro Deep Research DISTILL pass | ✅ Resolved April 11 — both 7-section and 13-section reports processed in Sprint 3 |
 | 9 | Mastery Lab files not in git (still manual uploads) | ✅ Resolved April 12 — moved to Claudious/mastery-lab/, GitHub sync connected (8 files) |
 
 ---
