@@ -14,3 +14,16 @@
 2026-04-12 2026-04-12-commit-subagents-to-repo PROPOSED
 2026-04-12 2026-04-12-mcp-prompt-caching-tools REDUNDANT
 2026-04-12 2026-04-12-context-buffer-reserve REDUNDANT
+2026-04-13 2026-04-13-autocompact-pct-override | PROPOSED | TEST-FIRST; interacts with AUTO_COMPACT_WINDOW already in env
+2026-04-13 2026-04-13-plan-v2-agent-count | PROPOSED | TEST-FIRST; token cost scales linearly, unclear ROI on small repos
+2026-04-13 2026-04-13-fine-grained-tool-streaming | QUEUED | SAFE + HIGH + TRIVIAL — single env var, no downsides
+2026-04-13 2026-04-13-mcp-connection-batch-size | QUEUED | SAFE + HIGH + TRIVIAL — Logan runs 5+ MCP servers
+2026-04-13 2026-04-13-precompact-hook-blocking | PROPOSED | TEST-FIRST; requires hook authoring + trigger logic
+2026-04-13 2026-04-13-stalled-stream-auto-abort | REDUNDANT | Automatic behavior after claude update; no config change
+2026-04-13 2026-04-13-memory-leak-long-sessions | REDUNDANT | Automatic fix after claude update; no config change
+2026-04-13 2026-04-13-bash-permission-bypass-patch | PROPOSED | Manual claude update required on Mac+PC; security priority
+2026-04-13 2026-04-13-skill-description-1536-chars | PROPOSED | MEDIUM effort — audit + rewrite 15+ skill descriptions
+2026-04-13 2026-04-13-mcp-sse-buffer-leak-fix | REDUNDANT | Automatic fix after claude update; no config change
+2026-04-13 2026-04-13-subagent-invocation-quality | PROPOSED | Touches CLAUDE.md — multiplicative token cost; project-first rollout
+2026-04-13 2026-04-13-perplexity-model-council | PROPOSED | Subscription + ROI review needed
+
