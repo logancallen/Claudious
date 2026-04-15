@@ -27,4 +27,10 @@
 **Learning:** SessionEnd directive prompts Claude to write handoff to .claude/handoff.md (completed, pending, blockers, next action). SessionStart reads handoff.md and pre-appends to new session. Eliminates manual handoff writing entirely. Add handoff.md to .gitignore. Primary mechanism is CLAUDE.md directive (in-context), not a scheduled task.
 **Applies to:** All Claude Code projects
 
+### 2026-04-15 — PATTERN — Operator Pattern with allowedTools Scoping
+**Severity:** HIGH
+**Context:** Central orchestrator + specialized subagents becomes deterministic when orchestrator uses --allowedTools to restrict each subagent's tool access.
+**Learning:** Define orchestrator with narrow scope (Task, Bash), spawn subagents with restricted scopes (frontend: Edit,Read,Glob — no Bash; DB: Bash,Read — no Edit). Prevents scope creep.
+**Applies to:** All projects using .claude/agents/ subagent definitions.
+
 ## Archive

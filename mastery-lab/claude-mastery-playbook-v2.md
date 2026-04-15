@@ -861,3 +861,30 @@ The freshness protocol changed the constitution version from v6 → v7.
 The `final-claude-md-constitution-v7.md` and `final-mythos-emulator-skill-v7.md`
 replace the v6 files from the previous session. Do not commit the v6 files.
 
+---
+
+## CC-038: CLAUDE.md Iterative Optimization via Prompt Learning
+
+**Category:** Claude Code
+**Platform:** Claude Code
+**Source:** Arize AI (Aparna Dhinakaran), SWE Bench research, November 2025
+**Credibility:** VERIFIED
+**Model Version:** Universal
+
+**What it is:** RL-inspired methodology for systematically improving CLAUDE.md rules. Run repeatable failing tasks, diff outputs against desired results, extract corrective instructions, test each addition for improvement AND test removal (bloat hurts). Converts CLAUDE.md optimization from guessing to measuring. +5-10% code generation accuracy on SWE Bench with zero architecture changes.
+
+**Implementation:**
+1. Identify a repeatable failing pattern in Claude Code (e.g., forgets tests, misnames files)
+2. Run the task against current CLAUDE.md, document actual output
+3. Behavioral diff: what went wrong, what instruction would have prevented it
+4. Write corrective rule as a single CLAUDE.md line (specific, not aspirational)
+5. Add rule, re-run same task — did it fix?
+6. Test removal — remove rule, re-run. If bug doesn't return, rule wasn't the fix. Delete it.
+7. Cycle weekly on highest-failure-rate workflow per project
+
+**Logan Relevance:** NEW
+**Impact Estimate:** HIGH — compounds with every CLAUDE.md rule, makes CC-001 and all per-project rules more effective
+**Effort:** LOW (<30 min per cycle)
+**Dependencies:** CC-001 (CLAUDE.md optimization) — already implemented
+**Compounding:** Amplifies all CLAUDE.md rules. Feeds Pioneer config health assessment.
+

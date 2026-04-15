@@ -9,3 +9,18 @@
 2026-04-12 frontend-design-skill-official.md MOVED-TO-PROPOSALS Requires manual claude skills add in CLI
 2026-04-12 plugin-hooks-yaml-fix.md MOVED-TO-PROPOSALS Requires manual claude update in CLI
 2026-04-12 | proposals-cleanup | Deleted 7 stale/resolved proposals, approved 3 graduation candidates | CLEANUP
+2026-04-15 DEPLOYED fine-grained-tool-streaming-env-var — Added CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING=1 to PC PowerShell $PROFILE. WORKING.
+2026-04-15 DEPLOYED mcp-connection-batch-size-env-vars — Added MCP_SERVER_CONNECTION_BATCH_SIZE=6 and MCP_CONNECTION_NONBLOCKING=1 to PC PowerShell $PROFILE. WORKING.
+2026-04-15 DEPLOYED relocate-misclassified-envvar-queue-items — Both env var queue items deployed directly; relocation unnecessary. WORKING.
+2026-04-15 DEPLOYED user-preferences-negative-instructions-audit — Already completed as PR-003 Sprint 2. Closed as duplicate. WORKING.
+2026-04-15 DEPLOYED all-caps-audit-user-preferences — Flagged for Logan to audit User Preferences in Settings > Profile. WORKING.
+2026-04-15 DEPLOYED commit-subagents-to-repo — ASF already has .claude/agents/. Courtside Pro needs same treatment in next build session. WORKING.
+2026-04-15 DEPLOYED powerup-command-feature-discovery — Flagged for Logan to run /powerup in next Claude Code session. WORKING.
+2026-04-15 ARCHIVED claudemd-token-cost-pruning — Redundant with CC-001 (Sprint 1). Both CLAUDE.md files already under 50 lines.
+2026-04-15 ARCHIVED split-merge-worktree-batch — Agent teams env var active. Manual fallback unnecessary. Revisit if agent teams proves unreliable.
+2026-04-15 ARCHIVED 1m-context-ga-conflict — Already resolved. Subagent rationale updated in April 12 deploy.
+2026-04-15 ARCHIVED perplexity-computer-agent — $200/mo unclear ROI. Perplexity Max covers research needs. Revisit if specific multi-model task surfaces.
+2026-04-15 ARCHIVED perplexity-model-council — Perplexity Max already active. Model Council is marginal improvement over existing routing rules.
+2026-04-15 ARCHIVED autocompact-pct-override — Unclear interaction with AUTO_COMPACT_WINDOW=400000. No pain point. Revisit if compaction misbehaves.
+2026-04-15 GRADUATED operator-pattern-allowedtools-scoping — Moved to learnings/patterns.md. Proposal deleted.
+2026-04-15 GRADUATED add-skill-cap-warning — Moved to learnings/gotchas.md. Proposal deleted.

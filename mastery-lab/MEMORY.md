@@ -24,6 +24,7 @@ Living intelligence system for discovering, evaluating, and implementing Claude 
 - Sprint 2 (April 8): CC-019 through CC-025 — env vars, Codex plugin, subagents
 - Sprint 3 (April 11-12): Claudious repo built, Courtside Pro automated, ASF Graphics knowledge consolidated, 7 Cowork scheduled tasks deployed, Implementer closed the loop, AutoDream confirmed live
 - Completed: User Preferences rewrite (PR-003), 6 MCPs disconnected, 4 MEMORY.md files placed, 7 Cowork scheduled tasks deployed, Implementer closed the loop, AutoDream confirmed live, Mastery Lab moved to GitHub sync, Cowork reduced to 7 tasks (removed Config Backup, Auto-Harvest, AutoDream Check), .01% additions (pre-push hooks, parallel-build skill, Codex deploy gate) applied to ASF and Courtside Pro
+- Sprint 4 (April 15): PC env vars updated (+3 new), proposals batch decision (7 install, 2 graduate, 6 archive, 2 keep), CC-038 (Arize prompt learning) added to playbook
 - Pending: connect Claudious to remaining 5 projects, fix migrations 026-028, GeometryEngine test failures (5 tests, Court Designer)
 
 ## Credibility Hierarchy

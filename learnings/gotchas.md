@@ -39,4 +39,10 @@
 **Learning:** git config core.hooksPath .claude/hooks must be set per repo. On PC it may not persist reliably across sessions. Verify at start of any Claude Code session involving hooks: git config core.hooksPath. If empty: re-run git config core.hooksPath .claude/hooks. Add verification to session-start hook output.
 **Applies to:** All Claude Code projects using .claude/hooks/ on Windows PC
 
+### 2026-04-15 — GOTCHA — Skill Description Truncation Cap (34-36 skills)
+**Severity:** HIGH
+**Context:** Claude Code truncates skill descriptions when total count exceeds ~34-36.
+**Learning:** Monitor total skill count across global + project scopes. If approaching 34, consolidate or remove low-value skills. No error is thrown — descriptions silently truncate.
+**Applies to:** All Claude Code sessions with many custom skills.
+
 ## Archive

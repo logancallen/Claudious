@@ -26,4 +26,15 @@
 2026-04-13 2026-04-13-mcp-sse-buffer-leak-fix | REDUNDANT | Automatic fix after claude update; no config change
 2026-04-13 2026-04-13-subagent-invocation-quality | PROPOSED | Touches CLAUDE.md — multiplicative token cost; project-first rollout
 2026-04-13 2026-04-13-perplexity-model-council | PROPOSED | Subscription + ROI review needed
+2026-04-14 2026-04-14-mantle-auth-proxy | REDUNDANT | N/A to Logan's direct-API setup (Bedrock-specific); informational only
+2026-04-14 2026-04-14-mcp-allowlist-env | PROPOSED | Security hardening — file already drafted (proposals/mcp-allowlist-env-security-hardening.md); needs MCP env audit before rollout
+2026-04-14 2026-04-14-anthropic-aws-provider | REDUNDANT | N/A to Logan's direct-API setup (AWS EDP/enterprise-specific); informational only
+2026-04-14 2026-04-14-arize-prompt-learning-claudemd | QUEUED | SAFE + HIGH + TRIVIAL — md-only addition to techniques.md (queue/add-arize-prompt-learning-technique.md)
+2026-04-14 2026-04-14-powerup-lessons | PROPOSED | SAFE — requires manual Claude Code CLI session; file drafted (proposals/powerup-command-feature-discovery.md)
+2026-04-14 2026-04-14-operator-pattern-allowedtools | PROPOSED | TEST-FIRST — subagent refactor required; file drafted (proposals/operator-pattern-allowedtools-scoping.md)
+2026-04-14 2026-04-14-mcp-gateway-pattern | PROPOSED | REVIEW-REQUIRED — new infra component, only relevant if multi-user Claude workflows land
+2026-04-14 2026-04-14-mcp-stateless-redis-sessions | PROPOSED | REVIEW-REQUIRED — informational; applies only if ASF/Courtside build self-hosted MCP server
+2026-04-14 2026-04-14-mcp-circuit-breaker | PROPOSED | TEST-FIRST — hook-based wrapper; revisit after next MCP flap event
+2026-04-14 2026-04-14-spec-first-plan-mode | QUEUED | SAFE + HIGH + TRIVIAL — md-only addition to patterns.md (queue/add-spec-first-plan-mode-pattern.md)
+2026-04-14 2026-04-14-perplexity-session-memory-pages | PROPOSED | SAFE — external tool routing update; bundle with perplexity-model-council subscription review
 
