@@ -51,4 +51,10 @@
 **Learning:** Monitor total skill count across global + project scopes. If approaching 34, consolidate or remove low-value skills. No error is thrown — descriptions silently truncate.
 **Applies to:** All Claude Code sessions with many custom skills.
 
+### 2026-04-15 — GOTCHA — Cowork Cannot Access Multiple Repos Simultaneously
+**Severity:** HIGH
+**Context:** Drift Detector Cowork task failed because it needs both Claudious and asf-graphics-app repos. Cowork sandbox only mounts one working folder.
+**Learning:** Any task requiring cross-repo access must run in Claude Code, not Cowork. This also killed Config Backup and Auto-Harvest.
+**Applies to:** All Cowork scheduled tasks that reference files outside the mounted working folder.
+
 ## Archive

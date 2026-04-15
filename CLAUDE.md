@@ -37,3 +37,4 @@ bash ~/Projects/claudious/scripts/rollback-config.sh YYYY-MM-DD
 - scripts/sync-knowledge.sh — one-command knowledge push
 - scripts/backup-config.sh — weekly config snapshot
 - scripts/rollback-config.sh — restore config from snapshot
+- scripts/drift-check.sh — Run `bash scripts/drift-check.sh` monthly or before any migration work
