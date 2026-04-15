@@ -42,6 +42,14 @@ OFFICIAL (Anthropic) > VERIFIED (tested with evidence) > COMMUNITY (widely repor
 - Content: frameworks, hidden tools, mental models, agent architecture
 
 ## Deployment Status
+- April 14, 2026 (later session): MCP expansion + global skills deployment.
+  Added 3 Claude Code MCPs (Playwright, TranscriptAPI, GitHub). Deployed 3
+  global Claude Code skills (health-optimizer, macro-intelligence,
+  negotiation-playbook). Cowork expanded from 7 to 8 scheduled tasks —
+  Evidence Loop added to verify that deployed techniques produced measurable
+  impact (closes Implementer → playbook feedback gap). All 8 Cowork task
+  prompts audited and corrected (paths, output contracts, scope language).
+  Global agents directory received fixes during audit.
 - April 14, 2026: Mythos Emulator Constitution v7 deployed to ASF Graphics and
   Courtside Pro (Court Designer and Genesis Framework SKIPPED — repos not
   present at expected paths on this machine; re-run when available). Universal

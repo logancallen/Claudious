@@ -1,6 +1,6 @@
 # Logan's Current Claude Setup — Baseline Snapshot v4
 
-**Last Updated:** April 12, 2026 (post-Claudious build + ASF consolidation + Cowork deployment)
+**Last Updated:** April 14, 2026 (post-MCP expansion + global skills deployment + Cowork Evidence Loop addition)
 **Purpose:** This file gives the Mastery Lab project awareness of Logan's existing Claude infrastructure so it can accurately identify gaps, avoid redundant recommendations, and prioritize high-leverage improvements.
 
 **Update trigger:** Update this file whenever a significant change is made to any Claude project, skill, preference, or integration.
@@ -13,7 +13,7 @@
 - **Models available:** Opus 4.6, Sonnet 4.6, Haiku 4.5
 - **Context window:** 1M tokens (GA as of March 13, 2026)
 - **Claude Code:** v2.1.104, Opus 4.6, 1M context
-- **Features enabled:** Projects, Artifacts, Memory, Web Search, Deep Research, Code Execution, Skills, MCP Integrations, Cowork (active — 7 scheduled tasks)
+- **Features enabled:** Projects, Artifacts, Memory, Web Search, Deep Research, Code Execution, Skills, MCP Integrations, Cowork (active — 8 scheduled tasks)
 - **AutoDream:** ✅ LIVE — Auto-memory: on, confirmed April 12, 2026
 - **NOT available on Max:** Auto mode (CC-009) — Team/Enterprise/API only
 
@@ -39,7 +39,7 @@
 
 ---
 
-## Custom Skills (7 Claude.ai + 4 Claude Code Global + 4 ASF Project + 2 Courtside Pro Project)
+## Custom Skills (7 Claude.ai + 7 Claude Code Global + 4 ASF Project + 2 Courtside Pro Project)
 
 ### Claude.ai Skills (User-level, `/mnt/skills/user/`)
 
@@ -61,6 +61,9 @@
 | `pioneer` | Claude self-improvement engine | ✅ |
 | `project-router` | Routes tasks to correct Claude Project | ✅ |
 | `caveman` | 75% internal token reduction | ✅ |
+| `health-optimizer` | Training, recovery, nutrition, sleep advisor for Logan | ✅ |
+| `macro-intelligence` | Macro, investing, and portfolio intelligence for Logan | ✅ |
+| `negotiation-playbook` | Counterparty profiling, negotiation strategy, sales framework | ✅ |
 
 ### ASF Graphics Project Skills (.claude/skills/)
 
@@ -130,8 +133,16 @@
 | Clarify | ❌ Disconnected April 12 |
 
 ### Claude Code
-- 2 project-relevant MCP servers kept
+
+| MCP Server | Status | Purpose |
+|---|---|---|
+| Playwright | ✅ Connected | Browser automation for UI testing and verification |
+| TranscriptAPI | ✅ Connected | YouTube transcript ingestion for Mastery Lab DISTILL pipeline |
+| GitHub | ✅ Connected | Repo, PR, and issue operations from within Claude Code |
+
+- 2 project-relevant MCP servers kept from Sprint 1
 - 3 unused servers disconnected (Sprint 1, ~8,400 tokens/msg saved)
+- 3 new servers added April 14, 2026 (Playwright, TranscriptAPI, GitHub)
 
 ---
 
@@ -141,7 +152,7 @@
 **Local:** C:\Users\logan\OneDrive\Documents\GitHub\Claudious (PC)
 **Connected to:** ALL 8 Claude Projects as knowledge source
 
-### Automated Components (7 Cowork Scheduled Tasks)
+### Automated Components (8 Cowork Scheduled Tasks)
 
 | Task | Frequency | What It Does |
 |---|---|---|
@@ -152,6 +163,9 @@
 | Retrospective | Weekly Sun 11:10am | Prunes, validates, graduates knowledge |
 | Pioneer | Weekly Sun 12:30pm | Analyzes config, proposes improvements |
 | Digest | Weekly Sun 9:35pm | Compiles weekly summary for Logan |
+| Evidence Loop | Weekly | Verifies deployed techniques produced measurable impact; closes the loop between Implementer and playbook |
+
+**April 14, 2026:** All 8 task prompts audited and corrected — fixed path references, tightened output contracts, removed ambiguous scope language, and verified each task against its required inputs/outputs.
 
 ### Closed Loop
 Scout discovers → Evaluator triages → queue/ → Implementer deploys → deployed.log → Pioneer verifies → feeds back to queue/
@@ -159,7 +173,7 @@ Scout discovers → Evaluator triages → queue/ → Implementer deploys → dep
 ### Logan's Time Commitment
 - Weekly: Read Digest (~2 min), review queue/ (~5 min)
 - Monthly: Review proposals/ (~10 min)
-- Total: ~30 min/month across 7 scheduled tasks
+- Total: ~30 min/month across 8 scheduled tasks
 
 ---
 

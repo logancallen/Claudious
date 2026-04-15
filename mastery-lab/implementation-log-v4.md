@@ -2,7 +2,7 @@
 
 **Purpose:** Track every technique implemented from the playbook — what changed, where, and whether it worked. This creates the feedback loop that makes the Mastery Lab smarter over time.
 
-**Last Updated:** April 12, 2026
+**Last Updated:** April 14, 2026
 
 ---
 
@@ -217,6 +217,42 @@ Result: POSITIVE — eliminates 3 no-value tasks, prevents git lock collisions.
 Applied to: Claudious proposals/
 What changed: 7 resolved/stale proposals deleted, 3 graduation candidates moved to skills/graduated/, pioneer report archived to retrospectives/.
 Result: POSITIVE — proposals/ reduced from 12 to 5 active items.
+
+---
+
+## April 14, 2026 — MCP Expansion + Global Skills + Cowork Evidence Loop
+
+### Claude Code MCP Expansion (Playwright + TranscriptAPI + GitHub)
+**Applied to:** Claude Code (global)
+**What changed:** Installed 3 new MCP servers:
+- Playwright — browser automation for UI testing/verification directly from Claude Code
+- TranscriptAPI — YouTube transcript ingestion for Mastery Lab DISTILL pipeline (removes manual copy/paste step)
+- GitHub — repo, PR, and issue operations from inside Claude Code
+**Result:** POSITIVE
+**Measured impact:** DISTILL pipeline can now pull transcripts autonomously; UI regressions verifiable without leaving Claude Code; GitHub ops (PRs, issue triage) consolidated into the CC loop.
+**Propagate to:** All active Claude Code projects inherit automatically (global scope).
+
+### Global Claude Code Skills (health-optimizer, macro-intelligence, negotiation-playbook)
+**Applied to:** Claude Code (global — ~/.claude/skills/)
+**What changed:** Deployed 3 new personal-domain skills:
+- health-optimizer — training, recovery, nutrition, sleep, supplement advisor
+- macro-intelligence — investing, portfolio, macro thesis, position sizing
+- negotiation-playbook — counterparty profiling, proposal/RFP drafting, deal structuring (BuyBoard, school district procurement, contractor/manufacturer meetings)
+**Result:** POSITIVE — global skill count 4 → 7.
+**Notes:** Triggers tuned to avoid false positives with business-ops tasks (e.g., macro-intelligence skips routine Courtside Pro financials; negotiation-playbook skips internal invoicing).
+
+### Cowork Task 8: Evidence Loop Added
+**Applied to:** Cowork scheduled tasks
+**What changed:** Added 8th weekly task — Evidence Loop. Verifies that techniques marked "deployed" in deployed.log actually produced measurable impact; closes the Implementer → playbook feedback gap identified in prior sprints. Cowork total: 7 → 8.
+**Result:** POSITIVE — previously the loop ended at "deployed"; now it ends at "verified impact or flagged for review."
+**Notes:** Without Evidence Loop, Pioneer had no signal on whether deployed SAFE items were actually working in practice — only whether they landed.
+
+### All 8 Cowork Task Prompts Audited and Corrected
+**Applied to:** Cowork scheduled tasks (all 8)
+**What changed:** Full audit pass across Scout, Evaluator, Implementer, Drift Detector, Retrospective, Pioneer, Digest, Evidence Loop prompts. Fixed path references, tightened output contracts (explicit file targets and schemas), removed ambiguous scope language, verified each task against its required inputs/outputs. Global agents directory received fixes surfaced during the audit.
+**Result:** POSITIVE
+**Measured impact:** Prompts now deterministic about where to read from and write to — reduces Cowork sandbox failure modes (wrong path, silent no-op, ambiguous handoff).
+**Notes:** Audit triggered by realization that Evidence Loop couldn't be added cleanly without first normalizing what the other 7 tasks were actually writing.
 
 ---
 
