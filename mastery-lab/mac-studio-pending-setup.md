@@ -17,3 +17,5 @@ claude mcp add --transport http transcript-api https://transcriptapi.com/mcp
 # GitHub MCP requires PAT — see phase1-mcp-installs.md
 git clone https://github.com/zarazhangrui/follow-builders.git ~/.claude/skills/follow-builders
 cd ~/.claude/skills/follow-builders/scripts && npm install
+
+# Copy the ## Proactive Tool Recommendations section from PC's ~/.claude/CLAUDE.md to Mac's ~/.claude/CLAUDE.md
