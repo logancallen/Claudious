@@ -13,5 +13,3 @@
 
 ### 2026-04-12 — CRITICAL — AUTODREAM
 AutoDream is now available in phased rollout (started late March 2026). Feature consolidates Claude Code memory files automatically — prunes stale entries, merges duplicates, resolves contradictions, converts relative dates to absolute. Activates when 24hrs since last org + 5 new records. Check Claude Code `/memory` settings on all projects to confirm enablement.
-
-2026-04-14 CRITICAL ASF-GRAPHICS Migrations 026-028 broke employee permissions. Root cause unidentified. Do NOT run new migrations until resolved. Dedicated audit session required.
