@@ -4,7 +4,7 @@ set -e
 
 # Detect machine
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OS" == "Windows_NT" ]]; then
-    REPO_PATH="C:/Users/logan/OneDrive/Documents/GitHub/Claudious"
+    REPO_PATH="C:/Users/logan/Projects/Claudious"
     HOME_PATH="C:/Users/logan"
     PROJECTS_PATH="C:/Users/logan/Projects"
     CP_PATH="C:/Users/logan/courtside-pro"

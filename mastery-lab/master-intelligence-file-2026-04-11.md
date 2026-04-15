@@ -194,7 +194,7 @@ All knowledge files current forever
 Global intelligence repo connected to ALL 7 Claude Projects. Every session in every project feeds it. It feeds every future session everywhere.
 
 **Repo:** `logancallen/Claudious` (GitHub, private)
-**Local path:** `C:\Users\logan\OneDrive\Documents\GitHub\Claudious`
+**Local path:** `C:\Users\logan\Projects\Claudious`
 
 **What it contains:**
 ```

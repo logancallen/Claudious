@@ -3,6 +3,12 @@
 
 ## Active Gotchas
 
+### 2026-04-15 — GOTCHA — OneDrive Corrupts .git Index Files
+**Severity:** CRITICAL
+**Context:** Claudious repo in OneDrive caused .git/index corruption and sticky index.lock files. Every Cowork scheduled task hitting the mount failed on git add.
+**Learning:** Never store git repos inside OneDrive-synced folders. OneDrive syncs .git/ binary internals and creates lock file conflicts. Move repos to a non-synced path (C:\Users\logan\Projects\).
+**Applies to:** All git repos on Windows machines with OneDrive active.
+
 ### 2026-04-11 — GOTCHA — PostgREST Silent 1000-Row Truncation
 **Severity:** CRITICAL
 **Context:** Root cause of persistent vehicle/trailer dropdown bug in ASF Graphics that survived multiple fix attempts.

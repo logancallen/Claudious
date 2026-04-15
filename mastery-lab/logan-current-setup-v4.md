@@ -153,7 +153,7 @@
 ## Claudious — Autonomous Intelligence System
 
 **Repo:** logancallen/Claudious (GitHub, private)
-**Local:** C:\Users\logan\OneDrive\Documents\GitHub\Claudious (PC)
+**Local:** C:\Users\logan\Projects\Claudious (PC)
 **Connected to:** ALL 8 Claude Projects as knowledge source
 
 ### Automated Components (8 Cowork Scheduled Tasks)
