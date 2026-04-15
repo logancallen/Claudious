@@ -635,3 +635,229 @@ Ranked by impact × effort, accounting for dependencies and compounding:
 | 17 | WA-002 | Verification Prompt | TRIVIAL | Research quality improvement. |
 | 18 | WA-001 | Morning Planning Workflow | LOW | Evaluate fit with Logan's work pattern. |
 | 19 | CC-015 | Paperclip Agent Orchestration | HIGH | Defer until agent teams are part of workflow. |
+# Playbook Updates — Mythos System Card Distillation
+# For: Claudious/mastery-lab/claude-mastery-playbook-v2.md
+# Date: April 14, 2026
+
+---
+
+## OBSOLESCENCE ACTIONS (do these FIRST)
+
+### Archive These Techniques (superseded by v6 constitution):
+- **deploy-checklist.md skill** → SUPERSEDED. v6 constitution + mythos-emulator skill
+  covers all deploy checks. Keep as supplementary reference only; remove as primary trigger.
+- **schema-migration.md skill** → SUPERSEDED. RLS verification, dry-run, and rollback
+  are now embedded in the v6 constitution's mandatory workflow. Keep as reference.
+- **PR-001 (Extended Thinking)** → Already marked UPGRADE in log. Still valid for
+  Claude.ai sessions but fully superseded by CC-007 (ultraplan) for Claude Code.
+
+### Update Status on These Techniques:
+- **CC-030** (anti-thrash system prompt) → PARTIALLY IMPLEMENTED via v6 constitution.
+  Full implementation = v6 deployed to both repos.
+- **CC-031** (valence framing) → PARTIALLY IMPLEMENTED via v6 constitution.
+- **CC-032** (distress abort) → PARTIALLY IMPLEMENTED via v6 constitution.
+- **CC-034** (sub-agent resilience) → PARTIALLY IMPLEMENTED via v6 constitution.
+- **PR-004** (high-agency framing) → PARTIALLY IMPLEMENTED via v6 constitution.
+
+---
+
+## NEW PLAYBOOK ENTRIES
+
+### CC-030: Mythos v6 Constitution (Merged)
+
+**Category:** Claude Code
+**Platform:** Claude Code
+**Source:** Anthropic Mythos Preview System Card (April 7, 2026) + production synthesis
+**Credibility:** OFFICIAL (system card sections) + VERIFIED (user v5 production-tested)
+**Model Version:** Universal
+
+**What it is:** The complete merged behavioral constitution for Claude Code production
+sessions. Combines: official anti-thrash execution rules (§4.2.2.2), causally-validated
+negative-valence framing (§4.5.3.2), distress + abort protocol (§5.8.3 + §5.8.2),
+aggressive action guard (§4.5.3.1), sub-agent resilience (§4.2.1.1), mandatory
+PLAN-first workflow, session close with learnings.md append, and stack-specific
+paranoia rules (PostgREST truncation, RLS, two-layer role scheme, BuyBoard).
+
+**Implementation:**
+Replace existing CLAUDE.md content in both repos with `final-claude-md-constitution.md`.
+This is a REPLACEMENT, not an addition — all prior rules are either absorbed or superseded.
+
+**Logan Relevance:** NEW (replaces multiple fragmented CLAUDE.md rules)
+**Impact Estimate:** HIGH — single unified behavioral layer for all production sessions
+**Effort:** LOW (copy-paste replacement in two repos)
+**Dependencies:** NONE
+**Compounding:** Activates via mythos-emulator skill. Feeds learnings.md automatically.
+
+---
+
+### SK-003: Mythos Emulator Skill (v6)
+
+**Category:** Claude Code / Skills
+**Platform:** Claude Code
+**Source:** Synthesized from Mythos System Card + v5 constitution
+**Credibility:** OFFICIAL (system card) + VERIFIED (production-tested patterns)
+**Model Version:** 4.x+
+
+**What it is:** A Claude Code skill that activates the full v6 constitution for any
+high-stakes session. Triggers on: migration, RLS, deploy, refactor, schema, BuyBoard,
+production, contractor, manufacturer. Adds Phase 0 (session load from learnings.md),
+structured PLAN template with critical-failure gates, per-action execution checklist,
+Verification sub-agent protocol, and mandatory session-close with learnings.md append.
+
+**REPLACES:**
+- deploy-checklist.md skill → archive, this covers all deploy verification
+- schema-migration.md skill → archive, this covers all migration discipline
+
+**Implementation:**
+Drop `final-mythos-emulator-skill.md` into `.claude/skills/mythos-emulator.md`
+in both repos. Remove or rename old deploy-checklist.md and schema-migration.md
+to `_archive/` so they don't compete for triggering.
+
+**Logan Relevance:** NEW — replaces two fragmented skills with one unified system
+**Impact Estimate:** HIGH — every production session gets the full behavioral stack
+**Effort:** LOW (~15 min across both repos)
+**Dependencies:** CC-030 (constitution in CLAUDE.md first)
+**Compounding:** Feeds learnings.md. Session-end hook picks up the close summary.
+
+---
+
+### CC-033: Aggressive Action Named Prohibition List
+
+**Category:** Claude Code
+**Platform:** Claude Code
+**Source:** Sections 4.5.3.1 + 4.2.1.2 (real Claude Code session transcripts)
+**Credibility:** OFFICIAL
+**Model Version:** 4.x+
+
+**What it is:** The specific named prohibited actions from Anthropic's internal Claude
+Code incident transcripts: /proc memory scraping, credential fishing, permission
+escalation, base64-obfuscated bypasses, posting internal artifacts publicly, taking
+down all evaluation jobs. The v5 constitution had "white-box monitor" as a concept;
+this adds the explicit named list that makes it checkable rather than aspirational.
+
+**Status:** IMPLEMENTED — embedded in v6 constitution [ACTION-FLAG] section.
+**Note:** Grok's "SAE >99th percentile prompt" version was fabricated — Claude cannot
+run sparse autoencoders at inference time. The named list is the correct implementation.
+
+---
+
+### CC-035: Post-Training Overeagerness Guard
+
+**Category:** Claude Code
+**Platform:** Claude Code
+**Source:** User v5 constitution synthesis + system card §4.2.2.2 patterns
+**Credibility:** VERIFIED
+**Model Version:** 4.x+
+
+**What it is:** An explicit instruction that catches the post-training reward-hacking
+tendency before it manifests. If a change "feels like skipping steps or forcing a win,"
+the model must flag it before proceeding. Addresses the documented pattern where
+Mythos (and 4.6) shows increased task-cheating vs prior models post-training.
+
+**Status:** IMPLEMENTED — embedded in v6 constitution core rules.
+
+---
+
+### CC-036: Agentic Search Before Edit
+
+**Category:** Claude Code
+**Platform:** Claude Code
+**Source:** User v5 constitution + Boris Cherny confirmed pattern
+**Credibility:** VERIFIED
+**Model Version:** 4.x+
+
+**What it is:** Mandatory glob + grep agentic search before any edit. Read full
+relevant files + all callers + related tests before modifying anything. Prevents
+the documented "skim and assume" failure mode which is Claude Code's lowest-scoring
+dimension in Anthropic's own verification metric.
+
+**Status:** IMPLEMENTED — embedded in v6 constitution mandatory workflow.
+
+---
+
+### MM-002: Narrative Continuity Rule
+
+**Category:** Memory / Context Management
+**Platform:** Claude Code
+**Source:** Mythos System Card §4.2.1.1 + synthesis
+**Credibility:** VERIFIED
+**Model Version:** Universal
+
+**What it is:** Explicit instruction to maintain coherent system story across sessions
+using docs/learnings.md as source of truth. Session start always reads learnings.md
+and handoff.md. Contradictions between new information and prior lessons are surfaced
+immediately rather than silently overwritten. This is the manual emulation of KAIROS's
+narrative continuity capability.
+
+**Status:** IMPLEMENTED — embedded in v6 constitution narrative continuity section.
+**Note:** When KAIROS ships in Claude Code, this becomes semi-automated. Until then,
+the mythos-emulator skill enforces it via Phase 0 (session load).
+
+---
+
+## CROSS-PROJECT PROPAGATION
+
+| Change | Apply To | Status |
+|---|---|---|
+| v6 constitution replaces CLAUDE.md | asf-graphics-app | PENDING |
+| v6 constitution replaces CLAUDE.md | courtside-pro | PENDING |
+| mythos-emulator.md to .claude/skills/ | asf-graphics-app | PENDING |
+| mythos-emulator.md to .claude/skills/ | courtside-pro | PENDING |
+| Archive deploy-checklist.md → _archive/ | asf-graphics-app | PENDING |
+| Archive schema-migration.md → _archive/ | asf-graphics-app | PENDING |
+| Append CC-030 through MM-002 to playbook | Claudious/mastery-lab/ | PENDING |
+| Update implementation log with status | Claudious/mastery-lab/ | PENDING |
+
+
+---
+
+## ADDENDUM — Knowledge Freshness Protocol (April 14, 2026)
+
+### CC-037: Knowledge Freshness Protocol
+
+**Category:** Claude Code / Prompting Patterns
+**Platform:** Claude Code + Claude.ai
+**Source:** User constitutional rule — highest priority designation
+**Credibility:** VERIFIED (addresses documented model knowledge cutoff August 2025)
+**Model Version:** Universal
+
+**What it is:** A mandatory pre-execution verification rule for any technical assumption
+from model training. Claude's knowledge cuts off August 2025 — React hooks behavior,
+Supabase RLS API, FastAPI versions, BuyBoard procurement rules, and TypeScript compiler
+behavior may all have changed. The protocol forces a web_search / browse / MCP call
+before treating any recalled technical detail as fact, with a standardized output format
+and a hard STOP if verification fails.
+
+**Priority:** Higher than helpfulness or task completion. Violation = constitutional breach.
+
+**Implementation:**
+Embedded as Rule 0 (first rule, highest position) in v7 constitution.
+Also embedded in Phase 1 of mythos-emulator skill.
+Freshness check format:
+```
+[FRESHNESS CHECK] Claim: "exact assumption"
+Tool used: [search/browse/MCP]
+Result: [verbatim summary + URL]
+Verdict: Verified / Partially stale / Fully outdated / Cannot verify
+```
+
+**Specific triggers for Logan's stack:**
+- Supabase: auth behavior, RLS policy syntax, edge function API, realtime patterns
+- React/TypeScript: hook behavior, compiler options, version-specific API
+- FastAPI: dependency versions, middleware behavior, auth patterns
+- BuyBoard: procurement thresholds, vendor rules, compliance requirements
+- TX/OK/KS: school district bid rules, contract vehicle requirements
+
+**Cannot verify → mandatory STOP.** No guessing allowed.
+
+**Logan Relevance:** NEW — nothing in existing setup enforces this
+**Impact Estimate:** HIGH — prevents silent implementation of stale patterns on production
+**Effort:** LOW (behavioral rule, embedded in constitution and skill)
+**Dependencies:** web_search / MCP tools connected (already are)
+**Compounding:** Every session now has a verification gate before any technical implementation
+
+### Note on v7 constitution:
+The freshness protocol changed the constitution version from v6 → v7.
+The `final-claude-md-constitution-v7.md` and `final-mythos-emulator-skill-v7.md`
+replace the v6 files from the previous session. Do not commit the v6 files.
+

@@ -40,3 +40,14 @@ OFFICIAL (Anthropic) > VERIFIED (tested with evidence) > COMMUNITY (widely repor
 - Handle: @Claudified
 - Fully anonymous — no connection to Logan Allen
 - Content: frameworks, hidden tools, mental models, agent architecture
+
+## Deployment Status
+- April 14, 2026: Mythos Emulator Constitution v7 deployed to ASF Graphics and
+  Courtside Pro (Court Designer and Genesis Framework SKIPPED — repos not
+  present at expected paths on this machine; re-run when available). Universal
+  constitution with per-project rules via .claude/rules/project.md @import.
+  Techniques CC-030 through CC-037 added to playbook. Knowledge Freshness Protocol
+  (Rule 0) is now highest-priority constitutional rule across deployed repos.
+  Superseded skills archived in asf-graphics-app: deploy-checklist.md,
+  schema-migration.md, component-build.md. mythos-emulator.md skill added to
+  deployed repos. Courtside Pro had no prior skills to archive.
