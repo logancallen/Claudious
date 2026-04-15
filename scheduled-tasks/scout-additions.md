@@ -1,0 +1,4 @@
+- KAIROS Claude Code daemon rollout — search "KAIROS Claude Code" and "Claude Code background daemon"
+- Chyros feature release — search "Chyros Claude" and "Claude Code persistent memory"
+- Opus 4.7 official release — search "Claude Opus 4.7 release"
+- AutoDream updates — search "Claude AutoDream" for any changes to behavior
