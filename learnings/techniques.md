@@ -63,4 +63,22 @@
 **Learning:** Pick a repeatable failing task. Run it against current CLAUDE.md. Diff Claude's actual output vs. desired output. Extract the exact instruction that would have prevented the error (e.g., "Run `npm test` before declaring done"). Append to CLAUDE.md, then test removal to confirm the new line is actually pulling weight — bloat hurts. Re-run. Cycle weekly on highest-failure-rate workflows. Pair with Bloated CLAUDE.md antipattern to keep net line count flat.
 **Applies to:** All Claude Code projects — CLAUDE.md iteration on ASF Graphics, Courtside Pro, Claude Mastery Lab
 
+### 2026-04-16 — TECHNIQUE — Native `--worktree` Flag Replaces Manual Split-and-Merge Setup
+**Severity:** HIGH
+**Context:** `claude --worktree <name>` (or `-w <name>`) collapses the create-worktree → cd → launch-claude sequence into one command per parallel agent. Direct upgrade to the split-and-merge pattern Logan already uses.
+**Learning:** Use `claude -w api-refactor`, `claude -w ui-polish`, etc. per terminal to spin up isolated parallel sessions. Auto-creates an isolated git worktree, checks out `worktree-{name}` branch from `origin/HEAD`, and scopes the Claude session to that directory. With no argument, generates a name automatically. Headless via tmux: `claude --worktree <name> --tmux`. Practical limit: 5-10 parallel sessions before merge bottleneck and rate-limit throttling. Pro-tier users hit limits in minutes with 2+ parallel sessions — Max tier required for serious scaling.
+**Applies to:** All Claude Code projects using parallel-agent workflows — ASF Graphics, Courtside Pro, Claudious
+
+### 2026-04-17 — TECHNIQUE — Git Checkpoint Before Every Autonomous Claude Run
+**Severity:** HIGH
+**Context:** Source: X/Twitter community (Thariq @trq212) — higher success rate than in-session repair.
+**Learning:** Commit a git checkpoint before any autonomous or multi-step Claude run: `git add -A && git commit -m "checkpoint: pre-claude-run"`. If the result is wrong, rollback with `git reset --hard HEAD~1` instead of attempting in-session repair — rollback is faster and more reliable than forward-fixing Claude errors mid-run. This is especially important before /ultraplan runs, long Cowork sessions, and any agent-teams invocation.
+**Applies to:** All Claude Code projects — ASF Graphics, Courtside Pro, Claudious, Claude Mastery Lab
+
+### 2026-04-17 — TECHNIQUE — Skills as Auto-Saved Pattern Docs from Debugging Sessions
+**Severity:** HIGH
+**Context:** Source: X/Twitter community (Thariq @trq212) — Claude auto-creates skill files from debugging sessions.
+**Learning:** Claude Code can auto-create `.claude/skills/` files from debugging sessions — prompt with "save this debugging pattern as a skill." The resulting skill files are LLM-optimized docs (not generic markdown): they include trigger conditions, known failure modes, and step-by-step resolution. Feed skill files directly into the next session's context via `CLAUDE.md` references or claude.ai Project knowledge. This compounds: each session's learnings become the next session's starting instructions.
+**Applies to:** All Claude Code projects — wire into post-debugging workflow on ASF Graphics, Courtside Pro, Claudious
+
 ## Archive

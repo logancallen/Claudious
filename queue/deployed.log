@@ -28,3 +28,8 @@
 2026-04-16 | add-spec-first-plan-mode-pattern.md | Appended Spec-First Plan Mode pattern to learnings/patterns.md | DEPLOYED
 2026-04-16 | clean-stale-alerts-round-2.md | Removed AUTODREAM and Agent Teams alerts from alerts.md (2 stale alerts cleared) | DEPLOYED
 2026-04-16 | relocate-misclassified-envvar-queue-items.md | Target files already deployed 2026-04-15; relocation unnecessary. Closed as no-op. | DEPLOYED
+2026-04-17 DEPLOYED claudeignore-500-token-target — Appended CLAUDE.md 500-token ceiling + .claudeignore antipattern to learnings/antipatterns.md. WORKING. [evidence: grep-confirmed "claudeignore" in learnings/antipatterns.md]
+2026-04-17 DEPLOYED worktree-cli-flag-technique — Appended native --worktree flag technique to learnings/techniques.md. WORKING. [evidence: grep-confirmed "worktree" in learnings/techniques.md]
+2026-04-17 DEPLOYED session-checkpoint-technique — Appended git checkpoint before autonomous runs technique to learnings/techniques.md. WORKING. [evidence: grep-confirmed "checkpoint: pre-claude-run" in learnings/techniques.md]
+2026-04-17 DEPLOYED skills-auto-save-pattern — Appended skills auto-save pattern docs technique to learnings/techniques.md. WORKING. [evidence: grep-confirmed "debugging pattern as a skill" in learnings/techniques.md]
+2026-04-17 DEPLOYED cowork-peak-hour-gotcha — Appended Cowork peak-hour session limits GOTCHA to learnings/gotchas.md. WORKING. [evidence: grep-confirmed "5am.*11am PT" in learnings/gotchas.md]

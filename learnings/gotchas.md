@@ -63,4 +63,10 @@
 **Learning:** Three failures compound: (1) Two repos (OneDrive + Projects) point to same remote — diagnostic output varies by cwd, masking real state. (2) Cowork sandbox has no git push auth — commits stay in sandbox, die on recycle. (3) GitHub Desktop holds repo locks — CLI git fails with HEAD.lock errors. Mitigations: Projects\Claudious confirmed canonical; OneDrive kept as read-only mirror (retirement pending consumer audit); close GitHub Desktop before CLI git on Claudious; Cowork push fix deferred (advisory mode vs GITHUB_TOKEN env var). Detection: any Implementer/autonomous run must be verified by running `git log --oneline -3` in Projects\Claudious the same day — do not rely on report output alone.
 **Applies to:** Claudious, any future Cowork-operated repos
 
+### 2026-04-17 — GOTCHA — Cowork Hits 5-Hour Session Limits Faster During Peak Hours
+**Severity:** HIGH
+**Context:** Source: TechRadar + Claude Code issues — usage limits tightened weekday peak hours as of April 2026.
+**Learning:** Cowork sessions burn through the 5-hour limit significantly faster during weekday peak hours (8am–2pm ET / 5am–11am PT). Schedule long Cowork tasks (Ultraplan runs, agent-teams sessions, multi-file refactors) for off-peak hours. Pro plan ($20/mo) hits limits particularly fast — Max plan recommended for any Cowork session longer than 30 minutes. No notification is given when limits are about to be hit — tasks are interrupted mid-run.
+**Applies to:** All Cowork sessions — ASF Graphics, Courtside Pro, Claudious, Claude Mastery Lab
+
 ## Archive

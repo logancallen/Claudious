@@ -21,4 +21,10 @@
 **Learning:** Every connected MCP server loads full tool definitions into context on every message. One server alone = ~8,400 tokens per message wasted if unused. Disconnect all MCP servers not needed for current task. Reconnect on demand. Audit at start of every Claude Code session via /mcp.
 **Applies to:** Claude.ai and Claude Code MCP management
 
+### 2026-04-16 — ANTIPATTERN — CLAUDE.md Without `.claudeignore` and Size Ceiling
+**Severity:** HIGH
+**Context:** Source: buildtolaunch.substack token-optimization writeup. Sharpens the existing Bloated CLAUDE.md antipattern with a concrete structural target.
+**Learning:** Structural target for CLAUDE.md: "five rules and three file pointers," under ~500 tokens (closer to 200 is better). Each line must answer "would removing this cause a mistake?" — yes = keep, no = cut. Pair with a `.claudeignore` file (gitignore syntax) at project root that strips `node_modules`, `.next`, `dist`, `build`, `*.lock`, `.env*`, and `coverage/` from Claude's visibility entirely. Audit length with `wc -w CLAUDE.md` × ~1.3 = token estimate. If over 500 tokens, move details to `docs/` files referenced by filename, not inlined. Re-measure after Arize prompt-learning iteration to catch bloat regression.
+**Applies to:** All Claude Code projects — ASF Graphics, Courtside Pro, Claudious, Claude Mastery Lab
+
 ## Archive
