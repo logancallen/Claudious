@@ -3,6 +3,13 @@
 
 ## Active Patterns
 
+### 2026-04-17 — PATTERN — Split tactical fixes from strategic refactors
+
+**Severity:** HIGH
+**Context:** Press Box Wrap intake bug had a 1-line fix (intakeConfig.js:64 category 'wrap'→'flat') and a 16-file consolidation (product-type vocabulary unification). Bundling them would have delayed the user-visible fix by days while the refactor scoped. Split into two commits: fix(intake) shipped immediately, docs(audit) staged for later prompt.
+**Learning:** When a production bug has both a tactical patch and a strategic refactor path, ship the patch FIRST as a standalone commit, then plan the refactor separately. Never let the patch wait on the refactor. Document the larger scope in a committed audit doc so the future work isn't lost.
+**Applies to:** Any bug where the root-cause fix is large but a symptom-fix is small.
+
 ### 2026-04-11 — PATTERN — 3-Layer Claude Code Knowledge Architecture
 **Severity:** HIGH
 **Context:** Discovered during deep architecture research.
