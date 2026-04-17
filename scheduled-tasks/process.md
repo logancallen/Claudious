@@ -3,7 +3,8 @@
 ## 0. Environment
 
 ```bash
-cd /repo || { echo "ABORT: wrong cwd"; exit 1; }
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "ABORT: not in a git repo"; exit 1; }
+cd "$REPO_ROOT"
 
 git config user.name "logancallen"
 git config user.email "loganallensf@gmail.com"
