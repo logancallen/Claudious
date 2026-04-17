@@ -24,3 +24,7 @@
 2026-04-15 ARCHIVED autocompact-pct-override — Unclear interaction with AUTO_COMPACT_WINDOW=400000. No pain point. Revisit if compaction misbehaves.
 2026-04-15 GRADUATED operator-pattern-allowedtools-scoping — Moved to learnings/patterns.md. Proposal deleted.
 2026-04-15 GRADUATED add-skill-cap-warning — Moved to learnings/gotchas.md. Proposal deleted.
+2026-04-16 | add-arize-prompt-learning-technique.md | Appended Arize Prompt-Learning Loop technique to learnings/techniques.md | DEPLOYED
+2026-04-16 | add-spec-first-plan-mode-pattern.md | Appended Spec-First Plan Mode pattern to learnings/patterns.md | DEPLOYED
+2026-04-16 | clean-stale-alerts-round-2.md | Removed AUTODREAM and Agent Teams alerts from alerts.md (2 stale alerts cleared) | DEPLOYED
+2026-04-16 | relocate-misclassified-envvar-queue-items.md | Target files already deployed 2026-04-15; relocation unnecessary. Closed as no-op. | DEPLOYED

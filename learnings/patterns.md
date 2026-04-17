@@ -33,4 +33,10 @@
 **Learning:** Define orchestrator with narrow scope (Task, Bash), spawn subagents with restricted scopes (frontend: Edit,Read,Glob — no Bash; DB: Bash,Read — no Edit). Prevents scope creep.
 **Applies to:** All projects using .claude/agents/ subagent definitions.
 
+### 2026-04-14 — PATTERN — Spec-First Plan Mode Workflow
+**Severity:** HIGH
+**Context:** Formalizes Logan's "plan first, approve, then code" User Preference into a repeatable file artifact.
+**Learning:** Before any non-trivial feature, create `specs/<feature-name>.md` with four sections: Scope, Constraints, Acceptance Criteria, Do-Not-Do. Start Claude Code in plan mode. Share spec. Prompt: "Review this spec and propose an implementation plan. Do not write code." Iterate on plan — challenge assumptions, require rationale. Only after plan approval, exit plan mode and execute. The Do-Not-Do section is the highest-leverage block: it replaces negative User Preferences instructions with positive constraints scoped to one feature.
+**Applies to:** All Claude Code projects — ASF Graphics, Courtside Pro — for any feature >2 files or >30 min estimated work
+
 ## Archive

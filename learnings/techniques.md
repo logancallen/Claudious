@@ -57,4 +57,10 @@
 **Learning:** Create scripts/sync-knowledge.sh that warns on stale docs/ files, commits pending changes with "docs: auto-sync knowledge files", pushes to main, prints Sync reminder listing ALL connected Claude Projects. Run after every session. Wire git identity first using local (not --global) config on Windows when bash doesn't read global config.
 **Applies to:** All Claude Code projects with GitHub sync
 
+### 2026-04-14 — TECHNIQUE — Arize Prompt-Learning Loop for CLAUDE.md
+**Severity:** HIGH
+**Context:** Arize published a systematic method for CLAUDE.md optimization showing +5-10% SWE Bench improvement without model changes.
+**Learning:** Pick a repeatable failing task. Run it against current CLAUDE.md. Diff Claude's actual output vs. desired output. Extract the exact instruction that would have prevented the error (e.g., "Run `npm test` before declaring done"). Append to CLAUDE.md, then test removal to confirm the new line is actually pulling weight — bloat hurts. Re-run. Cycle weekly on highest-failure-rate workflows. Pair with Bloated CLAUDE.md antipattern to keep net line count flat.
+**Applies to:** All Claude Code projects — CLAUDE.md iteration on ASF Graphics, Courtside Pro, Claude Mastery Lab
+
 ## Archive
