@@ -84,4 +84,10 @@
 **Learning:** Pick a repeatable failing task. Run it against current CLAUDE.md. Diff Claude's actual output vs. desired output. Extract the exact instruction that would have prevented the error (e.g., "Run `npm test` before declaring done"). Append to CLAUDE.md, then test removal to confirm the new line is actually pulling weight — bloat hurts. Re-run. Cycle weekly on highest-failure-rate workflows. Pair with Bloated CLAUDE.md antipattern to keep net line count flat.
 **Applies to:** All Claude Code projects — CLAUDE.md iteration on ASF Graphics, Courtside Pro, Claude Mastery Lab
 
+### 2026-04-16 — TECHNIQUE — Native `--worktree` Flag Replaces Manual Split-and-Merge Setup
+**Severity:** HIGH
+**Context:** `claude --worktree <name>` (or `-w <name>`) collapses the create-worktree → cd → launch-claude sequence into one command per parallel agent. Direct upgrade to the split-and-merge pattern Logan already uses.
+**Learning:** Use `claude -w api-refactor`, `claude -w ui-polish`, etc. per terminal to spin up isolated parallel sessions. Auto-creates an isolated git worktree, checks out `worktree-{name}` branch from `origin/HEAD`, and scopes the Claude session to that directory. With no argument, generates a name automatically. Headless via tmux: `claude --worktree <name> --tmux`. Practical limit: 5-10 parallel sessions before merge bottleneck and rate-limit throttling. Pro-tier users hit limits in minutes with 2+ parallel sessions — Max tier required for serious scaling.
+**Applies to:** All Claude Code projects using parallel-agent workflows — ASF Graphics, Courtside Pro, Claudious
+
 ## Archive

@@ -28,3 +28,5 @@
 2026-04-16 | add-spec-first-plan-mode-pattern.md | Appended Spec-First Plan Mode pattern to learnings/patterns.md | DEPLOYED
 2026-04-16 | clean-stale-alerts-round-2.md | Removed AUTODREAM and Agent Teams alerts from alerts.md (2 stale alerts cleared) | DEPLOYED
 2026-04-16 | relocate-misclassified-envvar-queue-items.md | Target files already deployed 2026-04-15; relocation unnecessary. Closed as no-op. | DEPLOYED
+2026-04-17 | worktree-cli-flag-technique.md | Appended Native --worktree Flag technique to learnings/techniques.md | DEPLOYED
+2026-04-17 | claudeignore-500-token-target.md | Target learnings/antipatterns.md outside allowed scope (techniques.md, patterns.md, gotchas.md only); item left in queue for manual handling | SKIPPED_OUT_OF_SCOPE
