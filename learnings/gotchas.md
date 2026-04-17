@@ -3,6 +3,20 @@
 
 ## Active Gotchas
 
+### 2026-04-17 — GOTCHA — CC file-change summaries cannot be trusted without grep proof
+
+**Severity:** CRITICAL
+**Context:** Claude Code's Prompt 3 Fix 9 summary claimed VEHICLE_PRODUCT_TYPES was added to JobMaterials.jsx. A later audit claimed the constant didn't exist. Rebase revealed the constant DID exist (commit e97a513) — the audit had been run on a stale tree. Session-end summaries conflate "I intended to add this" with "this is on disk and pushed."
+**Learning:** Every CC prompt that claims to add/modify a symbol must end with mandatory grep proof-of-work: `grep -n <symbol> <file>`. Session-end audits must `git pull --rebase` first. Claude.ai advisors must not trust summaries for downstream decision-making — verify with git log / grep / Supabase MCP against live state.
+**Applies to:** Any Claude Code session that produces a file-change summary. Any Claude.ai advisor session that acts on CC's self-reported state.
+
+### 2026-04-17 — GOTCHA — Audit docs run on stale git trees produce false claims
+
+**Severity:** HIGH
+**Context:** Product-type vocabulary audit (commit dfa5e85 before rebase) asserted VEHICLE_PRODUCT_TYPES didn't exist and next migration number was 035. Both false once rebased against remote main — constant existed at e97a513, next migration was 043.
+**Learning:** Before writing any audit, `git pull --rebase origin main` and `git log --oneline -20` to verify tree is current. After any rebase, re-run grep claims and migration-number claims. Ship an addendum if the audit already committed with known-false claims.
+**Applies to:** Any audit, schema snapshot, or state document that makes factual claims about codebase contents.
+
 ### 2026-04-15 — GOTCHA — OneDrive Corrupts .git Index Files
 **Severity:** CRITICAL
 **Context:** Claudious repo in OneDrive caused .git/index corruption and sticky index.lock files. Every Cowork scheduled task hitting the mount failed on git add.
