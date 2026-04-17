@@ -888,3 +888,104 @@ replace the v6 files from the previous session. Do not commit the v6 files.
 **Dependencies:** CC-001 (CLAUDE.md optimization) — already implemented
 **Compounding:** Amplifies all CLAUDE.md rules. Feeds Pioneer config health assessment.
 
+---
+
+### CC-039: Cloud Routines (Laptop-Closed Scheduled Claude Code Execution)
+
+**Category:** Workflow Automation
+**Platform:** Claude Code (web/cloud)
+**Source:** Anthropic official announcement April 14, 2026 (code.claude.com/docs + multiple press sources)
+**Credibility:** OFFICIAL
+**Model Version:** Selectable per routine
+
+**What it is:** Saved Claude Code configurations (prompt + repositories + connectors + trigger) that run on Anthropic's cloud infrastructure. Three trigger types: Scheduled (cron-style, min 1-hour interval), API (HTTP POST with bearer token), GitHub webhook. Laptop can be closed. Existing /schedule tasks auto-migrated. Max plan: 15 routine runs/day. Branch push restricted to claude/* prefix by default. Routines share subscription token budget with interactive sessions.
+
+**Implementation:**
+1. Visit claude.ai/code/routines (or type /schedule in CLI)
+2. Click New routine, provide name + prompt + repo + connectors + trigger
+3. For scheduled: pick preset or use /schedule update for custom cron (min 1h)
+4. For API: generated endpoint returns bearer token; POST with optional text field appended to prompt
+5. For GitHub: install Claude GitHub App on target repo separately (CLI /web-setup does not install it)
+
+**Logan Relevance:** NEW — replaces Cowork sandbox limitations (no git push, single folder, permission prompts). Key unlock for BuyBoard RFP automation and Claudious maintenance.
+**Impact Estimate:** HIGH — autonomous cloud execution was the missing piece in the Claudious pipeline.
+**Effort:** LOW (~10 min to create first routine)
+**Dependencies:** Claude Code on the web enabled, GitHub connected.
+**Compounding:** Enables CC-042. Can migrate select Cowork scheduled tasks.
+
+---
+
+### CC-040: 1-Hour Prompt Cache TTL (Env Var)
+
+**Category:** Context Management
+**Platform:** Claude Code
+**Source:** Claude Code CHANGELOG April 2026 (code.claude.com/docs/changelog)
+**Credibility:** OFFICIAL
+**Model Version:** 4.x+
+
+**What it is:** Two environment variables control prompt cache TTL: ENABLE_PROMPT_CACHING_1H=1 opts into 1-hour cache TTL on API key / Bedrock / Vertex / Foundry. FORCE_PROMPT_CACHING_5M forces 5-minute TTL. Anthropic reverted the default from 1h to 5m in March 2026 because short sessions and sub-agents benefit more from the cheaper 5m write cost. 1h is better for long-lived sessions with stable CLAUDE.md/MEMORY.md that persist beyond 5 minutes.
+
+**Implementation:**
+1. PC: add `$env:ENABLE_PROMPT_CACHING_1H = "1"` to PowerShell $PROFILE, or set persistently via System Environment Variables.
+2. Measure burn rate at claude.ai/settings/usage before and 48h after.
+3. Revert if burn rate increases — 1h cache writes are 100% more expensive than base input tokens (vs 25% for 5m).
+4. Do NOT set FORCE_PROMPT_CACHING_5M — counter-productive for Logan's typical long-form Claude Code sessions.
+
+**Logan Relevance:** NEW (UPGRADE to implicit caching) — turns a one-knob default into a deliberate decision.
+**Impact Estimate:** MEDIUM — if long sessions dominate, 1h cache reduces token cost meaningfully. If short sessions dominate, it increases cost.
+**Effort:** TRIVIAL (<5 min)
+**Dependencies:** NONE
+**Compounding:** Interacts with CC-010 (compact protocol) and CC-034 (sub-agent model).
+
+**Note on Grok dump:** Community reports claimed this was a slash command — it is actually an env var. Credibility lesson logged in Claudious learnings.
+
+---
+
+### CC-041: /self-eval for Skill Self-Improvement
+
+**Category:** Skills & Plugins
+**Platform:** Claude Code (global + per-project)
+**Source:** Claudious master-intelligence-file-2026-04-11.md (previously un-extracted to playbook)
+**Credibility:** VERIFIED
+**Model Version:** Universal
+
+**What it is:** Custom slash command that, at session end, reviews every skill that triggered or was manually invoked during the session, identifies what each skill missed or got wrong, and writes proposed line-level edits to `.claude/skills/_proposed-edits/<skill>.md`. Pioneer reviews proposals weekly; approved edits applied on Sundays. Skills iterate instead of freezing at creation date.
+
+**Implementation:**
+1. Global command at ~/.claude/commands/self-eval.md (installed April 16, 2026)
+2. Session-end reminder in ~/.claude/CLAUDE.md
+3. `_proposed-edits/` directories created in: global, ASF Graphics, Courtside Pro
+4. Directories gitignored to keep proposals out of version control until graduated (pattern: ignore contents, keep .gitkeep tracked)
+5. Pioneer task prompt updated to read `_proposed-edits/` during weekly retrospective
+
+**Logan Relevance:** NEW — closes the skill-improvement feedback loop. 14-skill surface means compound impact over 10+ uses per skill.
+**Impact Estimate:** MEDIUM — noise risk if Pioneer review lapses; improvement compounds if maintained.
+**Effort:** LOW (deployed April 16)
+**Dependencies:** Session-end hook (exists).
+**Compounding:** Multiplies across every skill use. Synergizes with harvest (session learnings) and Pioneer (config self-improvement).
+
+---
+
+### CC-042: API Routines — Webhook/HTTP-Triggered Execution
+
+**Category:** Workflow Automation
+**Platform:** Claude Code (cloud)
+**Source:** Anthropic official April 14, 2026
+**Credibility:** OFFICIAL
+**Model Version:** Selectable per routine
+
+**What it is:** Subset of Routines (CC-039). Each routine exposes a unique HTTPS endpoint with dedicated bearer token. External systems POST JSON with optional `text` field appended as one-shot user turn. Use cases: BuyBoard RFP alert → proposal draft. GitHub PR opened → adversarial review. Sentry alert → incident triage. Deploy pipeline → smoke check + go/no-go post.
+
+**Implementation (deferred to when webhook source exists):**
+1. Create routine via claude.ai/code/routines with trigger type = API
+2. Copy bearer token to password manager
+3. POST to endpoint: curl -X POST <endpoint> -H "Authorization: Bearer <token>" -d '{"text": "<context>"}'
+4. Routine runs on Anthropic infra, returns session URL for live viewing
+5. GitHub webhook variant requires separate Claude GitHub App install (see CC-039)
+
+**Logan Relevance:** NEW but DEFERRED — requires webhook data source for BuyBoard that does not yet exist. Ship Claudious Weekly Health Check routine first (CC-039 trigger=Scheduled) to prove end-to-end.
+**Impact Estimate:** HIGH (when data source exists)
+**Effort:** MEDIUM (webhook source research + plumbing)
+**Dependencies:** CC-039 proven in production first. RFP data source (RSS, third-party aggregator, or manual trigger).
+**Compounding:** Transforms negotiation-playbook skill into automated pipeline.
+

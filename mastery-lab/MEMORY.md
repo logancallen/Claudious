@@ -11,7 +11,7 @@ Living intelligence system for discovering, evaluating, and implementing Claude 
 - research-prompt-kit.md — Grok/ChatGPT research prompt templates
 - task-routing-table.md — platform routing decisions
 - master-intelligence-file-2026-04-11.md — consolidated state from April 11 sprint
-- cowork-scheduled-tasks-guide.md — all 7 Cowork task prompts and setup
+- cowork-scheduled-tasks-guide.md — canonical mirror of Cowork task prompts + Cloud Routines; currently skeleton, seeded incrementally
 
 ## Processing Pipeline
 - DISTILL mode: raw inputs → technique extraction → cross-reference → playbook entry

@@ -256,6 +256,42 @@ Result: POSITIVE — proposals/ reduced from 12 to 5 active items.
 
 ---
 
+## April 16, 2026 — Sprint 5: Routines + Self-Eval + Prompt Cache
+
+### CC-041: /self-eval Slash Command Deployed
+**Applied to:** Global ~/.claude/commands/ + ASF Graphics + Courtside Pro
+**What changed:** Created /self-eval global command that critiques skills used during a session and writes proposed edits to `_proposed-edits/` directories (gitignored with .gitkeep tracked) for Pioneer weekly review. Session-end reminder added to global CLAUDE.md. Directories created in ~/.claude/skills/ + asf-graphics-app/.claude/skills/ + courtside-pro/.claude/skills/.
+**Result:** Deployed — effectiveness TBD after first full Pioneer review cycle (Sunday April 19).
+**Measured impact:** None yet — instrument for future measurement.
+**Notes:** Skill-improvement feedback loop was identified in April 11 bootstrap but never implemented until now. Caught and corrected a .gitignore pattern error during deployment — single-line ignore would have defeated .gitkeep; corrected to `_proposed-edits/*` + `!_proposed-edits/.gitkeep`.
+
+### CC-040: ENABLE_PROMPT_CACHING_1H Env Var on PC
+**Applied to:** Windows PC PowerShell $PROFILE
+**What changed:** Added $env:ENABLE_PROMPT_CACHING_1H = "1". Did NOT set FORCE_PROMPT_CACHING_5M.
+**Result:** Deployed April 16 — measurement window 48 hours. Revert trigger: noticeable burn rate increase at claude.ai/settings/usage.
+**Measured impact:** Baseline burn rate recorded April 16. Re-check April 18.
+**Notes:** Grok dump incorrectly claimed this was a slash command. Correct implementation is env var. Anthropic reverted default to 5m in March 2026 because short sessions benefit more from cheaper 5m write cost (25% premium vs 100% for 1h).
+
+### CC-039: First Cloud Routine Deployed — Claudious Weekly Health Check
+**Applied to:** claude.ai/code/routines
+**What changed:** Created scheduled routine running Sundays 8:00 AM CDT. Reads Claudious queue/ + proposals/ + deployed.log + retrospectives/ + visible `_proposed-edits/` contents. Outputs 1-paragraph state summary + top 3 action items. Posts to Slack DM. Runs before Scout (8:45 AM).
+**Result:** Deployed — first scheduled run Sunday April 19. Run now verification TBD.
+**Measured impact:** TBD — measured by whether Sunday summary reduces Logan's manual queue/proposals review time.
+**Notes:** Chose Health Check over BuyBoard RFP as first routine because BuyBoard has no data source yet. Proves Cloud Routines end-to-end before trusting with revenue-adjacent workflows. CC-042 (API routines) deferred until RFP webhook source exists.
+
+### /recap Adoption (Behavior Change, Not Playbook Entry)
+**Applied to:** Global ~/.claude/CLAUDE.md
+**What changed:** Added session-lifecycle v2 section instructing Claude to run /recap on any resumed session before acting.
+**Result:** Deployed.
+**Notes:** Supersedes manual session-start handoff reading. Works alongside SessionEnd hook chain.
+
+### Grok Dump Credibility Finding
+**Applied to:** Claudious learnings (cross-project)
+**What changed:** Logged learning — Grok X-scraping dumps produced ~10% signal rate on April 13-16 batch (4 of ~35 "findings" were new and verifiable). One claim was substantively correct but surface wrong (CC-040 as slash command vs env var). Action: reduce Grok dump frequency to bi-weekly unless a major Anthropic announcement triggers targeted sweep.
+**Result:** Finding logged. Cadence change to implement.
+
+---
+
 ## Rejected After Testing
 
 ### CC-009: Auto Mode Permissions

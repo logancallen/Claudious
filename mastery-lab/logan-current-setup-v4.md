@@ -113,6 +113,7 @@
 - MCP_SERVER_CONNECTION_BATCH_SIZE=6
 - MCP_CONNECTION_NONBLOCKING=1
 - CLAUDE_CODE_PLAN_V2_AGENT_COUNT=3 (was already set but undocumented)
+- ENABLE_PROMPT_CACHING_1H=1 — Added 2026-04-16. Opts into 1-hour prompt cache TTL. Measuring 48h burn rate at claude.ai/settings/usage. Revert if burn rate increases — 1h cache writes cost 100% premium vs 25% for 5m. Do NOT set FORCE_PROMPT_CACHING_5M.
 
 ### Environment Variables (Mac Studio — NOT YET SET)
 - Same 5 core vars + 3 new vars (FINE_GRAINED_TOOL_STREAMING, MCP_SERVER_CONNECTION_BATCH_SIZE, MCP_CONNECTION_NONBLOCKING) need adding to ~/.zshrc
@@ -178,6 +179,13 @@ Scout discovers → Evaluator triages → queue/ → Implementer deploys → dep
 - Weekly: Read Digest (~2 min), review queue/ (~5 min)
 - Monthly: Review proposals/ (~10 min)
 - Total: ~30 min/month across 8 scheduled tasks
+
+### Claude Code Cloud Routines
+
+First routine deployed April 16, 2026:
+- **Claudious Weekly Health Check** — Sundays 8:00 AM CDT, reads queue/ + proposals/ + deployed.log + retrospectives/, posts 1-paragraph state summary + top 3 action items to Slack DM. Runs before Scout (8:45 AM) to provide fresh context.
+
+Max plan cap: 15 routine runs/day across all routines (combined with any auto-migrated /schedule tasks).
 
 ---
 
