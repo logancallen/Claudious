@@ -3,6 +3,27 @@
 
 ## Active Techniques
 
+### 2026-04-17 — TECHNIQUE — CC crash recovery via Claude.ai Supabase MCP
+
+**Severity:** HIGH
+**Context:** Migration 041 (auth.uid wrap across 94 policies) crashed Claude Code mid-apply with `API Error: terminated` at 146K tokens. File was written to disk but migration didn't apply. Retry-in-CC risked the same failure.
+**Learning:** When CC crashes mid-apply on a Supabase migration, recovery path is NOT to retry in CC. Apply the migration directly via Claude.ai Supabase MCP `apply_migration` — it's a separate execution path with different failure modes. DB state is authoritative via `execute_sql` queries; git state reconciles after. File on disk from CC is reusable as the migration source.
+**Applies to:** Any long-running Supabase migration, any CC session hitting context/token limits mid-execution.
+
+### 2026-04-17 — TECHNIQUE — RLS auth.role() wraps identically to auth.uid()
+
+**Severity:** HIGH
+**Context:** Migration 041 wrapped 94 auth.uid() refs. Advisor still showed 11 auth_rls_initplan warnings after — all were auth.role() calls, same per-row evaluation issue. Migration 042 wrapped them with same `(select auth.role())` pattern.
+**Learning:** Supabase RLS auth.*() functions (auth.uid, auth.role, auth.jwt) all suffer the same per-row evaluation cost. The `(select auth.FN())` wrap lets Postgres cache the scalar per-query. Always audit ALL auth.*() refs, not just auth.uid(). Generic dry-run probe: wrapped-count exclusion against pg_policies.qual and with_check.
+**Applies to:** Any Supabase project using RLS. Any PostgREST-backed app where RLS policies run on every row fetch.
+
+### 2026-04-17 — TECHNIQUE — Pre/post-apply count gates for schema migrations
+
+**Severity:** LOW
+**Context:** Migrations 041 and 042 used identical gate pattern: dry-run probe against live pg_policies returns a count (94/135 pre-041, 11 pre-042), migration applies, re-run probe expects 0/0. Gate caught no issues this sprint, but would have caught advisor-snapshot drift if present.
+**Learning:** For any bulk-policy or bulk-data migration, hard-gate on pre-apply count matching expected baseline AND post-apply count being 0 (or whatever the target state is). Advisor snapshots drift from live state; always query live. Gate catches partial applies, wrong scope, and advisor staleness in one pattern.
+**Applies to:** Supabase migrations touching multiple policies/rows, any bulk DB change with a countable target state.
+
 ### 2026-04-11 — TECHNIQUE — GitHub Closed-Loop Knowledge Sync
 **Severity:** CRITICAL
 **Context:** Discovered building Courtside Pro — the agent with ground truth should maintain knowledge files.
