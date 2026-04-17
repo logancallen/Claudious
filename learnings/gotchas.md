@@ -57,4 +57,10 @@
 **Learning:** Any task requiring cross-repo access must run in Claude Code, not Cowork. This also killed Config Backup and Auto-Harvest.
 **Applies to:** All Cowork scheduled tasks that reference files outside the mounted working folder.
 
+### 2026-04-16 — GOTCHA — Cowork Sandbox Git Persistence — Three Compounding Failures
+**Severity:** CRITICAL
+**Context:** Sunday Implementer run (2026-04-16) appeared successful — report showed DEPLOYED for 3 items, 1 no-op, commit cf732ec. Local investigation revealed no lost commit but exposed three interacting failure modes that together create silent data loss risk.
+**Learning:** Three failures compound: (1) Two repos (OneDrive + Projects) point to same remote — diagnostic output varies by cwd, masking real state. (2) Cowork sandbox has no git push auth — commits stay in sandbox, die on recycle. (3) GitHub Desktop holds repo locks — CLI git fails with HEAD.lock errors. Mitigations: Projects\Claudious confirmed canonical; OneDrive kept as read-only mirror (retirement pending consumer audit); close GitHub Desktop before CLI git on Claudious; Cowork push fix deferred (advisory mode vs GITHUB_TOKEN env var). Detection: any Implementer/autonomous run must be verified by running `git log --oneline -3` in Projects\Claudious the same day — do not rely on report output alone.
+**Applies to:** Claudious, any future Cowork-operated repos
+
 ## Archive
