@@ -37,4 +37,19 @@
 2026-04-14 2026-04-14-mcp-circuit-breaker | PROPOSED | TEST-FIRST — hook-based wrapper; revisit after next MCP flap event
 2026-04-14 2026-04-14-spec-first-plan-mode | QUEUED | SAFE + HIGH + TRIVIAL — md-only addition to patterns.md (queue/add-spec-first-plan-mode-pattern.md)
 2026-04-14 2026-04-14-perplexity-session-memory-pages | PROPOSED | SAFE — external tool routing update; bundle with perplexity-model-council subscription review
+2026-04-16 2026-04-16-context-mode-mcp-plugin | PROPOSED | TEST-FIRST — third-party MCP dependency; audit repo + quarantine pilot before adoption
+2026-04-16 2026-04-16-worktree-cli-flag | QUEUED | SAFE + HIGH + TRIVIAL — additive CLI flag; direct upgrade to split-and-merge pattern
+2026-04-16 2026-04-16-env-var-trio-effort-teams-thinking | PROPOSED | TEST-FIRST — EFFORT_LEVEL=high has material token cost; benchmark before persistent export
+2026-04-16 2026-04-16-compile-time-feature-flags-inventory | PROPOSED | INTELLIGENCE — KAIROS/COORDINATOR/ULTRAPLAN/CHICAGO_MCP watchlist; add to alerts.md
+2026-04-16 2026-04-16-growthbook-tengu-feature-gates | PROPOSED | INTELLIGENCE — add troubleshooting-step-0 gotcha for remote kill-switches
+2026-04-16 2026-04-16-claudeignore-500-token-target | QUEUED | SAFE + HIGH + TRIVIAL — antipatterns.md addition with concrete size ceiling + .claudeignore recipe
+2026-04-16 2026-04-16-tui-fullscreen-command | PROPOSED | SAFE LOW-IMPACT — bundled in v2-1-x-command-awareness.md
+2026-04-16 2026-04-16-focus-command-replaces-ctrl-o | PROPOSED | SAFE LOW-IMPACT — bundled in v2-1-x-command-awareness.md
+2026-04-16 2026-04-16-team-onboarding-command | PROPOSED | SAFE LOW-IMPACT — bundled in v2-1-x-command-awareness.md
+2026-04-16 2026-04-16-background-monitor-plugin-manifest | PROPOSED | TEST-FIRST — new plugin surface; pilot on throwaway plugin first
+2026-04-16 2026-04-16-hook-session-title-output | PROPOSED | SAFE — hook authoring work; low priority unless session list is noisy
+2026-04-16 2026-04-16-exclude-dynamic-prompt-sections-flag | PROPOSED | TEST-FIRST — may strip currentDate context; one-task pilot before rollout
+2026-04-16 2026-04-16-proactive-loop-alias | PROPOSED | SAFE LOW-IMPACT — bundled in v2-1-x-command-awareness.md
+2026-04-16 2026-04-16-agent-skills-spec-cross-platform | PROPOSED | STRATEGIC — format portability hedge; inventory + marketplace scan
+2026-04-16 2026-04-16-perplexity-comet-grok-deep-search | PROPOSED | SAFE — external routing update; bundle with perplexity-model-council subscription review
 
