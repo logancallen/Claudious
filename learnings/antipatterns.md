@@ -3,6 +3,13 @@
 
 ## Active Antipatterns
 
+### 2026-04-17 — ANTIPATTERN — Parallel vocabularies for same domain concept
+
+**Severity:** HIGH
+**Context:** ASF Graphics product_type stored in 5 vocabularies across frontend/backend/DB. Filter predicates written in one vocabulary silently no-op against data stored in another. Two latent bugs found in live code (phases.js:72, backend/routes/emails.py:536-573) that never fired because data normalization was missing at the predicate site.
+**Learning:** Multiple representations of the same domain concept is an antipattern that generates silent-failure bugs. One canonical internal key (snake_case), labels for display only, and a normalization shim at every ingress boundary (LLM output, free-text fields, legacy data, API boundaries). DB-level CHECK constraints or enums catch drift at write time.
+**Applies to:** Any domain enum (product_type, status, role, category) across any stack. Particularly acute when LLM output or user free-text feeds into a typed column.
+
 ### 2026-04-11 — ANTIPATTERN — Bloated CLAUDE.md with Domain Knowledge
 **Severity:** HIGH
 **Context:** April 7 optimization sprint.
