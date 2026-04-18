@@ -3,6 +3,13 @@
 
 ## Active Patterns
 
+### 2026-04-17 — PATTERN — Roadmap auto-close via post-commit hook dispatcher
+
+**Severity:** HIGH
+**Context:** ASF Graphics accumulated ~50 open work items tracked across chat transcripts — invisible across sessions. Sprint 4.6 stood up `docs/roadmap.md` as the single source of truth (P0–P3, BUG/UX/FEATURE/PERF/REFACTOR/DOC) and wired `.claude/hooks/post-commit-roadmap.sh` to parse `roadmap: close RM-XXX` directives from commit messages, move the matching line from OPEN to CLOSED with a date + sprint-tag stamp, and re-commit as `docs: roadmap auto-update`. Pre-existing inline `post-commit` logic was preserved by renaming it to `post-commit-docs.sh`; the new `post-commit` is a 10-line dispatcher that runs every executable `post-commit-*.sh` in the hooks dir.
+**Learning:** One commit-message directive replaces manual roadmap.md editing across multiple sessions. The dispatcher pattern (`post-commit` → `post-commit-*.sh`) lets independent hook concerns coexist without stepping on each other. Key failure modes to guard: self-recursion on the auto-update commit (skip via subject regex), and sprint-tag extraction picking up model-version strings like "Claude Opus 4.7" in `Co-Authored-By` trailers (scrub trailer lines before regex). Live-test the hook in the same session by including a close directive in the first fix commit — a hook that's never exercised is a hook that breaks in the next sprint.
+**Applies to:** Any repo with a cross-session work backlog and `core.hooksPath` set. Pairs well with a `roadmap: add` directive for symmetry.
+
 ### 2026-04-17 — PATTERN — Split tactical fixes from strategic refactors
 
 **Severity:** HIGH

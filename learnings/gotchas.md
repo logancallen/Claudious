@@ -3,6 +3,20 @@
 
 ## Active Gotchas
 
+### 2026-04-17 — GOTCHA — Supabase projects post-2026-Q1 default to ES256 asymmetric JWT keys
+
+**Severity:** CRITICAL
+**Context:** ASF Graphics Sprint 4.6. Backend verifier pinned `algorithms=["HS256"]` during an auth-hardening pass. Supabase had migrated the project to asymmetric signing keys (`/auth/v1/.well-known/jwks.json` returned a single ES256 P-256 key), and every authenticated route started failing with `Invalid token: The specified alg value is not allowed`. The error surfaced on three unrelated screens (Design Library, PVO, Production Hub Measure) with identical text — one root cause, three symptoms.
+**Learning:** On any Supabase-backed backend created after 2026-Q1, `GET <project>.supabase.co/auth/v1/.well-known/jwks.json` before pinning PyJWT / jose algorithms. If JWKS returns ES256/RS256, the verifier must accept that alg (via `PyJWKClient` or equivalent); keep HS256 only as a fallback for legacy service-role tokens signed with the shared secret. Dispatch on the token header's `alg` instead of hard-coding a single algorithm in `algorithms=[...]`.
+**Applies to:** All projects using Supabase Auth + a non-Supabase backend verifier (FastAPI, Express, Go). Triggered by any auth-hardening PR that narrows the accepted alg list.
+
+### 2026-04-17 — GOTCHA — Render-layer bugs survive fetch-layer fixes until a human tests the UI
+
+**Severity:** HIGH
+**Context:** ASF Graphics Sprint 4.5 added `historical_jobs` fetching to `useJobs.js`; DB returned all 325 rows correctly. Sprint 4.6 discovered `/jobs` still only showed 8 rows because `mapHistoricalJob` set `isArchived: true` on every imported row, and the default `statusFilter = 'active'` plus the `all` filter both excluded archived. Fetch was green; one boolean in the mapper gated every user-visible bucket.
+**Learning:** After any "fetch fix," verify the render. Boolean fields that gate visibility (isArchived, isHidden, isDeleted, isDeprecated) are the most common render-layer culprits. When a user reports a count mismatch ("I see 8, you told me there are 337"), count the data in the DB, then count it in the rendered DOM — the gap pinpoints the layer. Never declare a fetch fix done without visual verification.
+**Applies to:** Any React/Vue/Svelte hook that fetches a collection and maps it through a transformer before rendering. Especially acute when the mapper adds flags that aren't in the source table.
+
 ### 2026-04-17 — GOTCHA — CC file-change summaries cannot be trusted without grep proof
 
 **Severity:** CRITICAL
