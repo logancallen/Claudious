@@ -1,5 +1,16 @@
 # CURATE — Claudious daily task
 
+**Effort:** high
+**Task Budget:** 40000 tokens (beta header: `task-budgets-2026-03-13`)
+**Model:** `claude-opus-4-7`
+**Writes to:** `archive/digest/${TODAY}.md`, `canonical/briefing-today.md`, `alerts.md`, `archive/retrospectives/${TODAY}.md` (Sundays), `archive/runs/${TODAY}.md`, `canonical/active-findings.md` (pruning), `canonical/open-decisions.md` (pruning), `canonical/prompting-rules.md` (Sunday graduations), `canonical/antipatterns.md` (Sunday graduations)
+
+---
+
+## Literal-interpretation guardrail
+
+Summarize today's ledger and proposals using only their content. Do not infer severity from your own priors. A proposal is "NEEDS YOU" only if archive/proposals/ contains it — never invent items for the brief. If today's intake is empty, say so; do not pad.
+
 ## 0. Environment
 
 ```bash
@@ -18,10 +29,11 @@ git pull origin main --ff-only || { echo "ABORT: pull failed"; exit 1; }
 TODAY=$(date +%Y-%m-%d)
 NOW=$(date +%H:%M)
 DOW=$(date +%u)
-LEDGER="runs/${TODAY}.md"
-DIGEST="digest/${TODAY}.md"
-RETRO="retrospectives/${TODAY}.md"
-mkdir -p runs digest retrospectives skills/graduated
+LEDGER="archive/runs/${TODAY}.md"
+DIGEST="archive/digest/${TODAY}.md"
+BRIEF="canonical/briefing-today.md"
+RETRO="archive/retrospectives/${TODAY}.md"
+mkdir -p archive/runs archive/digest archive/retrospectives canonical
 
 # Double-run check (manual trigger protection)
 if [ -f "$DIGEST" ]; then
@@ -39,9 +51,9 @@ START=$(date +%s)
 
 ## 1. Scope
 
-- **Daily MAY write:** `digest/${TODAY}.md`, `alerts.md`, `runs/${TODAY}.md`
-- **Sunday additionally:** `retrospectives/${TODAY}.md`, `skills/graduated/*.md`, archive `proposals/*.md`, `queue/*.md`, modify `learnings/*.md` for graduations
-- **MAY NEVER:** deploy code, touch application repos, modify User Preferences
+- **Daily MAY write:** `archive/digest/${TODAY}.md`, `canonical/briefing-today.md`, `alerts.md`, `archive/runs/${TODAY}.md`, `canonical/active-findings.md` (prune only), `canonical/open-decisions.md` (prune only)
+- **Sunday additionally:** `archive/retrospectives/${TODAY}.md`, `canonical/prompting-rules.md` (graduation appends), `canonical/antipatterns.md` (graduation appends), archive `archive/proposals/*.md`, `archive/queue/*.md`, modify `learnings/*.md` for graduations
+- **MAY NEVER:** deploy code, touch application repos, modify User Preferences, modify `canonical/claude-state.md` or `canonical/claude-code-state.md` (intake-only), modify `canonical/00-README.md` or `canonical/toolchain.md` (manual only)
 
 ## 2. Dependencies
 
@@ -62,6 +74,19 @@ if ! check_dep "$INTAKE_STATUS" || ! check_dep "$PROCESS_STATUS"; then
   echo "" >> "$LEDGER"
   echo "### ${NOW} curate [DEPENDENCY_NOT_SATISFIED]" >> "$LEDGER"
   echo "- reason: intake=${INTAKE_STATUS:-missing}, process=${PROCESS_STATUS:-missing}" >> "$LEDGER"
+  # Still write a briefing so Logan sees the failure in email
+  cat > "$BRIEF" <<EOF_BRIEF
+📬 Claudious Daily — $(date +'%a %b %d')
+
+📊 System: BROKEN
+
+Today's pipeline did not complete.
+🏥 Intake [$([ "$INTAKE_STATUS" = "COMPLETE" ] || [ "$INTAKE_STATUS" = "COMPLETE_NO_WORK" ] && echo ✅ || echo ❌)] Process [$([ "$PROCESS_STATUS" = "COMPLETE" ] || [ "$PROCESS_STATUS" = "COMPLETE_NO_WORK" ] && echo ✅ || echo ❌)] Curate [❌]
+
+See ${LEDGER} for the failure reason.
+
+Archive: github.com/logancallen/Claudious/blob/main/archive/runs/${TODAY}.md
+EOF_BRIEF
   git add -A && git commit -m "curate: skipped, deps not ready" && git push origin main
   exit 0
 fi
@@ -76,13 +101,13 @@ echo "- start: $(date +%FT%T)" >> "$LEDGER"
 ### 3.1 Ledger Health Check (bootstrapping-aware)
 
 ```bash
-LEDGER_COUNT=$(ls runs/*.md 2>/dev/null | wc -l)
+LEDGER_COUNT=$(ls archive/runs/*.md 2>/dev/null | wc -l)
 BOOTSTRAPPING=false
 [ "$LEDGER_COUNT" -lt 7 ] && BOOTSTRAPPING=true
 ```
 
 If not bootstrapping, scan last 7 ledger files:
-- Count status distribution
+- Count status distribution (COMPLETE / COMPLETE_NO_WORK / ABORT / DEPENDENCY_NOT_SATISFIED)
 - Flag missing days (no ledger file)
 - Flag ABORT or DEPENDENCY_NOT_SATISFIED
 
@@ -94,32 +119,103 @@ If bootstrapping: skip missing-day alerts, just report what exists.
 
 - Proposals >7 days old → flag for Sunday review (not archive — just flag)
 - Queue items >3 days old → flag
-- Alerts — only archive if content matches a resolved item in `deployed.log` (never age-only)
+- Alerts — only archive if content matches a resolved item in `archive/queue/deployed.log` (never age-only)
 
-### 3.3 Write Daily Digest
+### 3.3 Prune `canonical/active-findings.md`
+
+In place, keep only entries with all of:
+- Date within last 7 days, AND
+- `**Action:**` is `queued` or `proposed`
+
+Remove entries where:
+- `**Action:**` is `graduated` or `archived` (process promoted them; canonical mirror holds the durable form)
+- Date is older than 7 days regardless of action (findings that never graduated in 7 days are stale signal — they either proposed or rotted)
+
+Before removing, mirror the block to `archive/intake/active-findings-pruned-${TODAY}.md` (append mode) so history exists. Never lose a finding silently.
+
+### 3.4 Prune `canonical/open-decisions.md`
+
+For each entry in `canonical/open-decisions.md`, check the pointed-to `archive/proposals/<name>.md` file mtime. If >30 days old:
+1. Append the entry to `archive/retrospectives/archive.md` with `pruned_from_open_decisions: ${TODAY}` tag.
+2. Remove the entry from `canonical/open-decisions.md`.
+3. Do NOT delete the archive/proposals/*.md file — just stop surfacing it.
+
+### 3.5 Write Daily Digest (`archive/digest/${TODAY}.md`)
+
+Full digest — verbose, archival:
 
 ```markdown
 # Daily Digest — ${TODAY}
 
 ## Today
-- Intake: <counts>
-- Process: <counts>
-- Curate: <this run>
+- Intake: <counts — Scout/Drift/Config and novelty flag>
+- Process: <counts — triaged, deployed, canonical mirrors, verified>
+- Curate: <this run's prune/graduate counts>
 
 ## Action Required
-<only list real items>
+<list real items from canonical/open-decisions.md top by recency>
 
 ## System Health (last 7 days)
 - Days complete: X / Y (Y = days with any ledger)
 - Aborted: X
 - Week status: <healthy|degraded|broken|bootstrapping>
+
+## Canonical state
+- active-findings entries: N (pruned M)
+- open-decisions entries: N (pruned M)
+- Last claude-state.md update: <date>
+- Last claude-code-state.md update: <date>
 ```
+
+### 3.6 Write `canonical/briefing-today.md` (OVERWRITE — phone-readable)
+
+Hard overwrite this file. Goal: Logan reads it in ≤15 seconds on phone. Keep under 30 lines. Pull data from:
+- Ledger (intake/process/curate status → health)
+- Today's `archive/intake/${TODAY}.md` (top 3–5 findings by credibility + relevance)
+- Today's process deploys (from `archive/queue/deployed.log` lines dated ${TODAY})
+- `canonical/open-decisions.md` (top 3 entries)
+- `alerts.md` (CRITICAL only)
+
+Determine system health:
+- `HEALTHY` — intake, process, curate all COMPLETE or COMPLETE_NO_WORK
+- `DEGRADED` — 1 of 3 is ABORT/DEPENDENCY_NOT_SATISFIED
+- `BROKEN` — 2+ failures OR any ABORT on today
+
+Template:
+
+```
+📬 Claudious Daily — <Day Mon DD>
+
+📊 System: <HEALTHY | DEGRADED | BROKEN>
+
+🆕 NEW (<count>)
+• <1-line finding — kebab-id: summary>
+• <1-line finding>
+• <1-line finding>
+
+⚡ DEPLOYED (<count>)
+• <1-line what changed>
+
+⚠️ NEEDS YOU (<count>)
+• <kebab-id>: <summary> — <one-word action>
+
+🏥 Intake [✅/❌] Process [✅/❌] Curate [✅/❌]
+
+Archive: github.com/logancallen/Claudious/blob/main/archive/digest/${TODAY}.md
+```
+
+Rules for the brief:
+- If a section count is 0, show the section header with `(0)` and no bullets — do not omit the section.
+- No section has more than 5 bullets. If there are more, truncate and append `• +N more in digest`.
+- No line over 100 chars (mobile wraps badly).
+- CRITICAL alerts from `alerts.md` bump the `📊 System:` line from HEALTHY to DEGRADED and add a line `🚨 <alert title>` above `🆕 NEW`.
+- Emojis in this file are intentional — the brief is the phone UI. Do not remove them when refactoring.
 
 Commit:
 
 ```bash
 git add -A
-git commit -m "curate: daily digest ${TODAY}" || echo "no daily changes"
+git commit -m "curate: daily digest + brief ${TODAY}" || echo "no daily changes"
 ```
 
 ## 4. Sunday Work (only if $DOW == 7)
@@ -142,55 +238,67 @@ Else if `WEEK_BROKEN=true`:
 Week has <N> broken days. Graduations/prunes skipped. Review: <days>.
 ```
 
-Else, full retrospective:
+Else, full retrospective below.
 
-**Prune proposals (>30 days):**
+### 4.2 Prune proposals (>30 days)
 
 ```bash
-for f in proposals/*.md; do
+for f in archive/proposals/*.md; do
   AGE=$(( ($(date +%s) - $(stat -c %Y "$f" 2>/dev/null || stat -f %m "$f")) / 86400 ))
   AGE=${AGE#-}
   if [ "$AGE" -gt 30 ]; then
-    echo "$(date +%F) | $f | stale >30d" >> retrospectives/archive.md
+    echo "$(date +%F) | $f | stale >30d" >> archive/retrospectives/archive.md
     git rm "$f"
   fi
 done
 ```
 
-**Graduate learnings (3+ citations):**
-1. Scan `learnings/*.md` for patterns referenced 3+ times
-2. Create `skills/graduated/<name>.md` with consolidated content
-3. Remove source entries from `learnings/*.md`
-4. Verify: `grep -c "<key phrase>" learnings/*.md` → must = 0
-5. If >0 → revert, log failure
-6. Append to `deployed.log`: `YYYY-MM-DD GRADUATED <name>`
+Then re-trigger `canonical/open-decisions.md` regeneration (same logic as process Phase 3) so the index reflects the pruned set.
 
-**Calibration:**
-- Scan deployed.log last 30 days
+### 4.3 Graduate learnings (3+ citations) — now writes to canonical
+
+Scan `learnings/*.md` for patterns referenced 3+ times. For each:
+
+1. Determine target canonical file:
+   - TECHNIQUE or PATTERN → `canonical/prompting-rules.md`
+   - ANTIPATTERN or GOTCHA → `canonical/antipatterns.md`
+2. Append consolidated content to the target canonical file under the matching section.
+3. Verify: `grep -c "<key phrase>" <canonical target>` → must ≥1. If 0, revert append and log failure.
+4. Remove source entries from `learnings/*.md`.
+5. Verify: `grep -c "<key phrase>" learnings/*.md` → must = 0 (or only inside `archive/` — not applicable since learnings stays at root). If >0, revert, log failure.
+6. Append to `archive/queue/deployed.log`: `YYYY-MM-DD GRADUATED <name> → <canonical target>. WORKING. [evidence: grep-confirmed]`.
+
+Graduations no longer write to `skills/graduated/` — canonical is the surface. `skills/` remains for Claude Code skill files only.
+
+### 4.4 Calibration
+
+- Scan `archive/queue/deployed.log` last 30 days
 - Compute % WORKING / BROKE / REGRESSED
 - If BROKE+REGRESSED >20% → note for next Intake's config analysis
 
-**Grade:**
+### 4.5 Grade
+
 - **A:** >95% WORKING, ≤5 stale, no broken weeks
 - **B:** 85–95%, ≤10 stale, 0–1 broken days
 - **C:** <85% or >10 stale or ≥2 broken days
 
-### 4.2 Weekly Digest (appended to daily)
+### 4.6 Weekly Digest (appended to daily `archive/digest/${TODAY}.md`)
 
 ```markdown
 ---
 
 ## Week Summary
 - Intake: X findings
-- Process: X deployed, X verified, X failed
-- Graduated: X
-- Pruned: X
+- Process: X deployed, X canonical-mirrors, X verified, X failed
+- Graduated: X → canonical
+- Pruned proposals: X
+- Pruned active-findings: X
 - Grade: <A|B|C>
 
 ## Top 3 for Coming Week
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Proposals Awaiting Logan (max 10)
 - ...
@@ -214,19 +322,22 @@ DUR=$((END - START))
 ```
 ### ${NOW} curate [${STATUS}]
 - commit: $(git rev-parse HEAD)
-- inputs: runs/ (last 7), proposals/, queue/, deployed.log, learnings/, alerts.md
-- outputs: digest/${TODAY}.md$([ $DOW -eq 7 ] && echo " + retrospectives/${TODAY}.md")
-- summary: Alerts=X, Stale=X$([ $DOW -eq 7 ] && echo ", Graduated=X, Archived=X, Grade=<>")
+- inputs: archive/runs/ (last 7), archive/proposals/, archive/queue/, archive/queue/deployed.log, learnings/, canonical/active-findings.md, canonical/open-decisions.md, alerts.md
+- outputs: archive/digest/${TODAY}.md, canonical/briefing-today.md$([ $DOW -eq 7 ] && echo ", archive/retrospectives/${TODAY}.md")
+- summary: Alerts=X, Stale=X, active-findings-pruned=X, open-decisions-pruned=X$([ $DOW -eq 7 ] && echo ", Graduated=X→canonical, Archived=X, Grade=<>")
 - duration: ${DUR}s
 ```
 
 ## 7. Self-Audit
 
-1. Daily digest exists
-2. Ledger health check ran (bootstrapping-aware)
-3. If Sunday: retrospective exists, graduations grep-verified
-4. Alerts only archived by resolution (never age)
-5. Action Required lists real items only
-6. Ledger updated from IN_PROGRESS
+1. `archive/digest/${TODAY}.md` exists
+2. `canonical/briefing-today.md` exists and was overwritten (mtime = today)
+3. Brief is ≤30 lines and includes all five required sections (NEW, DEPLOYED, NEEDS YOU, health row, archive link)
+4. Ledger health check ran (bootstrapping-aware)
+5. `canonical/active-findings.md` pruning mirrored to archive before removal
+6. If Sunday: retrospective exists, graduations grep-verified against canonical, proposals regenerated via open-decisions
+7. Alerts only archived by resolution (never age)
+8. Action Required lists real items only (no fabrication)
+9. Ledger updated from IN_PROGRESS
 
-Print status. Status must be one of: `COMPLETE | COMPLETE_NO_WORK | DEPENDENCY_NOT_SATISFIED | ABORT | IN_PROGRESS`.
+Print final status. Status must be one of: `COMPLETE | COMPLETE_NO_WORK | DEPENDENCY_NOT_SATISFIED | ABORT | IN_PROGRESS`.
