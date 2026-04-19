@@ -1,58 +1,75 @@
-# Claudious — Living Intelligence Base
+# Claudious — Autonomous Claude Nervous System
 
 **Owner:** logancallen
-**Purpose:** Fully automated cross-project, cross-platform intelligence system.
-Connected to ALL Claude Projects as a global knowledge source.
+**Purpose:** Self-maintaining shared knowledge layer across Logan's 8 Claude Projects.
 
-## This Repo Is Global
-Every Claude Project connects here as a knowledge source. Intelligence captured
-here is available in every future session across all projects automatically.
+---
 
-## Automated Components
-| Component | What It Does | Frequency |
+## What this repo is
+
+Claudious is the global brain for Logan's Claude ecosystem. Every Claude Project (ASF Graphics, Courtside Pro, Genesis Advisory, Claude Mastery Lab, etc.) attaches `canonical/` as project knowledge. Three daily cloud routines keep canonical current without manual tending.
+
+## Repo layout
+
+| Path | Purpose | Attached to Projects? |
 |---|---|---|
-| Scout | 6-search web sweep for new techniques + cross-platform | Weekly |
-| Evaluator | Triages scout findings against current config | Weekly |
-| Pioneer | Proposes self-improvements to Claude config | Monthly |
-| Auto-Harvest | Fallback BUG/GOTCHA capture from CC sessions | Daily |
-| Retrospective | Prunes, validates, promotes, graduates skills | Monthly |
-| Drift Detector | Compares schema docs vs actual DB | Weekly |
-| Config Backup | Snapshots all Claude config files | Weekly |
-| Digest | Weekly summary of all system outputs | Weekly |
-| Handoff Writer | Writes session handoff at session end | Per session |
+| `canonical/` | Current-state truth (9 signal-dense files) | **Yes** |
+| `archive/` | Dated history (intake, runs, digests, proposals, queue, scout, retrospectives, snapshots, evaluations, project-learnings, research) | No — reference only |
+| `scheduled-tasks/` | Cloud routine prompts (intake, process, curate, scout-additions) | No |
+| `learnings/` | Raw capture stream; graduates into `canonical/` | No |
+| `skills/` | Claude Code skill definitions | No (loaded by Claude Code directly) |
+| `mastery-lab/` | Prompting research vault | No |
+| `scripts/` | Sync, backup, rollback tooling | No |
+| `.github/workflows/` | Auto-merge and daily-briefing email | — |
 
-## Manual Actions (Logan only)
-- "approved" after harvest review
-- queue/ — deploy ready improvements (~5 min/week)
-- proposals/ — review judgment calls (~10 min/month)
-- queue/deployed.log — one line when deploying (~10 sec)
-- Sync button in Claude Project UI after pushes
+## Daily pipeline
 
-## Alert System
-alerts.md is checked at every session start. CRITICAL alerts surface immediately.
+```
+06:00  Intake   → archive/intake/YYYY-MM-DD.md   + canonical/active-findings.md
+                                                  + canonical/claude-state.md (on OFFICIAL MODEL-STATE)
+                                                  + canonical/claude-code-state.md (on OFFICIAL CC-STATE)
 
-## Emergency Rollback
-bash scripts/rollback-config.sh YYYY-MM-DD
+07:00  Process  → archive/queue/*.md              (auto-deploy candidates)
+                  archive/proposals/*.md          (judgment calls)
+                  learnings/*.md + canonical/prompting-rules.md | canonical/antipatterns.md
+                                                  (SAFE+HIGH+TRIVIAL auto-deploys, mirrored)
+                  canonical/open-decisions.md     (full regeneration)
 
-## File Index
-- learnings/techniques.md — Claude techniques (cross-project)
-- learnings/patterns.md — Architecture and workflow patterns
-- learnings/gotchas.md — Silent failures, edge cases
-- learnings/behavioral.md — User Preferences candidates
-- learnings/antipatterns.md — Token waste, output-degrading patterns
-- learnings/platforms/*.md — Platform-specific findings
-- skills/index.md — Master index of ALL skills across ALL projects
-- scout/ — Weekly web research outputs
-- evaluations/ — Triage results + processed.log
-- queue/ — Ready-to-deploy improvements + deployed.log
-- proposals/ — Improvements needing human judgment
-- retrospectives/ — Monthly analysis reports
-- snapshots/ — Weekly config backups
-- digest/ — Weekly system digests
-- alerts.md — Active system alerts
+20:00  Curate   → archive/digest/YYYY-MM-DD.md    (verbose daily digest)
+                  canonical/briefing-today.md     (phone-readable overwrite)
+                  canonical/active-findings.md    (prune >7d or graduated)
+                  canonical/open-decisions.md     (prune >30d proposals)
+                  archive/retrospectives/...      (Sundays — graduation + grading)
+```
 
-## Graduation Pipeline
-1. Learning appears in learnings/*.md
-2. Pattern cited 3+ times → retrospective flags as graduation candidate
-3. Pioneer generates skill file → queue/ for approval
-4. After approval: skill created, learning archived
+## Observability
+
+Every push to `main` that changes `canonical/briefing-today.md` triggers `.github/workflows/daily-briefing.yml`, which emails the brief to `loganallensf@gmail.com` via Gmail SMTP. A BROKEN brief is written even when routines fail — the email pipeline is the tripwire.
+
+## Routine details
+
+Each routine file in `scheduled-tasks/` declares:
+- `Effort:` — `high` or `xhigh`
+- `Task Budget:` — explicit token ceiling (`task-budgets-2026-03-13` beta)
+- `Model:` — `claude-opus-4-7`
+- `Writes to:` — the file allowlist
+
+Opus 4.7 interprets prompts literally; routines include an explicit literal-interpretation guardrail to prevent silent synthesis.
+
+## Emergency rollback
+
+```bash
+# Windows
+bash "C:/Users/logan/Projects/Claudious/scripts/rollback-config.sh" YYYY-MM-DD
+
+# Mac
+bash ~/Projects/claudious/scripts/rollback-config.sh YYYY-MM-DD
+```
+
+Or `git revert <sha>` on the offending commit.
+
+## Related
+
+- Alerts: `alerts.md` (session-start surfaces CRITICAL items)
+- Global Claude Code instructions: `~/.claude/CLAUDE.md` (session-lifecycle + response-self-check)
+- Claudious-specific rules: `CLAUDE.md` (this repo)
