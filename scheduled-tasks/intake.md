@@ -1,5 +1,16 @@
 # INTAKE — Claudious daily task
 
+**Effort:** xhigh
+**Task Budget:** 40000 tokens (beta header: `task-budgets-2026-03-13`)
+**Model:** `claude-opus-4-7`
+**Writes to:** `archive/intake/${TODAY}.md`, `archive/runs/${TODAY}.md`, `canonical/active-findings.md`, `canonical/claude-state.md` (conditional), `canonical/claude-code-state.md` (conditional)
+
+---
+
+## Literal-interpretation guardrail
+
+Interpret web search results literally. Do not synthesize beyond what the source states. Do not silently resolve ambiguity — flag it. If a finding could mean two things, write both interpretations and mark credibility `ANECDOTAL` until a second source confirms. Opus 4.7 no longer repairs ambiguous prompts; the same discipline applies here.
+
 ## 0. Environment
 
 ```bash
@@ -17,10 +28,10 @@ git pull origin main --ff-only || { echo "ABORT: pull failed"; exit 1; }
 
 TODAY=$(date +%Y-%m-%d)
 NOW=$(date +%H:%M)
-LEDGER="runs/${TODAY}.md"
-INTAKE="intake/${TODAY}.md"
-mkdir -p runs intake
-[ -d runs ] || { echo "ABORT: runs/ not writable"; exit 1; }
+LEDGER="archive/runs/${TODAY}.md"
+INTAKE="archive/intake/${TODAY}.md"
+mkdir -p archive/runs archive/intake canonical
+[ -d archive/runs ] || { echo "ABORT: archive/runs not writable"; exit 1; }
 
 # Double-run check (manual trigger protection)
 if [ -f "$INTAKE" ]; then
@@ -43,8 +54,9 @@ echo "- start: $(date +%FT%T)" >> "$LEDGER"
 
 ## 1. Scope
 
-- **MAY write:** `intake/${TODAY}.md`, `runs/${TODAY}.md`
-- **MAY NEVER:** modify `learnings/`, `queue/`, `proposals/`, `skills/`, any code repo, any migration, User Preferences
+- **MAY write:** `archive/intake/${TODAY}.md`, `archive/runs/${TODAY}.md`, `canonical/active-findings.md` (append only), `canonical/claude-state.md` (OFFICIAL updates only), `canonical/claude-code-state.md` (OFFICIAL updates only)
+- **MAY NEVER:** modify `learnings/`, `archive/queue/`, `archive/proposals/`, `skills/`, `canonical/prompting-rules.md`, `canonical/antipatterns.md`, `canonical/open-decisions.md`, `canonical/briefing-today.md`, any code repo, any migration, User Preferences
+- **MAY NEVER DELETE from canonical/** — deletion is curate's job only.
 
 ## 2. Dependencies
 
@@ -62,6 +74,8 @@ Count RELEVANT hits (ignore unrelated AI news, non-Anthropic launches):
 
 ### Section B — Scout
 
+Current search targets live in `scheduled-tasks/scout-additions.md`. Core six:
+
 1. `site:docs.claude.com OR site:code.claude.com changelog updated last 7 days`
 2. `"claude code" OR "CLAUDE.md" tips patterns site:twitter.com OR site:x.com past 48 hours`
 3. `"MCP server" OR "MCP tool" new release last 7 days`
@@ -73,37 +87,36 @@ For each RELEVANT hit, extract:
 - 1-line finding (what + why ≤20 words)
 - Source URL
 - Credibility: `OFFICIAL` | `VERIFIED` | `COMMUNITY` | `ANECDOTAL`
-- Type: `TECHNIQUE` | `TOOL` | `BEHAVIOR` | `NEWS`
+- Type: `TECHNIQUE` | `TOOL` | `BEHAVIOR` | `NEWS` | `MODEL-STATE` | `CC-STATE`
 - Relevance to Logan: `HIGH` | `MEDIUM` | `LOW` (skip LOW)
 
 ### Section C — Drift Check
 
-For each project path that exists on this machine:
-- `C:\Users\logan\Projects\asf-graphics-app`
-- `C:\Users\logan\Projects\courtside-pro`
+For each project path, attempt access. Cloud routines run on Linux — Windows paths are not reachable. If `test -d <path>` fails, note `not accessible in cloud execution` and continue.
 
-Check:
+Candidate paths:
+- `$REPO_ROOT/../asf-graphics-app`
+- `$REPO_ROOT/../courtside-pro`
+
+For any reachable repo, check:
 1. Migration files in `supabase/migrations/` vs entries in `docs/schema-state.md`
 2. Tables/columns in migrations not documented
 3. RLS policies in migrations not reflected in `docs/business-rules.md`
 
-If project missing: note "not present on this machine" (not a failure).
-
 ### Section D — Config Analysis
 
-Read:
-- `C:\Users\logan\.claude\CLAUDE.md`
-- `CLAUDE.md` (Claudious)
+Read (skip any that do not exist — do not abort):
+- `canonical/` (all files)
+- `CLAUDE.md` (Claudious root)
 - `learnings/*.md`
-- `skills/graduated/*.md`
-- `queue/deployed.log`
+- `archive/queue/deployed.log`
 - `alerts.md`
 
 Checks:
-1. **Stale path scan:** `grep -rni "OneDrive" CLAUDE.md learnings/ 2>/dev/null` — any hit = proposal
-2. **Removed-task references:** `grep -rni "AutoDream\|Config Backup\|Auto-Harvest" CLAUDE.md learnings/` — any hit = proposal
+1. **Stale path scan:** `grep -rni "OneDrive" CLAUDE.md learnings/ canonical/ 2>/dev/null` — any hit = proposal seed
+2. **Removed-task references:** `grep -rni "AutoDream\|Config Backup\|Auto-Harvest\|KAIROS\|Chyros" CLAUDE.md learnings/ canonical/ scheduled-tasks/` — any hit = proposal seed
 3. **Graduation candidates:** patterns in `learnings/*.md` referenced 3+ times
-4. **Deploy calibration:** scan `deployed.log` for BROKE/REGRESSED — if any, note common factor
+4. **Deploy calibration:** scan `archive/queue/deployed.log` for BROKE/REGRESSED — if any, note common factor
 5. **Unused rules:** best-effort, rules in CLAUDE.md with no session references in 30+ days
 
 Output per finding: name + rationale + `IMPACT (H/M/L)` + `EFFORT (T/L/M/H)` + `RISK (SAFE / TEST-FIRST / REVIEW-REQUIRED)`
@@ -115,9 +128,9 @@ git add -A
 git commit -m "intake: ${TODAY} sections A-D complete" || echo "nothing to commit in sections"
 ```
 
-## 4. Output
+## 4. Output — Dated Archive File
 
-Write `intake/${TODAY}.md`:
+Write `archive/intake/${TODAY}.md`:
 
 ```markdown
 # Intake — YYYY-MM-DD
@@ -144,11 +157,42 @@ Write `intake/${TODAY}.md`:
 - Novelty: <flag>
 ```
 
-## 5. Commit & Push
+## 5. Canonical Updates (write-only — never delete)
+
+After the dated archive file is written, propagate to canonical:
+
+### 5.1 `canonical/active-findings.md`
+
+Append each Scout/Drift/Config finding as:
+
+```markdown
+### [YYYY-MM-DD] [kebab-id]
+**Source:** [URL or path]
+**Credibility:** OFFICIAL | VERIFIED | COMMUNITY | ANECDOTAL
+**Type:** TECHNIQUE | TOOL | BEHAVIOR | NEWS | MODEL-STATE | CC-STATE
+**Summary:** [1-2 sentences, literal — no added synthesis]
+**Action:** queued
+```
+
+Action values: `queued` (default — process triages next), `proposed` (Logan review), `graduated` (promoted to canonical/prompting-rules or antipatterns), `archived` (merged to archive only). Intake only sets `queued`. Process/curate update the rest.
+
+### 5.2 `canonical/claude-state.md` (conditional)
+
+Update in place ONLY IF: credibility `OFFICIAL` AND type `MODEL-STATE` (new model release, pricing change, context window change, sampling-param behavior, deprecation, new capability). Edit the relevant section directly. Bump the `Last updated:` date at the top. Do NOT append a changelog — the file is current state, not history.
+
+### 5.3 `canonical/claude-code-state.md` (conditional)
+
+Update in place ONLY IF: credibility `OFFICIAL` AND type `CC-STATE` (new CC version, env var, slash command, keybinding change, feature flag). Same rules as 5.2.
+
+### 5.4 Literal updates only
+
+If a finding's OFFICIAL claim is narrow, update only that fact — do not rewrite the section. If the claim conflicts with existing canonical content, do NOT edit. Instead, add the conflict to `archive/intake/${TODAY}.md` Section D and let process handle it as a proposal.
+
+## 6. Commit & Push
 
 ```bash
 git add -A
-git commit -m "intake: ${TODAY} output written" || echo "nothing new"
+git commit -m "intake: ${TODAY} output + canonical updates" || echo "nothing new"
 git push origin main
 
 TOTAL=$(grep -oE 'Total for Process: [0-9]+' "$INTAKE" | grep -oE '[0-9]+' || echo 0)
@@ -159,25 +203,28 @@ END=$(date +%s)
 DUR=$((END - START))
 ```
 
-## 6. Update Ledger Entry (replace IN_PROGRESS)
+## 7. Update Ledger Entry (replace IN_PROGRESS)
 
 Use str_replace or sed equivalent to replace the `[IN_PROGRESS]` line with final status, and append details:
 
 ```
 ### ${NOW} intake [${STATUS}]
 - commit: $(git rev-parse HEAD)
-- inputs: web, ~/.claude, local repos
-- outputs: intake/${TODAY}.md
-- summary: Scout=X, Drift=X, Config=X (total=X, novelty=<flag>)
+- inputs: web, canonical/, learnings/, local repos (if accessible)
+- outputs: archive/intake/${TODAY}.md, canonical/active-findings.md (+N), canonical/claude-state.md (<updated|unchanged>), canonical/claude-code-state.md (<updated|unchanged>)
+- summary: Scout=X, Drift=X, Config=X (total=X, novelty=<flag>), canonical-edits=N
 - duration: ${DUR}s
 ```
 
 Commit + push ledger.
 
-## 7. Self-Audit
+## 8. Self-Audit
 
-1. `intake/${TODAY}.md` exists with all 4 sections
-2. Ledger entry updated from IN_PROGRESS to final status
-3. Stale-path + removed-task scans actually ran and reported
+1. `archive/intake/${TODAY}.md` exists with all 4 sections
+2. `canonical/active-findings.md` appended (or explicit "no findings" note in ledger)
+3. Any canonical/claude-state or canonical/claude-code-state edits have `Last updated:` bumped
+4. No deletes from any canonical file (only append/edit-in-place)
+5. Ledger entry updated from IN_PROGRESS to final status
+6. Stale-path + removed-task scans actually ran and reported
 
 Print final status. Status must be one of: `COMPLETE | COMPLETE_NO_WORK | DEPENDENCY_NOT_SATISFIED | ABORT | IN_PROGRESS`.
