@@ -10,6 +10,17 @@
 
 ## Active entries
 
+### 2026-04-19 — DECISION — Brand-aligned design correction after logo review
+
+**Severity:** HIGH
+**Context:** Original handoff spec called for Instrument Serif italic + warm maple (#D2B48C) accent — an editorial luxury-goods aesthetic chosen before the actual ASF logo was provided. Logo is a monochrome (black/white/grey) circular athletic seal with bold italic sans-serif wordmark and an A-monogram mountain mark. The original direction actively conflicted with the logo's typography and palette, signaling brand inconsistency.
+**Learning:** Design system decisions must be grounded in the actual brand mark, not a plausible-sounding interpretation of the business. Default to "make it the best you can" prompts require first establishing brand ground-truth via logo/visual assets before committing to fonts or colors. Specific corrections: swap Instrument Serif italic → Space Grotesk bold upright (matches logo typography energy without mimicking it); swap warm-maple accent → muted warm-grey (#A69A8F) that aligns with logo's monochrome palette while preserving enough warmth to avoid clinical feel; rename "Hardwood Resonance Glass" → "ASF Glass" (concept tied to maple no longer fits). Logo SVG displayed in navbar + footer; hero relies on typography.
+**Applies to:** Any greenfield brand-led web build where the design system spec arrives before the brand mark has been reviewed. Default stance: ask for the logo before writing any CSS.
+
+<!-- PROMOTE TO CLAUDIOUS: Request the brand's logo/mark BEFORE committing to font/color decisions on greenfield web builds. A plausible-sounding aesthetic (luxury editorial, premium tech, etc.) can actively contradict the real mark and signal brand inconsistency. Two-minute logo review prevents hours of design rework. -->
+
+---
+
 ### 2026-04-18 — GOTCHA — Scaffold shipped without .gitattributes; CRLF risk on Windows
 
 **Severity:** MEDIUM
