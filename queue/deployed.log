@@ -30,3 +30,11 @@
 2026-04-16 | relocate-misclassified-envvar-queue-items.md | Target files already deployed 2026-04-15; relocation unnecessary. Closed as no-op. | DEPLOYED
 2026-04-17 | worktree-cli-flag-technique.md | Appended Native --worktree Flag technique to learnings/techniques.md | DEPLOYED
 2026-04-17 | claudeignore-500-token-target.md | Target learnings/antipatterns.md outside allowed scope (techniques.md, patterns.md, gotchas.md only); item left in queue for manual handling | SKIPPED_OUT_OF_SCOPE
+2026-04-19 DEPLOYED opus-47-ga-model-update — Appended Opus 4.7 GA + xhigh effort entry to learnings/platforms/claude.md. WORKING. [evidence: grep-confirmed "Opus 4.7 GA" in learnings/platforms/claude.md]
+2026-04-19 DEPLOYED computer-use-cowork-max — Appended Computer Use in Cowork (Max plan) entry to learnings/platforms/claude.md. WORKING. [evidence: grep-confirmed "Computer Use in Cowork" in learnings/platforms/claude.md]
+2026-04-19 DEPLOYED persistent-agent-thread-max — Appended Persistent Agent Thread entry to learnings/platforms/claude.md. WORKING. [evidence: grep-confirmed "Persistent Agent Thread" in learnings/platforms/claude.md]
+2026-04-19 DEPLOYED mcp-500k-result-storage — Appended MCP 500K result storage entry to learnings/techniques.md. WORKING. [evidence: grep-confirmed "500,000 characters" in learnings/techniques.md]
+2026-04-19 DEPLOYED claude-code-w15-w16-features — Appended Claude Code Week 15-16 feature set entry to learnings/techniques.md. WORKING. [evidence: grep-confirmed "Week 15-16 April 2026" in learnings/techniques.md]
+2026-04-19 DEPLOYED logo-first-design-principle — Appended logo-first design principle entry to learnings/techniques.md. WORKING. [evidence: grep-confirmed "logo/mark BEFORE" in learnings/techniques.md]
+2026-04-19 DEPLOYED claudeignore-500-token-target — Appended .claudeignore + 500-token ceiling antipattern to learnings/antipatterns.md (previously SKIPPED_OUT_OF_SCOPE by automated processor; deployed manually this run). WORKING. [evidence: grep-confirmed "claudeignore" in learnings/antipatterns.md]
+2026-04-19 CLEANUP worktree-cli-flag-technique — Already deployed 2026-04-17; queue file removed (was missed in April 17 deploy cleanup). WORKING. [evidence: "Native `--worktree` Flag" confirmed in learnings/techniques.md since 2026-04-17]
