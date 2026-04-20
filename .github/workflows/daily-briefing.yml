@@ -5,12 +5,28 @@ on:
     branches: [main]
     paths:
       - 'canonical/briefing-today.md'
+      - 'archive/digest/**'
+  workflow_dispatch:
 
 jobs:
   email:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verify secrets present
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          if [ -z "$GMAIL_USER" ]; then
+            echo "::error::GMAIL_USER secret is empty or unset"
+            exit 1
+          fi
+          if [ -z "$GMAIL_APP_PASSWORD" ]; then
+            echo "::error::GMAIL_APP_PASSWORD secret is empty or unset"
+            exit 1
+          fi
+          echo "Both secrets present."
       - name: Read briefing
         id: brief
         run: |
