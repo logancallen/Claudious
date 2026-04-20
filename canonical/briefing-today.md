@@ -1,50 +1,29 @@
-# Briefing — Today
-
-**Last updated:** 2026-04-19
-**Status:** No briefing yet — `curate` routine has not run today.
-
----
-
-## Format
-
-This file is rewritten daily by the `curate` routine. Keep it phone-readable — terse, scannable, no buried detail. Target ≤30 lines, ≤500 words.
-
-```
-# Briefing — YYYY-MM-DD
+# Briefing — 2026-04-20
 
 ## System Health
-- Intake: <status>  Process: <status>  Curate: <status>
-- Week: <healthy | degraded | broken | bootstrapping>  Grade: <A | B | C>
+- Intake: COMPLETE (04:10) · Process: COMPLETE (04:24) · Curate: COMPLETE (this run)
+- Week: bootstrapping (4 / 7 ledger days present) · Grade: deferred until ≥7 days
 
 ## Action Required
-- <kebab-id>: <1-line — what Logan needs to do>
-- (only real items; empty list = "None today")
+- `skill-description-1536-chars-audit` — rewrite 15+ custom skill descriptions to 1,536-char limit (~45 min).
+- `context-mode-mcp-plugin` — 1-session test vs your 12-MCP setup; claimed 50–90% token reduction.
+- `user-preferences-adaptive-thinking-bypass` — paste `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1` into User Preferences.
+- `mcp-allowlist-env-security-hardening` — define `CLAUDE_CODE_MCP_ALLOWLIST_ENV` for 12 MCP servers.
+- `bash-permission-bypass-patch` — confirm `claude --version` ≥ 2.1.98 (canonical reports 2.1.113; likely auto-resolvable).
+- Full list: `canonical/open-decisions.md` (28 proposals awaiting judgment).
 
 ## Shipped Overnight
-- <kebab-id>: <1-line — what the routine deployed>
+- `disable-skill-shell-execution` — technique appended to `learnings/techniques.md` (WORKING, grep-verified).
+- `sonnet-1m-context-retirement-warning` — 2026-04-30 retirement note appended to `learnings/platforms/claude.md` (WORKING, grep-verified).
+- Canonical refresh: `claude-state.md` (deprecation schedule + managed-agents beta) and `claude-code-state.md` (MCP 500K, disableSkillShellExecution, push-notification tool, /team-onboarding, /autofix-pr, /doctor MCP scope warning, computer-use CLI preview, edit-on-cat/sed).
 
 ## Alerts
-- <CRITICAL / HIGH alerts, if any>
+- **CRITICAL** ASF-GRAPHICS migrations 026–028 broke employee permissions — do NOT run new migrations until audit session (active since 2026-04-14).
+- **HIGH** Bash permission bypass patched in v2.1.98 — verify current version.
+- **HIGH** Skill description limit 250→1,536 — 15+ custom descriptions pending rewrite.
+- **HIGH** `context-mode` MCP plugin pending test; GrowthBook tengu_* remote kill-switches; `CLAUDE_CODE_MCP_ALLOWLIST_ENV` hardening.
 
 ## Findings Worth Surfacing
-- <0–3 items from active-findings.md that touch today's work>
-```
-
----
-
-## Placeholder (until first curate run populates this)
-
-### System Health
-Not yet running through new canonical-aware routines. Seed populated 2026-04-19 by canonical restructure.
-
-### Action Required
-- See `canonical/open-decisions.md` — 28 proposals awaiting review. Top 3: `skill-description-1536-chars-audit`, `context-mode-mcp-plugin`, `rollback-path-windows-tilde-bug`.
-
-### Alerts
-- CRITICAL: ASF-GRAPHICS migrations 026–028 broke employee permissions. Do NOT run new migrations until audit session. (Active since 2026-04-14.)
-- HIGH: Skill description limit 250→1,536 chars — 15+ custom descriptions pending re-expansion.
-- HIGH: `context-mode` MCP plugin pending test (50–90% token reduction claim).
-
-### Findings Worth Surfacing
-- `cowork-context-1m-to-200k` — verify any workflow depending on 1M Cowork context.
-- `rollback-path-windows-tilde-bug` — emergency rollback may silently fail on Windows.
+- **Sonnet 4.5 / 4 1M context retires 2026-04-30** — 10 days out; audit any workflow still pinned to legacy Sonnet 1M beta.
+- **MCP 500K result storage** (Week 15-16) — raises payload ceiling; can change what's worth sending through MCP vs inline.
+- **/doctor now warns on MCP scope drift** — use before triaging MCP-break bugs.
