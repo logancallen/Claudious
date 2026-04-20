@@ -32,4 +32,10 @@
 **Learning:** Persistent Agent Thread lets Logan manage Cowork tasks from mobile (iOS/Android) and desktop (Claude Desktop) simultaneously. Tasks started in Cowork are accessible via the app — no need to stay at the computer while a long Cowork session runs. Max plan rollout is complete; Pro plan following. Use for: long-running Claudious process runs, overnight research tasks, build sessions that can be monitored from mobile.
 **Applies to:** All Cowork sessions on Max plan — Claudious process, ASF build sessions
 
+### 2026-04-20 — TECHNIQUE — Sonnet 4.5 / Sonnet 4 1M Context Beta Retires 2026-04-30
+**Severity:** HIGH
+**Context:** Anthropic official deprecation: the 1M-token context window beta on `claude-sonnet-4-5` and `claude-sonnet-4` retires 2026-04-30. After that date, those model IDs silently drop back to the base 200K window.
+**Learning:** Before 2026-04-30, audit any Sonnet 4.5 / Sonnet 4 pinned callers (Claude Code subagents with `CLAUDE_CODE_SUBAGENT_MODEL=claude-sonnet-4-6` are unaffected because they target 4.6, but any caller pinned to `claude-sonnet-4-5` or `claude-sonnet-4` that relies on the 1M beta header will degrade). Migration path: switch long-context workloads to Opus 4.7 (native 1M not guaranteed — check current state) or re-chunk to 200K. Grep for `claude-sonnet-4-5`, `claude-sonnet-4-20250514`, and any `beta.*context-1m` header in project configs.
+**Applies to:** Any Claude API / Claude Code caller pinned to Sonnet 4.5 or Sonnet 4 with long-context usage — audit window closes 2026-04-30
+
 ## Archive
