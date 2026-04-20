@@ -87,3 +87,17 @@ See `canonical/open-decisions.md` for active proposals. Notable candidates:
 - **`context-mode` MCP plugin** — 50–90% token reduction on MCP-heavy sessions. Pending test.
 - **Agent Skills Spec (Codex CLI + ChatGPT adoption)** — cross-platform skill portability.
 - **Background monitor plugin manifest** (v2.1.105 feature).
+
+## Competitors (evaluated, not in use)
+
+**Last updated:** 2026-04-19
+**Purpose:** Tools Logan has evaluated against Claude Code. Referenced by Grok scan to filter "already evaluated" from "new entrants".
+
+- Cursor
+- Windsurf
+- Codex CLI (OpenAI)
+- Gemini CLI (Google)
+- Cline
+- Aider
+
+**Update discipline:** When a new competitor is evaluated or a listed one shuts down, same-commit update here.
