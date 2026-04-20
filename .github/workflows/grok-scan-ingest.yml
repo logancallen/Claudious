@@ -1,0 +1,55 @@
+name: Grok Scan Ingest
+
+on:
+  schedule:
+    # 6:30 AM CT = 11:30 UTC (CST) / 12:30 UTC (CDT). Using 11:30 UTC covers
+    # standard time; during DST the fetch runs at 7:30 AM CT which is still
+    # inside all three lookback windows (24h/36h/48h).
+    - cron: '30 11 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch Grok scan via IMAP
+        id: fetch
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          set +e
+          python scripts/fetch_grok_scan.py
+          rc=$?
+          set -e
+          echo "fetch_rc=$rc" >> "$GITHUB_OUTPUT"
+          # Exit code 1 = no message found today (expected on low-volume days).
+          # Exit code 0 = wrote a new scan file.
+          # Exit codes 2/3 = real failure, surface it.
+          if [ $rc -eq 2 ] || [ $rc -eq 3 ]; then
+            exit $rc
+          fi
+
+      - name: Commit scan file
+        if: steps.fetch.outputs.fetch_rc == '0'
+        run: |
+          git config user.name "logancallen"
+          git config user.email "loganallensf@gmail.com"
+          git add archive/scan-inbox/
+          if git diff --staged --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          TODAY=$(date -u +%Y-%m-%d)
+          git commit -m "grok-scan: ingest ${TODAY}"
+          git push origin main
