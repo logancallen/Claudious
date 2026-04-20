@@ -1,6 +1,6 @@
 # Claude Model Ecosystem — Current State
 
-**Last updated:** 2026-04-19
+**Last updated:** 2026-04-20
 **Status:** Opus 4.7 is the current flagship. Opus 4.6 retains specific use cases (cloud Ultraplan).
 
 ---
@@ -42,7 +42,13 @@ Treat these as **literal 400-error hazards**, not warnings:
 
 ## Deprecation Schedule
 
+- **April 19, 2026** — `claude-3-haiku-20240307` retired. Any pinned caller returns an error — switch to Haiku 4.5.
+- **April 30, 2026** — 1M-token context window **beta** on Sonnet 4.5 and Sonnet 4 retires. After this date, those models drop back to their base context window. Audit any pinned Sonnet 4.5/4 callers relying on 1M context.
 - **June 15, 2026** — `claude-sonnet-4-20250514` and `claude-opus-4-20250514` retire. Migrate any pinned versions before then.
+
+## Managed Agents (Public Beta)
+
+Claude Managed Agents is in public beta behind the `managed-agents-2026-04-01` beta header. Anthropic-hosted agent runtime — alternative to self-hosted Routines and SDK loops. Evaluate before committing to a hosting model.
 
 ## Claude.ai Features Logan Uses
 

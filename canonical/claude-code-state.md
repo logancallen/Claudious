@@ -1,6 +1,6 @@
 # Claude Code — Current State
 
-**Last updated:** 2026-04-19
+**Last updated:** 2026-04-20
 **Version:** 2.1.113 (released 2026-04-17)
 **Default model:** Opus 4.7
 
@@ -21,6 +21,14 @@
 - **Routines research preview** — cloud scheduled tasks (claude.ai/code/routines).
 - **Bash permission bypass patched** (v2.1.98) — backslash-escaped flags could bypass safety checks; update is mandatory if running older versions.
 - **Skill `disable-model-invocation: true` fix** (v2.1.110) — now correctly allows manual `/<skill>` invocation while blocking auto-trigger.
+- **MCP 500K tool-result cap** — per-tool result limit raised to 500,000 characters via `_meta["anthropic/maxResultSizeChars"]`. Relevant for Logan's 5+ MCP setup when large payloads previously truncated.
+- **`disableSkillShellExecution` setting** (Week 14) — blocks inline shell execution inside skills and slash commands; security hardening when running third-party skills.
+- **Edit tool works on cat/sed-viewed files** (Week 14) — Edit no longer requires a dedicated Read when the file content was shown via `cat` or `sed`.
+- **Push notification tool** — Claude can send mobile push notifications when Remote Control and "Push when Claude decides" are enabled in config. Candidate for long-running Routine/Ultraplan completion alerts.
+- **`/doctor` MCP multi-scope warning** — warns when an MCP server is defined in multiple config scopes with different endpoints.
+- **`/team-onboarding`** — generates a personalized ramp-up guide for a new teammate from local usage patterns, commands, and MCP usage.
+- **`/autofix-pr`** — terminal-side PR auto-fix against a GitHub PR.
+- **Computer Use in CLI (research preview)** — Claude opens native apps, clicks through UI, and verifies changes from the terminal.
 
 ## Active Environment Variables (Logan's PowerShell `$PROFILE`)
 

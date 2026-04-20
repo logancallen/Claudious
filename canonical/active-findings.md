@@ -1,6 +1,6 @@
 # Active Findings — Last 7 Days
 
-**Last updated:** 2026-04-19
+**Last updated:** 2026-04-20
 **Scope:** Intake findings captured in the last 7 days that have not yet graduated to `prompting-rules.md` / `antipatterns.md` or been archived.
 **Refresh:** Maintained by the `intake` routine — new findings appended, items graduated or >7 days old removed.
 
@@ -112,6 +112,108 @@
 **Finding:** `C:\Users\logan\.claude\CLAUDE.md` line 34 references `~/Projects/claudious/scripts/rollback-config.sh` — tilde only resolves in WSL/Linux. PowerShell invocation silently fails.
 **Logan relevance:** Emergency rollback could fail silently when most needed.
 **Graduation path:** Proposal → pending Logan review (see `open-decisions.md`).
+
+---
+
+## 2026-04-20 Intake (novelty=high, 14 findings)
+
+### [2026-04-20] mcp-500k-result-limit
+**Source:** https://code.claude.com/docs/en/whats-new
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** MCP tool result limit raised to 500,000 characters via `_meta["anthropic/maxResultSizeChars"]`. Previously capped lower; large payloads truncated.
+**Action:** queued
+
+### [2026-04-20] managed-agents-public-beta
+**Source:** https://docs.claude.com/en/release-notes/overview
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Claude Managed Agents launched in public beta with the `managed-agents-2026-04-01` beta header. Anthropic-hosted agent runtime.
+**Action:** queued
+
+### [2026-04-20] sonnet-1m-context-beta-retirement
+**Source:** https://docs.claude.com/en/release-notes/overview
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** 1M token context window beta on Sonnet 4.5 and Sonnet 4 retires 2026-04-30. 10-day window; audit Sonnet 4.5/4 pinned callers relying on 1M context.
+**Action:** queued
+
+### [2026-04-20] haiku-3-retired
+**Source:** https://docs.claude.com/en/release-notes/overview
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** `claude-3-haiku-20240307` retired 2026-04-19. Any pinned caller now errors; switch to Haiku 4.5.
+**Action:** queued
+
+### [2026-04-20] disable-skill-shell-execution
+**Source:** https://code.claude.com/docs/en/whats-new/2026-w14
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** `disableSkillShellExecution` setting blocks inline shell execution inside skills and slash commands. Security hardening when running third-party skills.
+**Action:** queued
+
+### [2026-04-20] edit-tool-cat-sed-view
+**Source:** https://code.claude.com/docs/en/whats-new/2026-w14
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Edit tool now works on files previously viewed via `cat` or `sed` — no separate Read required.
+**Action:** queued
+
+### [2026-04-20] push-notification-tool
+**Source:** https://code.claude.com/docs/en/whats-new
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code ships a push-notification tool — mobile push when Remote Control and "Push when Claude decides" are enabled in config.
+**Action:** queued
+
+### [2026-04-20] doctor-mcp-scope-warning
+**Source:** https://code.claude.com/docs/en/whats-new
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** `/doctor` warns when an MCP server is defined in multiple config scopes with different endpoints.
+**Action:** queued
+
+### [2026-04-20] computer-use-cli-preview
+**Source:** https://releasebot.io/updates/anthropic/claude-code
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Computer Use reaches the CLI in research preview — Claude opens native apps, clicks UI, and verifies changes from the terminal.
+**Action:** queued
+
+### [2026-04-20] computer-use-cowork-max
+**Source:** https://releasebot.io/updates/anthropic/claude
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Computer Use available in Cowork and Claude Code for Pro and Max users.
+**Action:** queued
+
+### [2026-04-20] persistent-agent-thread-mobile
+**Source:** https://releasebot.io/updates/anthropic/claude
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Persistent agent thread for Pro and Max to manage Cowork tasks from mobile and desktop. Rolled to Max first, Pro two days later.
+**Action:** queued
+
+### [2026-04-20] cowork-ga-desktop
+**Source:** https://claude.com/product/cowork
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Claude Cowork generally available on macOS and Windows in Claude Desktop. Adds expanded analytics, OpenTelemetry support, RBAC for Enterprise.
+**Action:** queued
+
+### [2026-04-20] mcp-spec-oauth-2-1
+**Source:** https://use-apify.com/blog/mcp-server-handbook-2026
+**Credibility:** VERIFIED
+**Type:** TOOL
+**Summary:** MCP spec now includes OAuth 2.1 with incremental scope consent (April 2026). Affects authentication for self-hosted MCP servers.
+**Action:** queued
+
+### [2026-04-20] operating-model-5-parts
+**Source:** https://medium.com/@richardhightower/claude-code-2026-the-daily-operating-system-top-developers-actually-use-d393a2a5186d
+**Credibility:** COMMUNITY
+**Type:** TECHNIQUE
+**Summary:** Emerging OS-for-AI-dev framework: (1) keep always-on context small; (2) procedures → skills/commands; (3) protect active sessions from context pollution; (4) parallelize only with supervision + isolation; (5) short focused sessions over marathons.
+**Action:** queued
 
 ---
 
