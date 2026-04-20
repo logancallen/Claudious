@@ -1,5 +1,7 @@
 # Handoff — Active Session State
 
+**Recommended next-chat title:** `2026-04-20 — CLAUDIOUS — cowork-ga-desktop Proposal Review + Harvest`
+
 **Updated:** 2026-04-20 (afternoon — daily briefing fixed, Gmail forwarding live, proposal rejected)
 **From chat:** Claude Mastery Lab (daily-briefing.yml diagnosis + fix + end-to-end verification, Gmail→Outlook forwarding setup, operating-model-5-parts rejected)
 **Status:** Daily briefing email pipeline fully operational. Grok scout routing still blocked (unchanged). 1 proposal remaining in queue.
