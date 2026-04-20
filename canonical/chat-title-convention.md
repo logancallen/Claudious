@@ -2,7 +2,7 @@
 
 Format: `YYYY-MM-DD — [PROJECT] — [Topic]`
 
-## Project codes
+## Known project codes
 
 | Project | Code |
 |---|---|
@@ -17,12 +17,14 @@ Format: `YYYY-MM-DD — [PROJECT] — [Topic]`
 
 ## Rules
 
-- Date = today's actual date (YYYY-MM-DD), not topic start date
-- Separator = em dash (—), not hyphen or pipe
-- Topic = concise, specific, recognizable without opening the chat
-- Every handoff must include the recommended next-chat title at the top
-- When asked "what would you rename this chat," always return a title in this format
-- If chat spans multiple topics, title after the dominant topic and flag the pivot in the handoff
+- Use the project code matching the current Claude Project the chat is in. Never force-fit to an unrelated code just because a project isn't listed.
+- If the current project is not in the known codes list, derive the code from the project's actual name: uppercase, replace spaces with hyphens, strip punctuation. Keep derived codes ≤20 characters — truncate intelligently if longer.
+- Date = today's actual date (YYYY-MM-DD), not topic start date.
+- Separator = em dash (—), not hyphen or pipe.
+- Topic = concise, specific, recognizable without opening the chat.
+- Every handoff must include the recommended next-chat title at the top.
+- When asked "what would you rename this chat," always return a title in this format.
+- If chat spans multiple topics, title after the dominant topic and flag the pivot in the handoff.
 
 ## Examples
 
@@ -30,6 +32,8 @@ Format: `YYYY-MM-DD — [PROJECT] — [Topic]`
 - `2026-04-20 — ASF — Migration 026 Employee Permissions Fix`
 - `2026-04-20 — COURTSIDE — Pre-Demo Prep: Contractor Meeting`
 - `2026-04-20 — CLAUDIOUS — Canonical State Refresh`
+- `2026-04-20 — MOWER-MAINTENANCE — Spring Service Schedule` (derived code example)
+- `2026-04-20 — KITCHEN-RENO-2026 — Cabinet Vendor Comparison` (derived code example)
 
 ## Search patterns
 
