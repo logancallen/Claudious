@@ -5,6 +5,8 @@
 **Model:** `claude-opus-4-7`
 **Writes to:** `archive/intake/${TODAY}.md`, `archive/runs/${TODAY}.md`, `canonical/active-findings.md`, `canonical/claude-state.md` (conditional), `canonical/claude-code-state.md` (conditional)
 
+**Reads from:** `canonical/pipeline-flags.md`, `canonical/logan-current-stack.md`, `canonical/grok-scan-sources.md`, `archive/scan-inbox/*.md`, web, `canonical/*`, `learnings/*`
+
 ---
 
 ## Literal-interpretation guardrail
@@ -72,6 +74,39 @@ Count RELEVANT hits (ignore unrelated AI news, non-Anthropic launches):
 - 0 hits → `NOVELTY=low`, run shallow Scout (searches 1, 3, 5 only)
 - 1+ hits → `NOVELTY=high`, run full Scout (all 6)
 
+### Section B.0 — Grok Scan Ingest
+
+Read `canonical/pipeline-flags.md`. If `grok_ingest_enabled: false`, skip this section entirely.
+
+If `grok_ingest_enabled: true`:
+
+```bash
+SCAN_INBOX="archive/scan-inbox"
+LATEST_SCAN=$(ls -t ${SCAN_INBOX}/*-grok-scan*.md 2>/dev/null | head -1)
+
+if [ -z "$LATEST_SCAN" ]; then
+  echo "- grok-scan: no scan files in inbox (pipeline may not be live yet)" >> "$INTAKE"
+  SCAN_STATE="none"
+else
+  # Missing-scan alarm (Hardening #13): warn if latest scan >36h old.
+  SCAN_AGE_HOURS=$(( ($(date +%s) - $(stat -c %Y "$LATEST_SCAN" 2>/dev/null || stat -f %m "$LATEST_SCAN" 2>/dev/null || echo 0)) / 3600 ))
+  if [ "$SCAN_AGE_HOURS" -gt 36 ]; then
+    echo "- grok-scan: ALERT latest scan is ${SCAN_AGE_HOURS}h old (>36h threshold)" >> "$LEDGER"
+    SCAN_STATE="stale"
+  else
+    SCAN_STATE="fresh"
+  fi
+fi
+```
+
+If `SCAN_STATE=fresh`: read the latest scan file plus any others from last 7 days. Extract findings into Section B alongside web-search Scout findings. Tag each with `source: grok-scan` and the scan filename. Same credibility/type/relevance classification applies.
+
+If `SCAN_STATE=stale`: still read the file (partial value), but append `- note: latest scan is >36h old, coverage may have gaps` to Section B in the dated archive.
+
+If `SCAN_STATE=none`: proceed to Section B web-search Scout as the sole Scout source.
+
+Dedup rule: for each Grok-scan finding, grep `canonical/active-findings.md` and `archive/intake/` last 7 days. If kebab-id or URL already present → REDUNDANT, skip.
+
 ### Section B — Scout
 
 Current search targets live in `scheduled-tasks/scout-additions.md`. Core six:
@@ -112,12 +147,32 @@ Read (skip any that do not exist — do not abort):
 - `archive/queue/deployed.log`
 - `alerts.md`
 
+**Constitutional-rule seeds for next graduation cycle** (already drafted — if not yet graduated to `canonical/prompting-rules.md`, re-seed here as Config Proposal entries):
+
+1. **Rule: no-hardcoded-entities-in-routines** — Target `canonical/prompting-rules.md`. Any routine prompt, scan, or automated pipeline that targets people, products, URLs, versions, or organizational state must reference a canonical config file by URL, not inline the list. Exceptions: entities with zero rot risk (protocol names, company names). Quarterly staleness-audit reviews all canonical config files. Source: 2026-04-19 Grok pipeline adaptability audit. IMPACT: H | EFFORT: T | RISK: SAFE.
+
+2. **Rule: verification-prompts-suppress-self-report** — Target `canonical/prompting-rules.md`. Prompts that request verification outputs (commit SHAs, file contents, git status) must explicitly instruct CC to suppress the Confidence/Assumptions/Context-health self-report block. Otherwise the self-report overrides the requested verification output, forcing re-run. Source: 2026-04-19 handoff generation session. IMPACT: H | EFFORT: T | RISK: SAFE.
+
+Both rules are seeded here until they appear in `canonical/prompting-rules.md`. On graduation, delete these two bullet points from this section.
+
 Checks:
 1. **Stale path scan:** `grep -rni "OneDrive" CLAUDE.md learnings/ canonical/ 2>/dev/null` — any hit = proposal seed
 2. **Removed-task references:** `grep -rni "AutoDream\|Config Backup\|Auto-Harvest\|KAIROS\|Chyros" CLAUDE.md learnings/ canonical/ scheduled-tasks/` — any hit = proposal seed
 3. **Graduation candidates:** patterns in `learnings/*.md` referenced 3+ times
 4. **Deploy calibration:** scan `archive/queue/deployed.log` for BROKE/REGRESSED — if any, note common factor
 5. **Unused rules:** best-effort, rules in CLAUDE.md with no session references in 30+ days
+6. **Hardcoded entity scan** (constitutional rule enforcement): run the following greps. Any hit → proposal seed to extract the list to a canonical config file.
+
+```bash
+# X-handles that should be in canonical/grok-scan-sources.md or similar
+grep -rnE '@[a-zA-Z0-9_]{3,}' scheduled-tasks/ 2>/dev/null
+
+# Two-word capitalized proper names (likely person names) in routine prompts
+grep -rnE '\b[A-Z][a-z]+ [A-Z][a-z]+\b' scheduled-tasks/ 2>/dev/null | grep -viE '(Markdown|GitHub|MIT|API|CLI|SDK|URL|YAML|JSON|Claude Code|Claude Max|Claude Desktop|Claude Projects)'
+
+# Hardcoded tool-name lists (competitors, stack items)
+grep -rniE '(Cursor|Windsurf|Codex CLI|Gemini CLI|Cline|Aider)' scheduled-tasks/ 2>/dev/null
+```
 
 Output per finding: name + rationale + `IMPACT (H/M/L)` + `EFFORT (T/L/M/H)` + `RISK (SAFE / TEST-FIRST / REVIEW-REQUIRED)`
 
