@@ -108,4 +108,10 @@
 **Learning:** On any greenfield brand-led web build, request the actual logo/mark BEFORE writing CSS or committing to font/color choices. A plausible-sounding aesthetic (luxury editorial, premium tech, athletic etc.) can actively contradict the real brand mark and signal inconsistency. Two-minute logo review prevents hours of design rework. Specific trigger: the moment a client says "make it feel like X" — stop and ask "can I see the logo first?"
 **Applies to:** Any frontend build that begins with brand/aesthetic direction — ASF, Courtside Pro, any future Logan client project
 
+### 2026-04-20 — TECHNIQUE — `disableSkillShellExecution` Blocks Inline Shell in Skills
+**Severity:** HIGH
+**Context:** Claude Code Week 14 April 2026 shipped a `disableSkillShellExecution` setting that blocks inline shell execution inside skill/command bodies (security hardening). Logan runs multiple custom skills with bash fences, so this is directly relevant.
+**Learning:** Set `disableSkillShellExecution: true` in `~/.claude/settings.json` to prevent skills and slash commands from silently executing embedded shell. Prompts for explicit tool approval instead. Use when running untrusted or community-authored skills. Trade-off: local custom skills that rely on inline bash will prompt on every run — keep disabled during dev, flip on for production/trusted-only sessions. Check `/doctor` output if skills behave unexpectedly after enabling.
+**Applies to:** All Claude Code sessions using custom skills — Claudious skills, mastery-lab skills, any community-installed skill
+
 ## Archive
