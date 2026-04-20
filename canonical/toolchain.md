@@ -26,6 +26,8 @@ Claude.ai-connected MCP servers. Every one loads its tool definitions into conte
 
 **Hardening note:** `CLAUDE_CODE_MCP_ALLOWLIST_ENV` (in proposals) would restrict env inheritance to MCP servers — useful security hardening given 12 active servers. Not yet deployed.
 
+**OAuth 2.1 note (April 2026):** MCP spec now incorporates OAuth 2.1 with incremental scope consent. All 12 current MCP integrations are hosted/managed — no Logan-side migration required. Revisit if self-hosted MCP added.
+
 ## Custom Claude.ai Skills (8+)
 
 Skills trigger on name + description only — semantic match. 14-skill surface total across global + project; cap ~34–36 before descriptions truncate.
