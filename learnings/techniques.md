@@ -114,4 +114,10 @@
 **Learning:** Set `disableSkillShellExecution: true` in `~/.claude/settings.json` to prevent skills and slash commands from silently executing embedded shell. Prompts for explicit tool approval instead. Use when running untrusted or community-authored skills. Trade-off: local custom skills that rely on inline bash will prompt on every run — keep disabled during dev, flip on for production/trusted-only sessions. Check `/doctor` output if skills behave unexpectedly after enabling.
 **Applies to:** All Claude Code sessions using custom skills — Claudious skills, mastery-lab skills, any community-installed skill
 
+### 2026-04-20 — TECHNIQUE — CLAUDE.md 200-Line Cap with Skills and Nested Indexes
+**Severity:** MEDIUM
+**Context:** Community best practice (amitray.com/best-practices-for-claude-md) — oversized root CLAUDE.md files force Claude into expensive exploratory searches on every session start. Current compliance across Logan's stack verified 2026-04-20: Claudious 73 / courtside-pro 147 / asf-graphics-app 162 / allen-sports-floors 140 / global 75 — all under 200. First-citation graduation per Process proposal.
+**Learning:** Keep root CLAUDE.md under 200 lines. Push domain details into skills (`.claude/skills/*.md`) or `@imports` for modular composition. Use nested CLAUDE.md files in subdirectories as scoped indexes so Claude loads only the relevant context per path. If a root CLAUDE.md grows past 200, extract the largest section into a skill or split a subdirectory index rather than trimming content indiscriminately. Flag for canonical/prompting-rules.md promotion once a second independent citation surfaces.
+**Applies to:** All Claude Code projects with a root CLAUDE.md — Claudious, ASF Graphics, Courtside Pro, Allen Sports Floors, and user-global `~/.claude/CLAUDE.md`
+
 ## Archive
