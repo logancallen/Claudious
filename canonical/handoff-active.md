@@ -1,202 +1,167 @@
-# Handoff — 2026-04-20 (PM session 3, Research Synthesis Complete)
+# Handoff — 2026-04-21 (AM, Components Model Prompt 1 ready to ship)
 
-**Recommended next-chat title:** `2026-04-21 — ASF — Components Model Implementation Prompt 1 (Migrations 047-052)`
+**Recommended next-chat title:** `2026-04-21 — ASF — Components Model Prompt 1 Execution + Prompt 2 Draft`
 
 ---
 
 ## Current focus
 
-All three research workstreams (W1 industry ERP data models, W2 field-worker UX patterns, W3 pricing engine audit) completed and synthesized into a single architectural spec: `docs/architecture/components-model-synthesis-2026-04-20.md`. Synthesis locked in 7 architectural decisions from Logan and carries 3 Claude-recommended positions awaiting explicit confirmation. Next step is auditing the CC commit prompt, then kicking off Prompt 1 (migration suite 047-050, 052) when Logan is ready.
+Synthesis landed (`cf5f91a`). Prompt 1 drafted and ready to run in Claude Code. All three pending recommendations from the prior chat's synthesis confirmed. Next chat's first work: Logan runs Prompt 1 in CC, reports findings (especially QBO diagnostic results), and then Claude drafts Prompt 2 (backend pricing engine + parity harness).
 
-The component-model architectural pivot remains the target. Path A (research first, components model builds directly, interim stencil/design-library fixes folded in) confirmed. Volume discount deferred entirely from Phase 1 per Logan's decision — no bracket set. Design fee logic pivoted mid-chat from client-type-driven to design_source-driven-with-operator-question after Logan correctly identified that library presence doesn't imply library reuse.
+Memory has been pruned to reflect shipped state.
 
-## Completed this session
+## Completed this session (2026-04-21 AM)
 
-- **W2 research results received, read in full, integrated.** Field-worker UX patterns document. Key findings: hybrid template-seed + edit-after is the dominant pattern, field order Client → Location → Job Type → Components → Notes, progressive disclosure by job type (not mode toggle), ≤8-10 templates max, 56×56dp touch targets, interruption tolerance via auto-save, notes field last-not-first.
-- **W3 research results received (Claude Code audit, 1058 lines, commit `8a744cc`).** 20 primary pricing rules catalogued, ASCII flow diagram, 18 product types analyzed (0 per-product engine branches, 5 UI-level gates), 17 frontend/backend duplication reconciliation risks, 22 single-product-locked rules with per-component adjustments, 20 broken/suspicious items for review. Notable findings: install cost mismatch between frontend (`sqft * 1.5`) and backend (`sqft * rate`), $75-minimum order-of-ops divergence between single and multi engines, single-engine skips `validate_material_selection`, Friends & Family has no backend engine, sync endpoint only copies design_fees not full rate card.
-- **Synthesis document drafted (579 lines).** 6 sections + 4 appendices. Covers data model (jobs + job_components + component_materials + component_install + job_type_templates + surfaces + clients.default_deposit_mode), pricing engine refactor with rule-by-rule disposition, intake form spec (4 steps, 8 templates, conditional fields, Design Source UI, interruption tolerance), surface as first-class entity Phase 1 scope, migration strategy, build sequencing with 10-prompt CC sequence.
-- **7 architectural decisions locked this session with Logan:**
-  1. Install minimum: hybrid (mount per-component, wrap/flat per-job $150 combined).
-  2. Volume discount: DEFERRED entirely from Phase 1. No bracket set. Engine computes without volume discount layer; can add later as one function wrapping material totals.
-  3. Design fee: driven by `design_source` (what work is being done), not client type.
-  4. Design source: 5-option radio with smart default (library check → pre-select `library_reuse`, operator must tap-confirm). Options: library_reuse, library_modify, new_composition, new_logo, client_supplied. Each maps to derived design_fee_tier with operator override capability.
-  5. Deposit mode: NEW `deposit_mode` field on `jobs` (po_required / design_fee_as_deposit / none_internal). Separate from design fee. `clients.default_deposit_mode` seeds new jobs; operator-overridable at intake.
-  6. Autofill Phase 1: deterministic only. Library check + client type + template + PVO lookup + last-job-match pattern autofill. No ML/learning layer.
-  7. Autofill Phase 2: learning inference deferred 6+ months pending training data accumulation (current 10 jobs + legacy QBO insufficient).
-- **3 Claude recommendations pending Logan confirmation:**
-  - Surface as first-class entity, Phase 1 scope (Claude 75% confidence).
-  - 325 QBO legacy jobs not migrated, flagged `is_legacy=true` (Claude 85% confidence).
-  - Commit #2 stencil+design-library fixes folded into components commit rather than shipping interim (Claude 70% confidence).
-- **Memory maintenance issue logged as systemic concern.** Handoffs carry forward items that have shipped. Root cause: no pruning step in handoff generation. Fix: every handoff includes "What's no longer true" section + actual `memory_user_edits` calls before end of chat. This chat's handoff executes that discipline.
+- **Caught and fixed architectural defect in synthesis before commit.** Original §2.4 treated funding as binary (ISD-means-PO, business-means-deposit) and wired phase gates as hard blocks. Logan flagged: schools may be funded by booster clubs, PTAs, grants, sponsors, or business-direct, all on the same client record. Also caught that "PO before Quote→Design advance" was worded as a block — violates core operating rule (warn, don't block).
+- **Revised synthesis §2.4 end-to-end:** new `funding_source` job-level field with 8 values (`district_po`, `school_direct`, `booster_club`, `grant_or_sponsor`, `business_direct`, `internal`, `split`, `tbd`). Revised `deposit_mode` enum to 4 values (`po_required`, `deposit_required`, `net_terms`, `none`). Added explicit warn-not-block phase-gate behavior table. 5 worked examples including booster-funded school job and split-funding case.
+- **Updated synthesis cross-references:** schema (jobs + clients), §1.2 changes table, §1.4 stencil migration, §2.5 autofill, §3.1 intake form Step 1, §3.9 stencil flow, §6.1 migration 050, §6.2 parity fixtures (added booster scenario as required test), §6.3 Brady test job (now 2 scenarios on same client), Appendix A decision log, final success criteria.
+- **Synthesis committed as `cf5f91a`** on asf-graphics-app main. 656 lines. All 6 grep verifications passed. No deprecated enum values remain.
+- **Handoff committed as `fe0f63d`** on Claudious main. Prior handoff archived to `archive/handoffs/2026-04-20-2200.md`.
+- **All 3 pending recommendations confirmed:**
+  - Surfaces Phase 1 — SHIP (migration 047 creates table + seeds; FK in 048).
+  - QBO legacy flag — SHIP (migration 052 flags 325 jobs; separate diagnostic for QBO amount display issue Logan raised).
+  - Commit #2 stencil+design-library fixes — FOLD into components commit.
+- **Memory pruned:** #10 updated to reflect synthesis committed state; #17 updated to reflect post-revision decisions; #20 added (funding_source ≠ client identity, warn-not-block principle).
+- **Prompt 1 drafted:** 5 migrations (047-050, 052), full SQL, verification queries, commit strategy (5 separate commits), diagnostic for QBO amounts, learnings update block.
 
 ## In-flight items
 
-### Item 1 — CC prompt audit BEFORE Prompt 1 executes
+### Item 1 — Logan to execute Prompt 1 in CC
 
-**Next chat opens by auditing the CC synthesis commit prompt** (`/mnt/user-data/outputs/cc-prompt-commit-synthesis.md`). Specifically, verify:
+Prompt 1 file: `cc-prompt-1-migrations-047-052.md`. Re-download from prior chat's outputs and run in CC (asf-graphics-app repo, main branch).
 
-1. Path is correct (`docs/architecture/components-model-synthesis-2026-04-20.md`).
-2. Preflight instructions match known-acceptable state (docs/codebase-state.md modified is expected).
-3. Verification grep counts are achievable with the as-written synthesis.
-4. Commit message is accurate.
-5. Constraints are complete (no branches, no hook bypass, no cascading edits).
-6. Self-report suppression instruction is present.
+Expected CC runtime: 15-30 min.
 
-If audit passes → Logan runs the CC prompt in Windows CC. Commit SHA returned.
+Prompt covers:
+- Migration 047: `surfaces` reference table + 12 seeds.
+- Migration 048: `job_components`, `component_materials`, `component_install` + RLS + FK to surfaces.
+- Migration 049: `job_type_templates` + 8 seed rows.
+- Migration 050: `clients.default_funding_source` + `clients.default_deposit_mode` + backfill from `client_type` + CHECK constraints after backfill.
+- Migration 052: `jobs.is_legacy` column, flag 325 QBO jobs, diagnostic queries reporting QBO amount field state — no backfill.
 
-If audit flags issues → fix before running. Do not let a minor prompt defect create another failed-run situation.
+5 separate commits. All pushed to origin/main.
 
-### Item 2 — Three pending confirmations (blocks Prompt 1 ship)
+### Item 2 — QBO amounts display issue (Logan raised mid-session)
 
-Logan to confirm or reverse the three Claude-recommended positions:
+Logan reported QBO imported jobs don't display their amounts. Chose diagnose-only approach in Prompt 1's migration 052. Three diagnostic queries:
+- Count of legacy jobs with `total` null/zero/populated.
+- Count of legacy jobs with `subtotal` null/populated.
+- Schema inspection: which QBO-amount columns actually exist on `jobs`.
 
-- Surface as first-class entity, Phase 1 — ship or defer to Phase 2?
-- QBO legacy jobs not migrated — correct or migrate mechanically?
-- Commit #2 fold-in — fold into components commit or ship 9 non-catalog fixes interim?
+Based on findings, next step is decided (frontend display fix vs data backfill vs both).
 
-If all three confirm as-recommended → Prompt 1 ships as designed.
+### Item 3 — Prompt 2 to be drafted after Prompt 1 ships clean
 
-If any reverses → synthesis document needs a minor revision before Prompt 1 writes migrations (e.g., no surface reverse means migration 047 is dropped).
+Per synthesis §6.4 CC prompt sequence. Requires 047-050, 052 applied and verified.
 
-### Item 3 — Prompt 1 (migration suite 047-050, 052) not yet drafted
-
-Logan to approve that Prompt 1 should be drafted in the next chat as the first implementation step after synthesis is committed.
-
-Prompt 1 will:
-- Create `surfaces` reference table (12-15 seeds per §4.2).
-- Create `job_components`, `component_materials`, `component_install` tables (per §1.1).
-- Create `job_type_templates` + seed 8 templates (per §3.2).
-- Add `clients.default_deposit_mode` column + backfill from existing data.
-- Flag 325 QBO jobs `is_legacy=true`.
-- No code changes. Migration files only.
-
-Subsequent prompts (2-10) draft as each predecessor ships cleanly.
+Prompt 2 scope:
+- New file: `backend/services/pricing_engine.py` implementing `calculate_job_quote → aggregate(calculate_component_quote per component)`.
+- Parity harness: `tests/pricing_parity_v2.json` + pytest runner.
+- 13 parity scenarios per synthesis §6.2 (includes booster-club-funded scenario as required test).
+- No frontend, no API endpoint changes.
 
 ## Pending items (queued, not blocking current work)
 
-- **Salvaged flooring docs still need to be committed.** The 3 files (`docs/flooring-schema.md`, `docs/flooring-scope.md`, `prompt-4.7a-job-centric-foundation.md`) remain in the OneDrive clone at `C:\Users\logan\OneDrive\Documents\GitHub\asf-graphics-app`. Salvage script preserved in prior handoff. Run after confirming flooring migration state (`Get-ChildItem supabase\migrations -Filter "*flooring*"`).
-- **OneDrive clone + Projects clone cleanup** — after flooring salvage. Nuke both after verifying nothing unique.
-- **Prompt A (QBO imported jobs missing prices) — queued post-components-ship.**
-- **Prompt B (Quick Estimate tool for Brady) — queued post-Prompt A.**
-- **Phase 1 Step 3 — Service worker + install prompt + update prompt — queued.**
-- **2FA manual verification — pending Logan.**
-- **Learnings capture** (should be written to `docs/learnings.md` in asf-graphics-app at some point):
-  - Library presence ≠ reuse decision — operator question required, not inference (HIGH, design pattern learning).
-  - Design fee logic is work-driven, not client-type-driven (HIGH, ASF-specific).
-  - Deposit and design fee are separable concerns; client type governs deposit mode, work type governs design fee (HIGH, ASF-specific).
-  - Deterministic autofill gets 80% of value vs learning autofill; ship Phase 1 deterministic before Phase 2 learning (MEDIUM, cross-project).
-  - Hybrid install minimum (mount per-component, wrap/flat per-job) keeps math invisible to operator (MEDIUM, ASF-specific).
-  - Components-model engine rewrite should preserve JSON fixture harness pattern from substrate work (MEDIUM, cross-project).
-  - Handoff staleness compounds: items marked "pending" resurface after completion because no pruning step exists (HIGH, cross-project).
-- **Backend normalization shim removal** (jobs.py:545, emails.py:539, auto_categorizer.py:24, material_advisor.py:226-227, import_qbo.py) — dissolves in components refactor.
+- **Salvaged flooring docs need commit** — 3 files in OneDrive clone.
+- **OneDrive clone + Projects clone cleanup** after flooring salvage.
+- **Prompt A (QBO missing prices)** — becomes concrete after migration 052 diagnostic.
+- **Prompt B (Quick Estimate tool for Brady)** — queued post-Prompt A.
+- **Phase 1 Step 3 — Service worker + install prompt + update prompt** — queued.
+- **2FA manual verification** — pending Logan.
+- **Learnings capture** to add to `docs/learnings.md`:
+  - Library presence ≠ reuse decision — operator question required (HIGH).
+  - Design fee logic is work-driven, not client-type-driven (HIGH).
+  - Deposit and design fee are separable concerns (HIGH).
+  - Funding source ≠ client identity — track per job, client defaults as seeds (HIGH, new this session).
+  - Architectural defects caught pre-commit are cheap; post-commit are expensive — 20-min synthesis revision prevented ~30-hr month-3 rework (HIGH, new this session).
+  - Warn-not-block is a real operating rule, not a suggestion (HIGH, new this session).
+  - Deterministic autofill gets 80% of value vs learning autofill (MEDIUM).
+  - Hybrid install minimum keeps math invisible to operator (MEDIUM).
+  - Handoff staleness compounds without active pruning (HIGH, cross-project).
 
 ## Frustration signals (avoid in next chat)
 
-- **Don't assume library presence = library reuse** — Logan caught this. System must ask operator explicitly.
-- **Don't assume client type drives design fee** — Logan caught this. Work type (design_source) drives it.
-- **Don't route synthesis work to Claude Code** — CC is for codebase operations, not cross-document architectural reasoning. I do synthesis, CC commits.
-- **Don't recommend starting a new chat without preparing handoff first** — rule from prior sessions.
-- **Don't pursue in-person Brady/Chanté workflow study** — they get annoyed when Logan tries to interview them.
-- **Don't propose speculative infrastructure** — volume discount should NOT have a reserved JSONB column. If not shipping, don't reserve schema.
-- **Don't issue Claude Code prompts mid-flow without ensuring CC can finish in one sitting** — warn Logan about expected CC runtime.
-- **Don't ask Logan to substitute placeholders in raw URLs or commands** — build fill-in-the-blank scripts.
-- **Don't accept "already correct" without grep proof** — persistent CC failure mode.
-- **Don't over-hedge on recommendations** — 70%+ confidence = take a position.
-- **Don't batch multiple sequential commands** — one step at a time on dependent work.
-- **Don't respond to tactical questions with Classify/Best/Risks/Execution/Tracking framework** — reserve that for strategic decisions.
-- **Don't apologize over small mistakes** — own it, fix it, move on. No self-abasement.
+- **Don't paste file contents into CC prompts — use file-path references.** File-path pattern worked cleanly in this session.
+- **Don't bury execution instructions in long responses.** When the user is executing a sequence, short directive answers beat framework-structured responses.
+- **Don't assume userMemories entries are current without checking.** The "always apply migrations manually" memory was stale; current practice is CC-apply standard.
+- Don't assume library presence = library reuse.
+- Don't assume client type drives design fee or funding source.
+- Don't route synthesis work to CC.
+- Don't recommend new chat without preparing handoff first.
+- Don't pursue in-person Brady/Chanté workflow study.
+- Don't propose speculative infrastructure.
+- Don't issue CC prompts without ensuring CC can finish in one sitting.
+- Don't ask Logan to substitute placeholders — build fill-in-the-blank or file-path scripts.
+- Don't accept "already correct" without grep proof.
+- Don't over-hedge on recommendations — 70%+ confidence = take a position.
+- Don't batch multiple sequential commands.
+- Don't respond to tactical questions with Classify/Best/Risks/Execution/Tracking framework.
+- Don't apologize over small mistakes.
 
 ## User Preferences changes pending
 
 None from this session.
 
-**Candidate (not proposed yet):** Explicit rule about architectural inference — "When user states a business rule, parse it for edge cases before accepting. Example: 'design fee free for schools' → check: what about reused designs for businesses? Don't accept binary rules silently."
+## Decisions made this session
 
-## New findings (this session)
+- Synthesis §2.4 revised: `funding_source` (8 values) + `deposit_mode` (4 values) as two decoupled job-level fields.
+- All deposit-related phase gates warn, never block.
+- Surfaces as first-class Phase 1 confirmed.
+- QBO legacy jobs flagged not migrated, diagnostic query included in migration 052.
+- Commit #2 stencil+design-library fixes folded into components commit sequence.
+- Prompt 1 uses 5 separate commits (not one) for easier revert.
+- Prompt 1 applies migrations via Supabase MCP `apply_migration` (CC-apply standard, overrides stale manual-only memory).
+- QBO amounts: diagnose-only in migration 052. No data modification beyond legacy flag.
 
-- **Current engine is 1-level multi-zone, not components** — reconfirmed via W3 §5. Multi-zone treats job as "one product chopped into material pieces," not "job composed of N distinct components each with full pricing stack." Components refactor is a genuine architectural change, not a scope extension of existing multi-zone.
-- **W3 surfaced an engine duplication bug: frontend install cost uses `sqft * 1.5`, backend uses `sqft * rate`** — means margin badge in intake doesn't match backend-computed margin. §6.1 in W3 audit. Gets fixed in components engine rewrite.
-- **Design Library is a structurally under-utilized asset** — designed as a passive storage but should drive intake autofill via client+product match. Components model activates it as a decision input for `design_source` default.
-- **Deposit ≠ design fee** — Logan's clarification revealed these are separate concerns. ISDs have no deposit (PO gates phase advance); businesses have deposit (design fee collected at Quote phase). New `deposit_mode` field on jobs captures this correctly.
-- **Operator tap-confirm on library match** is the discipline that prevents silent inference bugs. Even when system knows the answer, asking the operator forces the decision to be auditable.
+## Files committed this session
 
-## Files committed (this session)
-
-- `docs/architecture/components-model-synthesis-2026-04-20.md` (synthesis, 656 lines, commit `cf5f91a` on 2026-04-20 evening). Revised mid-audit in next chat to add `funding_source` field and warn-not-block deposit gating. Final version is what landed.
-
-## Decisions made
-
-- Target architecture: components model (`job → job_components → [component_materials, component_install]`) with `job_type_templates` seeds + `surfaces` reference table + new `deposit_mode` on jobs + `default_deposit_mode` on clients.
-- Install minimum hybrid (mount per-component, wrap/flat combined per-job).
-- Volume discount deferred entirely from Phase 1.
-- Design fee = function of `design_source` not client type.
-- 5-option design_source radio with library-check smart default requiring operator tap-confirm.
-- New `deposit_mode` field separates deposit logic from design fee.
-- Autofill Phase 1 deterministic only. Phase 2 learning deferred 6+ months.
-- Surfaces Phase 1 (Claude recommendation, pending Logan final confirm).
-- 325 QBO legacy jobs flagged not migrated (Claude recommendation, pending Logan final confirm).
-- Commit #2 fold into components commit (Claude recommendation, pending Logan final confirm).
-- Synthesis commits to `docs/architecture/`, not `docs/research/` or `docs/audits/` — this is architectural spec, a new class.
-- Memory maintenance issue logged as systemic problem requiring active pruning at every handoff.
+- `docs/architecture/components-model-synthesis-2026-04-20.md` (656 lines, commit `cf5f91a` on asf-graphics-app main).
+- `canonical/handoff-active.md` + `archive/handoffs/2026-04-20-2200.md` (commit `fe0f63d` on Claudious main).
 
 ## Files NOT changed this session
 
-- No code commits.
-- No migrations.
-- No edits in any repo clone.
-- Synthesis file drafted in `/mnt/user-data/outputs/` awaiting CC commit.
+- No migrations applied yet (Prompt 1 does this in next chat).
+- No code changes. No backend / frontend / API edits.
 
 ## What was NOT discussed / explicitly out-of-scope
 
-Flagged for future sessions, not blocking current work:
-
-- **Flooring platform architecture** — whether components model extends to flooring or flooring gets a separate platform. Per Logan's clarification, court designer lives in asf-graphics-app for now; no separate flooring site. The salvaged flooring docs (`flooring-schema.md`, `flooring-scope.md`) remain planning artifacts, not current build plans. Architectural alignment decision deferred to future strategic session.
-- **Courtside Pro integration** — separate Supabase project (ID `vcxtnzmavjwzmrataegl`), no touch this refactor. Post-sale venture, on hold.
-- **Learning autofill design** — Phase 2 system. Deferred 6+ months. Approach: weighted inference from aggregate history per client + product signature. Not designed yet.
-- **BuyBoard Proposal 816-26 deliverables** — unaffected by refactor. Logan-only tasks queued (Gmail sends, ISD reference verification, Assumed Name Certificate filing, electronic submission at buyboard.com/vendor). Deadline June 11, 2026.
-- **PVO `.ai` template subscription call** — Logan needs to call 888-843-1325 before purchasing. Negotiate credit/prorate against existing WrapUP subscription. Confirm Chanté's login. Not blocking components work but needed before `fleet_wrap_single` template can pre-populate from PVO data.
-- **BuyBoard graphics coverage investigation** — BuyBoard Contract 737-24 covers flooring only. Graphics investigation status not updated this session.
-- **QBO production keys** — Still pending Intuit approval. Post-approval: copy Production Client ID + Secret to Railway, add redirect URI, authorize, import customers.
-- **Hudson Digital Graphics competitive tracking** — noted from memory as missed competitor with full product overlap. No action this session.
-- **2026 showcase year framing for sale valuation** — discussed briefly as context but not a driver of current decisions. Showcase year depends on clean 2025 tax filings (extension, September-October 2026). Components model shipping soon enough to generate 12-18 months of data before showcase matters.
-- **Strategic flooring vs graphics integration** — flooring-schema/scope docs propose flooring as same-platform expansion; Logan's memory frames flooring as separate. Incompatible strategies. Deferred to future strategic session.
-- **The "what could go wrong" pre-mortem on components refactor** — not run. Should run before Prompt 1 ships.
-- **Rollback strategy if components refactor fails mid-build** — not designed. Feature flag pattern mitigates but doesn't replace a real rollback plan.
+- Flooring platform architecture alignment — deferred.
+- Courtside Pro integration — on hold, separate Supabase project.
+- Learning autofill Phase 2 — deferred 6+ months.
+- BuyBoard Proposal 816-26 — unaffected, June 11 deadline.
+- PVO `.ai` template subscription — needed before `fleet_wrap_single` PVO pre-populate.
+- BuyBoard graphics coverage investigation — not updated.
+- QBO production keys — still pending Intuit approval.
+- Hudson Digital Graphics competitive tracking — no action.
+- Components refactor rollback strategy — not formally designed. Consider before Prompt 3 (engine swap).
+- Pre-mortem on components refactor — not run. Should run before feature flag flips for Brady (Prompt 9-ish).
 
 ## Context health notes for next chat
 
-- This chat used ~92% context by end. Continue into new chat; do not iterate further here.
-- Synthesis document at `/mnt/user-data/outputs/components-model-synthesis-2026-04-20.md` is the source of truth. CC commits it when prompt runs.
-- CC prompt at `/mnt/user-data/outputs/cc-prompt-commit-synthesis.md` awaits audit + run.
-- Three research documents used as source: W1 inline in prior chat message, W2 uploaded as file (`Field_Worker_Intake_Form_UX__Multi-Component_Job_Entry_Patterns.md`), W3 committed to repo (`docs/audits/pricing-engine-audit-2026-04-20.md`, commit `8a744cc`). W1 and W2 NOT in the repo. W3 is.
+- This chat used ~70% context at handoff. Prompt 2 drafting may push close — monitor.
+- Prompt 1 output file at `/mnt/user-data/outputs/cc-prompt-1-migrations-047-052.md`. Must be re-downloaded and attached to next chat.
+- Synthesis at `docs/architecture/components-model-synthesis-2026-04-20.md` commit `cf5f91a` is source of truth for all remaining prompts.
 
 ## Next chat first actions (execute in order)
 
 1. **Read this handoff first.** Do not respond to anything else before reading.
-2. **Audit the CC synthesis commit prompt.** File at `/mnt/user-data/outputs/cc-prompt-commit-synthesis.md`. Verify path correctness, preflight instructions, grep counts, commit message, constraints, self-report suppression. Report audit findings to Logan.
-3. **If audit passes:** Logan runs CC prompt. Confirm synthesis committed (commit SHA in response). Update prior `canonical/handoff-active.md` to reference the committed file.
-4. **If audit fails:** fix the prompt, re-verify, then Logan runs it.
-5. **Ask Logan to confirm 3 pending recommendations:**
-   - Surface as first-class Phase 1 — confirm or reverse?
-   - QBO legacy not migrated — confirm or reverse?
-   - Commit #2 fold into components commit — confirm or reverse?
-6. **If all three confirm:** draft Prompt 1 (migration suite 047-050, 052).
-7. **If any reverse:** revise synthesis accordingly, re-commit via CC prompt, then draft Prompt 1.
-8. **Draft Prompt 1** — assumption-free, reads codebase state, creates migration files only, commits, pushes, reports.
-9. **Execute memory maintenance** — review current `userMemories` for items that have shipped and strike them. Specifically audit for:
-   - Handoff references to items this chat has resolved.
-   - Old "pending" items that are now closed.
-   - Stale references to platform state.
-10. **Ask Logan about flooring docs salvage status** — did the OneDrive cleanup happen?
+2. **Confirm Prompt 1 file is available.** Logan attaches `cc-prompt-1-migrations-047-052.md` or confirms he has it locally.
+3. **Logan runs Prompt 1 in Claude Code** (asf-graphics-app repo, main branch). Expected 15-30 min.
+4. **CC reports:** 5 commit SHAs, verification query results, QBO diagnostic findings, any deviations.
+5. **Claude reviews CC report.** Verify all 5 migrations applied cleanly, row counts match expected (12 surfaces, 3 component tables, 8 templates, 0 null funding_source/deposit_mode, ~325 legacy jobs). Interpret QBO diagnostic.
+6. **Decide QBO follow-up based on diagnostic:**
+   - Amounts in `total`/`subtotal` → frontend display fix (small prompt).
+   - Amounts in different column (e.g., `qbo_total`) → data backfill prompt.
+   - Amounts not present anywhere → re-sync from QBO required.
+7. **Draft Prompt 2** (backend pricing engine + parity harness + 13 parity scenarios).
+8. **Run memory maintenance** before chat ends.
 
 ---
 
-## Research outputs to preserve for future reference
+## Research outputs (still available for future reference)
 
-All three research documents captured in this session. Should be accessible from next chat:
-
-- **W1:** Industry ERP data model analysis (Cyrious, ShopVox, SignTracker, EstiMate, PrintSmith Vision, CoreBridge). Not committed to repo. Inline in prior chat messages. Logan may save to `docs/research/W1-industry-erp-data-models.md` per original handoff plan.
-- **W2:** Field Worker Intake Form UX patterns. Uploaded file: `Field_Worker_Intake_Form_UX__Multi-Component_Job_Entry_Patterns.md`. Not committed to repo. Logan may save to `docs/research/W2-ux-trades-intake-patterns.md` per original handoff plan.
-- **W3:** Pricing engine audit. Committed to repo at `docs/audits/pricing-engine-audit-2026-04-20.md`, commit `8a744cc`.
+- **W1:** Industry ERP data model analysis. Inline in prior chat, not committed.
+- **W2:** Field Worker Intake Form UX patterns. Upload file, not committed.
+- **W3:** Pricing engine audit. Committed at `docs/audits/pricing-engine-audit-2026-04-20.md`, commit `8a744cc`.
 
 ## END OF HANDOFF
