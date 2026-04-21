@@ -10,6 +10,13 @@
 **Learning:** One commit-message directive replaces manual roadmap.md editing across multiple sessions. The dispatcher pattern (`post-commit` → `post-commit-*.sh`) lets independent hook concerns coexist without stepping on each other. Key failure modes to guard: self-recursion on the auto-update commit (skip via subject regex), and sprint-tag extraction picking up model-version strings like "Claude Opus 4.7" in `Co-Authored-By` trailers (scrub trailer lines before regex). Live-test the hook in the same session by including a close directive in the first fix commit — a hook that's never exercised is a hook that breaks in the next sprint.
 **Applies to:** Any repo with a cross-session work backlog and `core.hooksPath` set. Pairs well with a `roadmap: add` directive for symmetry.
 
+### 2026-04-17 — PATTERN — Single source of truth for domain-object classification
+
+**Severity:** HIGH
+**Context:** Press Box Wrap intake rendered Vehicle Lookup + Coverage Zones because step 3 branched on `productConfig.category === 'wrap'`, independent of JobMaterials.jsx's `VEHICLE_PRODUCT_TYPES` gate. Each component had its own product-type predicate; fixing one did not fix the others. Amendment audit found 14 parallel vocabularies across the codebase, each with its own branching logic.
+**Learning:** Any feature that differentiates behavior by a domain-object classification (product type, client type, job phase) must be audited at every touchpoint (intake, materials, stencils, warranty, emails, phases) — not just the first one that surfaces a bug. A single canonical predicate imported from one source of truth (`src/lib/productTypes.js` with `isVehicle(productType)`, `isBuilding(productType)`, etc.) is the only sustainable pattern. Ad-hoc `SET.has(row.col)` or `col === 'SomeLabel'` comparisons scattered across components generate scatter bugs whenever the storage format shifts (data migration, CHECK constraint, enum extension).
+**Applies to:** Any domain classification used for conditional UI or business logic. Particularly acute post-data-migration when the stored vocabulary changes underneath live predicates.
+
 ### 2026-04-17 — PATTERN — Split tactical fixes from strategic refactors
 
 **Severity:** HIGH

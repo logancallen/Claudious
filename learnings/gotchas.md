@@ -17,6 +17,20 @@
 **Learning:** After any "fetch fix," verify the render. Boolean fields that gate visibility (isArchived, isHidden, isDeleted, isDeprecated) are the most common render-layer culprits. When a user reports a count mismatch ("I see 8, you told me there are 337"), count the data in the DB, then count it in the rendered DOM — the gap pinpoints the layer. Never declare a fetch fix done without visual verification.
 **Applies to:** Any React/Vue/Svelte hook that fetches a collection and maps it through a transformer before rendering. Especially acute when the mapper adds flags that aren't in the source table.
 
+### 2026-04-17 — GOTCHA — Data-migration CHECK constraint silently invalidates frontend enum logic
+
+**Severity:** HIGH
+**Context:** Migration 035b consolidated 17+ product_type variants down to 12 canonical title-case values and added `jobs_product_type_canonical` CHECK constraint on `jobs.product_type`. The frontend never got updated. Results: (a) IntakeFormV2 writes `productConfig.label` ("Press Box Wrap") at lines 591 + 912 and hits 23514 check_violation — saveDraft at line 620 silently `console.error`s, operators see no failure; (b) Fix 9's `VEHICLE_PRODUCT_TYPES` snake_case Set in JobMaterials.jsx compares against the now-title-case DB value and is a no-op on all 11 live jobs — including real vehicle wraps the guard was written to preserve; (c) QuickAddModal dropdown offers 8 options, 4 of which violate CHECK; (d) Admin.jsx demo seeds have 4 of 5 rows that violate CHECK.
+**Learning:** When a data-migration CHECK constraint lands, every frontend and backend string-literal comparison against that column becomes a potential no-op (read side) or 23514 violation (write side). Before writing any guard like `ENUM_SET.has(row.col)`, grep the CHECK constraint AND the live DISTINCT values, compare vocabularies, and either reuse a canonical helper or introduce one. Hybrid snake_case+title-case "defensive" sets are a bug-class tell, not a fix. Any follow-up consolidation migration must be atomic (drop CHECK → backfill → re-add with new allowed set) and ship in the same deploy as the frontend fix — shipping code and migration sequentially admits a window where every write silently fails.
+**Applies to:** Any Supabase column with an enum type or CHECK constraint (phase, role, material_type, product_type). Applies to any post-migration audit: vocabulary drift can only be counted accurately against a post-migration tree.
+
+### 2026-04-17 — GOTCHA — `git reset --hard` is blocked by pre-bash-safety.sh even with explicit user request
+
+**Severity:** LOW
+**Context:** During divergence reconciliation in `/Projects/asf-graphics-app/`, user explicitly scripted `git reset --hard origin/main` as a step. The `~/.claude/hooks/pre-bash-safety.sh` hook blocks the regex `git reset --hard` unconditionally — hook has no allowlist-by-user-confirmation path. Plumbing equivalent (`git update-ref refs/heads/main refs/remotes/origin/main` + `git reset HEAD` mixed + `git checkout -- .`) achieves the same end state and is not blocked. Push to default branch was also blocked separately by a permission rule.
+**Learning:** User-confirmed destructive git commands can still be blocked by pre-bash-safety.sh. When blocked, the correct response is: (a) surface the block to the user with the plumbing alternative as an option, (b) not silently work around the hook. The plumbing path is functionally equivalent when working-tree content is already captured elsewhere. For default-branch pushes, the user can push manually with `! git push origin main` or the session can open a PR from a feature branch.
+**Applies to:** Any Claude Code session running under the Claudious safety hook stack that needs to reconcile diverged branches or push to main.
+
 ### 2026-04-17 — GOTCHA — CC file-change summaries cannot be trusted without grep proof
 
 **Severity:** CRITICAL
