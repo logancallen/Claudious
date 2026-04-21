@@ -1,415 +1,202 @@
-# Handoff — 2026-04-20 (PM session 2, Windows PC transition)
+# Handoff — 2026-04-20 (PM session 3, Research Synthesis Complete)
 
-**Recommended next-chat title:** `2026-04-21 — ASF — Research Synthesis + Components Model Design`
+**Recommended next-chat title:** `2026-04-21 — ASF — Components Model Implementation Prompt 1 (Migrations 047-052)`
 
 ---
 
 ## Current focus
 
-Three research workstreams in flight to design a bulletproof components-based job model for ASF Graphics. Commit #2 (stencil intake + design library fixes) was paused mid-build on Mac when CC took too long to investigate; abandoned cleanly with no destructive changes. Logan switched to Windows PC and resolved a 3-clone repo situation. Foundational flooring docs salvaged from OneDrive clone before deletion.
+All three research workstreams (W1 industry ERP data models, W2 field-worker UX patterns, W3 pricing engine audit) completed and synthesized into a single architectural spec: `docs/architecture/components-model-synthesis-2026-04-20.md`. Synthesis locked in 7 architectural decisions from Logan and carries 3 Claude-recommended positions awaiting explicit confirmation. Next step is auditing the CC commit prompt, then kicking off Prompt 1 (migration suite 047-050, 052) when Logan is ready.
 
-The architectural pivot: discovered through this session that the current `product_type` enum field is structurally insufficient — real jobs (especially press box installs) involve multiple materials applied to multiple surfaces. A press box wrap might combine vinyl on tin metal sides + window perf on the front + dimensional letters on Starboard. Single-product-per-job collapses this and silently breaks pricing, material orders, and labor estimation.
-
-Decision made: target architecture is a **components model** (job → 1-N components, each with material + surface + dimensions + install difficulty + ancillary equipment). Logan validated this is bill-of-materials thinking and aligns with how the work actually is. But components model build is 9-10 working days of focused work; Brady needs the platform sooner. Therefore: research first to design it correctly, then ship. During research week, Brady continues using current platform under the broken single-product model. 5-10 jobs of imperfect data are recoverable; building wrong architecture is not.
+The component-model architectural pivot remains the target. Path A (research first, components model builds directly, interim stencil/design-library fixes folded in) confirmed. Volume discount deferred entirely from Phase 1 per Logan's decision — no bracket set. Design fee logic pivoted mid-chat from client-type-driven to design_source-driven-with-operator-question after Logan correctly identified that library presence doesn't imply library reuse.
 
 ## Completed this session
 
-- **Architectural decision: components model is target architecture.** Single-product enum is insufficient for multi-material jobs. Documented bill-of-materials reasoning, three implementation paths (Path A = ship single-product fix now then build components in parallel, Path B = ship components in commit #2 with 5-7 day slip, Path C = empty-table-for-future antipattern), recommended Path A with research-first sequencing.
-- **Catalog simplification proposal:** drafted 14-entry catalog with 5 categories killing the location-as-product trap (`press_box_wrap`, `wall_wrap`, `bus_wrap`, `trailer_wrap`, `boat_wrap` all collapsed). Logan caught additional issue: even the simplified catalog still treats install context as product. Catalog work fully deferred pending research.
-- **Per-row migration mapping for 11 jobs** drafted with Logan's confirmations (J-7 → other, J-13 → gym_stencil, J-21 → building_wrap then revised, all others HIGH-confidence title-driven). Mapping deferred along with the catalog work.
-- **Premise break documented:** intake writes display labels (`'Gym Floor Stencil'`) to `jobs.product_type`, not snake_case keys (`'gym_stencil'`). Backend code branching on snake_case has been silently failing for every stencil job ever entered. Material auto-populate, completion email templates, AI categorization — all dead code in production. Brady has never seen those features fire.
-- **Three research workstreams designed and prompts drafted:**
-  - W1: Industry ERP data model research (Perplexity Deep Research, ~30-60 min)
-  - W2: UX patterns for trades-industry intake forms (Perplexity Deep Research, ~30-60 min)
-  - W3: Current pricing rules audit (Claude Code, ~1-2 hours)
-- **Repo cleanup on Windows PC:**
-  - Identified 3 clones: `Documents\GitHub` (canonical, clean, on `6399d39` matching origin/main), `Projects\` (3 days stale, 1 dirty file), `OneDrive\Documents\GitHub\` (OneDrive sync hazard)
-  - **CRITICAL save:** OneDrive clone contained 3 uncommitted files that were NOT in canonical clone:
-    - `docs/flooring-schema.md` (10KB, foundational schema work for ASF flooring expansion)
-    - `docs/flooring-scope.md` (10KB, component specs and routing for flooring division)
-    - `prompt-4.7a-job-centric-foundation.md` (23KB, prompt that shipped under different commits — historical reference)
-  - Logan's near-miss: initial recommendation was to delete OneDrive clone before realizing these files only existed there. Salvaged before deletion.
+- **W2 research results received, read in full, integrated.** Field-worker UX patterns document. Key findings: hybrid template-seed + edit-after is the dominant pattern, field order Client → Location → Job Type → Components → Notes, progressive disclosure by job type (not mode toggle), ≤8-10 templates max, 56×56dp touch targets, interruption tolerance via auto-save, notes field last-not-first.
+- **W3 research results received (Claude Code audit, 1058 lines, commit `8a744cc`).** 20 primary pricing rules catalogued, ASCII flow diagram, 18 product types analyzed (0 per-product engine branches, 5 UI-level gates), 17 frontend/backend duplication reconciliation risks, 22 single-product-locked rules with per-component adjustments, 20 broken/suspicious items for review. Notable findings: install cost mismatch between frontend (`sqft * 1.5`) and backend (`sqft * rate`), $75-minimum order-of-ops divergence between single and multi engines, single-engine skips `validate_material_selection`, Friends & Family has no backend engine, sync endpoint only copies design_fees not full rate card.
+- **Synthesis document drafted (579 lines).** 6 sections + 4 appendices. Covers data model (jobs + job_components + component_materials + component_install + job_type_templates + surfaces + clients.default_deposit_mode), pricing engine refactor with rule-by-rule disposition, intake form spec (4 steps, 8 templates, conditional fields, Design Source UI, interruption tolerance), surface as first-class entity Phase 1 scope, migration strategy, build sequencing with 10-prompt CC sequence.
+- **7 architectural decisions locked this session with Logan:**
+  1. Install minimum: hybrid (mount per-component, wrap/flat per-job $150 combined).
+  2. Volume discount: DEFERRED entirely from Phase 1. No bracket set. Engine computes without volume discount layer; can add later as one function wrapping material totals.
+  3. Design fee: driven by `design_source` (what work is being done), not client type.
+  4. Design source: 5-option radio with smart default (library check → pre-select `library_reuse`, operator must tap-confirm). Options: library_reuse, library_modify, new_composition, new_logo, client_supplied. Each maps to derived design_fee_tier with operator override capability.
+  5. Deposit mode: NEW `deposit_mode` field on `jobs` (po_required / design_fee_as_deposit / none_internal). Separate from design fee. `clients.default_deposit_mode` seeds new jobs; operator-overridable at intake.
+  6. Autofill Phase 1: deterministic only. Library check + client type + template + PVO lookup + last-job-match pattern autofill. No ML/learning layer.
+  7. Autofill Phase 2: learning inference deferred 6+ months pending training data accumulation (current 10 jobs + legacy QBO insufficient).
+- **3 Claude recommendations pending Logan confirmation:**
+  - Surface as first-class entity, Phase 1 scope (Claude 75% confidence).
+  - 325 QBO legacy jobs not migrated, flagged `is_legacy=true` (Claude 85% confidence).
+  - Commit #2 stencil+design-library fixes folded into components commit rather than shipping interim (Claude 70% confidence).
+- **Memory maintenance issue logged as systemic concern.** Handoffs carry forward items that have shipped. Root cause: no pruning step in handoff generation. Fix: every handoff includes "What's no longer true" section + actual `memory_user_edits` calls before end of chat. This chat's handoff executes that discipline.
 
 ## In-flight items
 
-### Item 1 — Three research workstreams (NOT YET KICKED OFF on Windows)
+### Item 1 — CC prompt audit BEFORE Prompt 1 executes
 
-Logan to kick these off in this order on Windows PC:
+**Next chat opens by auditing the CC synthesis commit prompt** (`/mnt/user-data/outputs/cc-prompt-commit-synthesis.md`). Specifically, verify:
 
-**W1 (Perplexity Deep Research):** Industry ERP data models for sign/wrap shops. Full prompt preserved below in "Prompt W1" section. Save output to `docs/research/W1-industry-erp-data-models.md`.
+1. Path is correct (`docs/architecture/components-model-synthesis-2026-04-20.md`).
+2. Preflight instructions match known-acceptable state (docs/codebase-state.md modified is expected).
+3. Verification grep counts are achievable with the as-written synthesis.
+4. Commit message is accurate.
+5. Constraints are complete (no branches, no hook bypass, no cascading edits).
+6. Self-report suppression instruction is present.
 
-**W2 (Perplexity Deep Research, second session):** UX patterns for trades-industry intake forms. Full prompt preserved below in "Prompt W2" section. Save output to `docs/research/W2-ux-trades-intake-patterns.md`.
+If audit passes → Logan runs the CC prompt in Windows CC. Commit SHA returned.
 
-**W3 (Claude Code session, Windows):** Audit-only pass on current pricing engine. Full prompt preserved below in "Prompt W3" section. Output committed by CC to `docs/audits/pricing-engine-audit-2026-04-20.md`.
+If audit flags issues → fix before running. Do not let a minor prompt defect create another failed-run situation.
 
-All three can run in parallel. Logan can kick off both Perplexity sessions and CC simultaneously, walk away, return to results.
+### Item 2 — Three pending confirmations (blocks Prompt 1 ship)
 
-### Item 2 — Salvaged flooring docs need to be committed (NOT YET DONE)
+Logan to confirm or reverse the three Claude-recommended positions:
 
-The 3 salvaged files are sitting in the OneDrive clone as of handoff time. Logan needs to:
+- Surface as first-class entity, Phase 1 — ship or defer to Phase 2?
+- QBO legacy jobs not migrated — correct or migrate mechanically?
+- Commit #2 fold-in — fold into components commit or ship 9 non-catalog fixes interim?
 
-1. Copy `docs/flooring-schema.md` and `docs/flooring-scope.md` from OneDrive clone to canonical clone (`C:\Users\logan\Documents\GitHub\asf-graphics-app`)
-2. Move `prompt-4.7a-job-centric-foundation.md` from OneDrive clone to canonical clone at `docs/archive/prompts/2026-04-18-prompt-4.7a-job-centric-foundation.md`
-3. Verify migration state — flooring-schema.md references migrations `005a_flooring_columns_tables.sql` and `005b_flooring_notify_trigger.sql`. Need to know if these exist in the repo (started-and-paused) or don't (started-and-aborted)
-4. Commit with appropriate message
-5. Then nuke OneDrive clone and `Projects\` clone
+If all three confirm as-recommended → Prompt 1 ships as designed.
 
-PowerShell commands for steps 1-2 preserved below in "Salvage commands" section.
+If any reverses → synthesis document needs a minor revision before Prompt 1 writes migrations (e.g., no surface reverse means migration 047 is dropped).
 
-### Item 3 — Court Designer scope clarification
+### Item 3 — Prompt 1 (migration suite 047-050, 052) not yet drafted
 
-Logan confirmed: Court Designer lives in asf-graphics-app for now. There is no separate flooring internal site. The flooring-schema/scope docs are reference for the eventual flooring expansion — whether as same-platform expansion (per the docs) or separate platform (per Logan's memory framing) is a future strategic decision, not blocking anything currently.
+Logan to approve that Prompt 1 should be drafted in the next chat as the first implementation step after synthesis is committed.
+
+Prompt 1 will:
+- Create `surfaces` reference table (12-15 seeds per §4.2).
+- Create `job_components`, `component_materials`, `component_install` tables (per §1.1).
+- Create `job_type_templates` + seed 8 templates (per §3.2).
+- Add `clients.default_deposit_mode` column + backfill from existing data.
+- Flag 325 QBO jobs `is_legacy=true`.
+- No code changes. Migration files only.
+
+Subsequent prompts (2-10) draft as each predecessor ships cleanly.
 
 ## Pending items (queued, not blocking current work)
 
-- **Commit #2 (stencil intake + design library fixes) — DEFERRED until research synthesis ships.** Catalog work (Fix 8) was the original blocker; deferring it left only 9 fixes which are independent of architecture. Re-evaluate after research synthesis: ship the 9 non-catalog fixes as commit #2, ship components model as commit #3, OR fold everything into one larger commit.
-- **Prompt A (QBO imported jobs missing prices) — queued, awaits commit #2 ship.** Full prompt in prior handoff archive.
-- **Prompt B (Quick Estimate tool for Brady) — queued, awaits Prompt A ship.** Full prompt in prior handoff archive.
-- **Phase 1 Step 3 — Service worker + install prompt + update prompt — queued.** Scope locked in earlier session.
-- **2FA manual verification — pending Logan.** Enroll → logout → login flow.
-- **Learnings capture in `docs/learnings.md`:**
-  - Login signOut-on-mount trap (HIGH severity, cross-project)
-  - Session-restore-timeout as fail-closed trap (HIGH severity, cross-project)
-  - Storage-format mismatch (display labels vs snake_case keys) — silent backend correctness bug pattern (HIGH severity, ASF-specific but generalizable)
-  - Stencil-vs-wrap structural divergence in single-product intake forms (MEDIUM severity, ASF-specific)
-  - Industry-specific category naming should pull from actual conventions before invention (LOW severity, cross-project)
-  - "Dominant product wins, secondary materials in notes" is anti-pattern that lies to the system (HIGH severity, cross-project — design-decision learning)
-  - OneDrive folder + git repo = data loss vector (HIGH severity, cross-project)
-- **OneDrive removal on Windows — pending after research week.** Clone safely deleted; Logan should configure git to never re-clone into OneDrive folder.
-- **Backend normalization shim removal** (jobs.py:545, emails.py:539, auto_categorizer.py:24, material_advisor.py:226-227, import_qbo.py mapping table) — separate commit after canonical catalog stabilizes for 30 days.
-- **`auto_categorizer.py:24`** has dead mapping `"floor": "floor_graphic"` to remove. Trivial. Folds into commit #2.
+- **Salvaged flooring docs still need to be committed.** The 3 files (`docs/flooring-schema.md`, `docs/flooring-scope.md`, `prompt-4.7a-job-centric-foundation.md`) remain in the OneDrive clone at `C:\Users\logan\OneDrive\Documents\GitHub\asf-graphics-app`. Salvage script preserved in prior handoff. Run after confirming flooring migration state (`Get-ChildItem supabase\migrations -Filter "*flooring*"`).
+- **OneDrive clone + Projects clone cleanup** — after flooring salvage. Nuke both after verifying nothing unique.
+- **Prompt A (QBO imported jobs missing prices) — queued post-components-ship.**
+- **Prompt B (Quick Estimate tool for Brady) — queued post-Prompt A.**
+- **Phase 1 Step 3 — Service worker + install prompt + update prompt — queued.**
+- **2FA manual verification — pending Logan.**
+- **Learnings capture** (should be written to `docs/learnings.md` in asf-graphics-app at some point):
+  - Library presence ≠ reuse decision — operator question required, not inference (HIGH, design pattern learning).
+  - Design fee logic is work-driven, not client-type-driven (HIGH, ASF-specific).
+  - Deposit and design fee are separable concerns; client type governs deposit mode, work type governs design fee (HIGH, ASF-specific).
+  - Deterministic autofill gets 80% of value vs learning autofill; ship Phase 1 deterministic before Phase 2 learning (MEDIUM, cross-project).
+  - Hybrid install minimum (mount per-component, wrap/flat per-job) keeps math invisible to operator (MEDIUM, ASF-specific).
+  - Components-model engine rewrite should preserve JSON fixture harness pattern from substrate work (MEDIUM, cross-project).
+  - Handoff staleness compounds: items marked "pending" resurface after completion because no pruning step exists (HIGH, cross-project).
+- **Backend normalization shim removal** (jobs.py:545, emails.py:539, auto_categorizer.py:24, material_advisor.py:226-227, import_qbo.py) — dissolves in components refactor.
 
-## Decisions made
+## Frustration signals (avoid in next chat)
 
-- **Components model is target architecture.** Path A (research first, ship single-product fix in interim, build components afterward) selected over Path B (ship components in 5-7 days) and Path C (reserved-but-unused JSONB column antipattern).
-- **Catalog work fully deferred** until research synthesis. Includes: 14-entry catalog, IA refactor, snake_case key migration, per-row product_type backfill, productTypes.js single-source-of-truth, intake form storage format fix.
-- **Brady continues using current platform during research week.** Imperfect data for ~5-10 jobs is acceptable cost for designing the right architecture. Migration of those rows when components model ships is straightforward (each becomes one component).
-- **In-person Brady/Chanté workflow study NOT pursued** — Logan declined ("they're busy and seem to get annoyed when I try to ask them"). Substituted with: W2 UX patterns research + a silent observation log Logan maintains during research week (watching audit log for fields left blank, notes doing structured work, repeated workarounds).
-- **Court Designer remains in asf-graphics-app.** No separate flooring internal site exists yet.
-- **Strategic conflict surfaced but not resolved:** flooring-schema/scope docs propose flooring-as-expansion of graphics platform with shared infra. Logan's memory frames flooring as a separate future platform. These two strategies are incompatible. Decision deferred to a future strategic session.
-- **Three Windows PC clones reduced to one:** `Documents\GitHub` retained as canonical. `OneDrive\Documents\GitHub\` and `Projects\` to be deleted after flooring docs salvaged.
-
-## Files NOT changed this session (intentional)
-
-- No code commits this session
-- No migrations applied
-- No file edits in any asf-graphics-app clone
-- The unstaged `src/lib/productTypes.js` from Mac sync (if it transferred to Windows) should be left untouched — it's a draft from abandoned investigation, not authoritative
-
-## Unresolved questions
-
-- Does the repo contain `005a_flooring_columns_tables.sql` and `005b_flooring_notify_trigger.sql` migrations? (Determines whether flooring schema was partially applied to Supabase or whether it was purely a planning doc.)
-- Strategic: flooring as graphics-platform expansion (per docs) vs. separate platform (per Logan's memory framing)?
-- Will the in-flight `prompt-4.7a-job-centric-foundation.md` work need anything ported into current architecture, or did it fully ship under different commits?
-
-## Frustration signals (avoid next chat)
-
-- **Don't recommend pursuing in-person workflow study with Brady/Chanté.** Logan tried, they got annoyed. Use silent observation + research substitutes only.
-- **Don't recommend nuking files without verifying they're safe to discard.** Near-miss with flooring docs this session — hash check first, always. Test-Path on the assumed-canonical location first, always.
-- **Don't propose adding speculative infrastructure ("reserved JSONB column for future")** — Logan correctly identified this as YAGNI. If components model isn't shipping in this commit, don't reserve schema for it.
-- **Don't underestimate scope on architectural changes.** Components model is ~9-10 working days for a focused builder, ~2 weeks calendar with CC + verification rounds. Be honest from the start.
-- **Don't issue Claude Code prompts mid-flow without ensuring CC can finish in one sitting.** Logan had to abandon a CC session because it took too long. For long-running CC tasks: warn Logan in advance about expected duration, recommend kicking off when he has uninterrupted time available.
-- **Don't ask Logan to substitute placeholders in raw URLs or commands** — build a fill-in-the-blank script or HTML form for multi-credential tasks.
-- **Don't force-feed migrations via CLI** — Logan applies manually via Supabase SQL Editor.
+- **Don't assume library presence = library reuse** — Logan caught this. System must ask operator explicitly.
+- **Don't assume client type drives design fee** — Logan caught this. Work type (design_source) drives it.
+- **Don't route synthesis work to Claude Code** — CC is for codebase operations, not cross-document architectural reasoning. I do synthesis, CC commits.
+- **Don't recommend starting a new chat without preparing handoff first** — rule from prior sessions.
+- **Don't pursue in-person Brady/Chanté workflow study** — they get annoyed when Logan tries to interview them.
+- **Don't propose speculative infrastructure** — volume discount should NOT have a reserved JSONB column. If not shipping, don't reserve schema.
+- **Don't issue Claude Code prompts mid-flow without ensuring CC can finish in one sitting** — warn Logan about expected CC runtime.
+- **Don't ask Logan to substitute placeholders in raw URLs or commands** — build fill-in-the-blank scripts.
 - **Don't accept "already correct" without grep proof** — persistent CC failure mode.
-- **Don't assume PowerShell handles bash-style command chaining (`&&`, `||`).** Use semicolons or write proper PowerShell scripts. Multi-line `if/else` blocks must be in scripts, not pasted line-by-line.
-- **Don't assume Claudious repo path without verifying.** Correct path is `C:\Users\logan\Projects\claudious\` (lowercase), not `Documents\GitHub\Claudious\`.
+- **Don't over-hedge on recommendations** — 70%+ confidence = take a position.
+- **Don't batch multiple sequential commands** — one step at a time on dependent work.
+- **Don't respond to tactical questions with Classify/Best/Risks/Execution/Tracking framework** — reserve that for strategic decisions.
+- **Don't apologize over small mistakes** — own it, fix it, move on. No self-abasement.
 
 ## User Preferences changes pending
 
-None.
+None from this session.
 
-## New findings (from this session)
+**Candidate (not proposed yet):** Explicit rule about architectural inference — "When user states a business rule, parse it for edge cases before accepting. Example: 'design fee free for schools' → check: what about reused designs for businesses? Don't accept binary rules silently."
 
-- **Storage-format mismatch in production (HIGH, ASF-specific):** `IntakeFormV2.jsx:598` and `:925` write `productConfig?.label` (display label) to `jobs.product_type` instead of `productConfig.key` (snake_case). 11 jobs in DB stored as display labels. Every backend `product_type === 'gym_stencil'` branch has been dead code since intake went live. Affected files: `backend/routes/jobs.py:545`, `backend/routes/emails.py:539`, `backend/services/auto_categorizer.py`, plus all stencil-aware behavior anywhere in backend.
-- **`design_library.product_type` column abuse (MEDIUM, ASF-specific):** column being used to store asset types (`mockup`, `logo`, `template`) and backdrop categories (`school_athletics`, `school_general`, `retail_storefront`) instead of product types. Filter-by-product-type returns garbage. Cleanup deferred to components-model commit but flagged for awareness.
-- **Industry-specific category naming research finding:** "Print Media" replaced with "Banners & Graphics" because vinyl/wrap industry uses location-based or installation-based categories, not media-type categories. Two-minute Perplexity search beats invention. Generalizable: when proposing UI category names for any vertical, check the industry first.
-- **Bill-of-materials = correct manufacturing data model:** every custom-fab business (sign shops, wrap shops, fabricators, kitchen installers) eventually converges on parent-job + child-components structure. Trying to model multi-material jobs as single-product-per-job creates silent failures everywhere. Generalizable to any production-management platform serving custom fabrication.
-- **OneDrive + git is a data loss vector (HIGH, cross-project):** OneDrive sync races with git operations. Files get created in OneDrive folder, sync interrupts the git add/commit cycle, work never reaches origin, only copy lives in the OneDrive folder that gets nuked. Logan's prior memory flagged this; this session nearly cost him the flooring docs as a result.
-- **Documented-wrong color range pattern still applies:** sidebar `#1A1A2E` reads as blue/indigo (wrong); correct is `#1D1D1F` (near-black). Per `.claude/settings.json` hooks. Not relevant to this session but reaffirmed in CLAUDE.md as a known trap.
-- **Claudious repo path on Windows is `C:\Users\logan\Projects\claudious\` (lowercase), NOT `Documents\GitHub\Claudious\`.** Corrected during this handoff commit.
+## New findings (this session)
 
-## Next session first actions
+- **Current engine is 1-level multi-zone, not components** — reconfirmed via W3 §5. Multi-zone treats job as "one product chopped into material pieces," not "job composed of N distinct components each with full pricing stack." Components refactor is a genuine architectural change, not a scope extension of existing multi-zone.
+- **W3 surfaced an engine duplication bug: frontend install cost uses `sqft * 1.5`, backend uses `sqft * rate`** — means margin badge in intake doesn't match backend-computed margin. §6.1 in W3 audit. Gets fixed in components engine rewrite.
+- **Design Library is a structurally under-utilized asset** — designed as a passive storage but should drive intake autofill via client+product match. Components model activates it as a decision input for `design_source` default.
+- **Deposit ≠ design fee** — Logan's clarification revealed these are separate concerns. ISDs have no deposit (PO gates phase advance); businesses have deposit (design fee collected at Quote phase). New `deposit_mode` field on jobs captures this correctly.
+- **Operator tap-confirm on library match** is the discipline that prevents silent inference bugs. Even when system knows the answer, asking the operator forces the decision to be auditable.
 
-1. **Read `canonical/handoff-active.md` before responding.**
-2. **Confirm research workstream status:** ask Logan whether he kicked off W1, W2, W3 yet, and whether outputs are ready.
-3. **If outputs ready:** Logan pastes all three documents into the chat. Synthesize into the bulletproof components-model schema + intake form spec + pricing engine refactor plan + migration strategy.
-4. **If outputs not ready:** confirm he has the prompts (preserved below), suggest he kick them off and return when results land.
-5. **Confirm OneDrive cleanup status:** flooring docs salvaged into canonical clone? OneDrive and Projects (asf-graphics-app) clones nuked?
-6. **Verify flooring migration state:** did `Get-ChildItem supabase\migrations -Filter "*flooring*"` return anything? This determines whether the flooring schema was partially applied or remains purely planning-stage.
-7. **Then proceed with architecture synthesis.**
+## Files committed (this session)
 
----
+- `docs/architecture/components-model-synthesis-2026-04-20.md` (synthesis, 656 lines, commit `cf5f91a` on 2026-04-20 evening). Revised mid-audit in next chat to add `funding_source` field and warn-not-block deposit gating. Final version is what landed.
 
-## Salvage commands (run on Windows PC if not yet done)
+## Decisions made
 
-```powershell
-$src = "C:\Users\logan\OneDrive\Documents\GitHub\asf-graphics-app"
-$dst = "C:\Users\logan\Documents\GitHub\asf-graphics-app"
+- Target architecture: components model (`job → job_components → [component_materials, component_install]`) with `job_type_templates` seeds + `surfaces` reference table + new `deposit_mode` on jobs + `default_deposit_mode` on clients.
+- Install minimum hybrid (mount per-component, wrap/flat combined per-job).
+- Volume discount deferred entirely from Phase 1.
+- Design fee = function of `design_source` not client type.
+- 5-option design_source radio with library-check smart default requiring operator tap-confirm.
+- New `deposit_mode` field separates deposit logic from design fee.
+- Autofill Phase 1 deterministic only. Phase 2 learning deferred 6+ months.
+- Surfaces Phase 1 (Claude recommendation, pending Logan final confirm).
+- 325 QBO legacy jobs flagged not migrated (Claude recommendation, pending Logan final confirm).
+- Commit #2 fold into components commit (Claude recommendation, pending Logan final confirm).
+- Synthesis commits to `docs/architecture/`, not `docs/research/` or `docs/audits/` — this is architectural spec, a new class.
+- Memory maintenance issue logged as systemic problem requiring active pruning at every handoff.
 
-# Copy flooring docs to canonical
-Copy-Item "$src\docs\flooring-schema.md" "$dst\docs\flooring-schema.md"
-Copy-Item "$src\docs\flooring-scope.md" "$dst\docs\flooring-scope.md"
+## Files NOT changed this session
 
-# Archive 4.7a prompt
-$promptArchiveDir = "$dst\docs\archive\prompts"
-if (-not (Test-Path $promptArchiveDir)) {
-    New-Item -ItemType Directory -Force -Path $promptArchiveDir | Out-Null
-}
-Copy-Item "$src\prompt-4.7a-job-centric-foundation.md" "$promptArchiveDir\2026-04-18-prompt-4.7a-job-centric-foundation.md"
+- No code commits.
+- No migrations.
+- No edits in any repo clone.
+- Synthesis file drafted in `/mnt/user-data/outputs/` awaiting CC commit.
 
-# Verify migration state
-Push-Location $dst
-Get-ChildItem supabase\migrations -Filter "*flooring*"
-Get-ChildItem supabase\migrations -Filter "005*.sql"
-git status
-Pop-Location
-```
+## What was NOT discussed / explicitly out-of-scope
 
-After verifying, commit from asf-graphics-app repo:
-git add docs/flooring-schema.md docs/flooring-scope.md docs/archive/prompts/2026-04-18-prompt-4.7a-job-centric-foundation.md
-git commit -m "docs: salvage flooring expansion planning + 4.7a prompt archive from OneDrive clone"
-git push origin main
+Flagged for future sessions, not blocking current work:
 
-Then nuke:
-```powershell
-Remove-Item -Recurse -Force "C:\Users\logan\OneDrive\Documents\GitHub\asf-graphics-app"
-Remove-Item -Recurse -Force "C:\Users\logan\Projects\asf-graphics-app"
-```
+- **Flooring platform architecture** — whether components model extends to flooring or flooring gets a separate platform. Per Logan's clarification, court designer lives in asf-graphics-app for now; no separate flooring site. The salvaged flooring docs (`flooring-schema.md`, `flooring-scope.md`) remain planning artifacts, not current build plans. Architectural alignment decision deferred to future strategic session.
+- **Courtside Pro integration** — separate Supabase project (ID `vcxtnzmavjwzmrataegl`), no touch this refactor. Post-sale venture, on hold.
+- **Learning autofill design** — Phase 2 system. Deferred 6+ months. Approach: weighted inference from aggregate history per client + product signature. Not designed yet.
+- **BuyBoard Proposal 816-26 deliverables** — unaffected by refactor. Logan-only tasks queued (Gmail sends, ISD reference verification, Assumed Name Certificate filing, electronic submission at buyboard.com/vendor). Deadline June 11, 2026.
+- **PVO `.ai` template subscription call** — Logan needs to call 888-843-1325 before purchasing. Negotiate credit/prorate against existing WrapUP subscription. Confirm Chanté's login. Not blocking components work but needed before `fleet_wrap_single` template can pre-populate from PVO data.
+- **BuyBoard graphics coverage investigation** — BuyBoard Contract 737-24 covers flooring only. Graphics investigation status not updated this session.
+- **QBO production keys** — Still pending Intuit approval. Post-approval: copy Production Client ID + Secret to Railway, add redirect URI, authorize, import customers.
+- **Hudson Digital Graphics competitive tracking** — noted from memory as missed competitor with full product overlap. No action this session.
+- **2026 showcase year framing for sale valuation** — discussed briefly as context but not a driver of current decisions. Showcase year depends on clean 2025 tax filings (extension, September-October 2026). Components model shipping soon enough to generate 12-18 months of data before showcase matters.
+- **Strategic flooring vs graphics integration** — flooring-schema/scope docs propose flooring as same-platform expansion; Logan's memory frames flooring as separate. Incompatible strategies. Deferred to future strategic session.
+- **The "what could go wrong" pre-mortem on components refactor** — not run. Should run before Prompt 1 ships.
+- **Rollback strategy if components refactor fails mid-build** — not designed. Feature flag pattern mitigates but doesn't replace a real rollback plan.
 
----
+## Context health notes for next chat
 
-## Prompt W1 — Industry ERP data model research (paste into Perplexity Pro Deep Research)
-I'm building an internal production management platform for a custom
-sign and wrap shop (vehicle wraps, building signage, banners,
-gym floor stencils, window perf, building wraps). Roughly $300K/year
-revenue, 4-person team, mix of school district and commercial work.
-I need to research how mature sign/wrap industry software solves the
-job-modeling problem. Specifically, when a single job involves multiple
-materials applied to multiple surfaces (e.g., a press box install with
-vinyl on tin metal sides + window perf on the front + dimensional letters
-on a Starboard panel), how do industry-standard tools structure this
-in their data model and intake workflow?
-Research these specific products in depth:
+- This chat used ~92% context by end. Continue into new chat; do not iterate further here.
+- Synthesis document at `/mnt/user-data/outputs/components-model-synthesis-2026-04-20.md` is the source of truth. CC commits it when prompt runs.
+- CC prompt at `/mnt/user-data/outputs/cc-prompt-commit-synthesis.md` awaits audit + run.
+- Three research documents used as source: W1 inline in prior chat message, W2 uploaded as file (`Field_Worker_Intake_Form_UX__Multi-Component_Job_Entry_Patterns.md`), W3 committed to repo (`docs/audits/pricing-engine-audit-2026-04-20.md`, commit `8a744cc`). W1 and W2 NOT in the repo. W3 is.
 
-Cyrious Control (cyrious.com)
-Shopworks
-Signtracker
-EstiMate by Signtracker
-PrintSmith Vision
-Any other sign/wrap industry ERP with significant market share
+## Next chat first actions (execute in order)
 
-For each product, find and report:
-A. JOB DATA MODEL
-
-How is a "job" structured? Is it one record with multiple line items, or a parent-child structure (job → components/sub-jobs)?
-Are line items called "components," "products," "items," "operations," or something else?
-Is each line item linked to a material, a surface, an install method, or some combination?
-How are ancillary items (equipment rental, hardware, prep work, travel) handled — separate line items, overhead lookup, or job-level fields?
-
-B. INTAKE WORKFLOW
-
-What fields does the user fill in first when creating a new job?
-How is product type / material / surface presented — dropdowns, search, templates, "kit" pre-fills?
-How does the form scale from a simple one-banner job to a complex multi-surface install?
-Are there templates or "kits" that pre-populate common job types (e.g., "full vehicle wrap kit" pre-fills 6 components)?
-
-C. PRICING MODEL
-
-How is price calculated when a job has multiple components with different materials and install difficulties?
-Are labor and material priced together (per sqft inclusive) or separately (material cost + labor multiplier)?
-How do install difficulty / install location modifiers work?
-Are there minimum-order or setup fees per job vs per component?
-
-D. MATERIAL & SURFACE LOOKUP
-
-Is "material" a free-text field, an enum, a lookup against an inventory table, or linked to a vendor catalog?
-Is "surface" tracked at all, and if so, how?
-
-E. CUT LIST / ORDER GENERATION
-
-Can these tools generate a cut list, material order, or production sheet from the job record?
-How does the data model enable that?
-
-F. KEY CRITICISMS
-
-What do users on industry forums (signs101, signdiscussionboard, reddit r/signshop) complain about with each tool's data model?
-What workarounds do shops invent to handle multi-material jobs the tool can't natively model?
-
-Deliver this as a structured comparison document. For each tool, show
-the actual data model shape using example records (mock data is fine
-if real screenshots aren't available). Cite sources for every claim
-including documentation pages, forum threads, and product reviews.
-End with a synthesis: across these 5+ tools, what are the 3-5
-data-model patterns that consistently work? What patterns consistently
-fail or get worked around? Which industry standard is closest to a
-"correct" answer for a small custom shop?
+1. **Read this handoff first.** Do not respond to anything else before reading.
+2. **Audit the CC synthesis commit prompt.** File at `/mnt/user-data/outputs/cc-prompt-commit-synthesis.md`. Verify path correctness, preflight instructions, grep counts, commit message, constraints, self-report suppression. Report audit findings to Logan.
+3. **If audit passes:** Logan runs CC prompt. Confirm synthesis committed (commit SHA in response). Update prior `canonical/handoff-active.md` to reference the committed file.
+4. **If audit fails:** fix the prompt, re-verify, then Logan runs it.
+5. **Ask Logan to confirm 3 pending recommendations:**
+   - Surface as first-class Phase 1 — confirm or reverse?
+   - QBO legacy not migrated — confirm or reverse?
+   - Commit #2 fold into components commit — confirm or reverse?
+6. **If all three confirm:** draft Prompt 1 (migration suite 047-050, 052).
+7. **If any reverse:** revise synthesis accordingly, re-commit via CC prompt, then draft Prompt 1.
+8. **Draft Prompt 1** — assumption-free, reads codebase state, creates migration files only, commits, pushes, reports.
+9. **Execute memory maintenance** — review current `userMemories` for items that have shipped and strike them. Specifically audit for:
+   - Handoff references to items this chat has resolved.
+   - Old "pending" items that are now closed.
+   - Stale references to platform state.
+10. **Ask Logan about flooring docs salvage status** — did the OneDrive cleanup happen?
 
 ---
 
-## Prompt W2 — UX patterns for trades intake forms (paste into Perplexity Pro Deep Research, separate session)
-I'm designing an intake form used by non-technical field workers in
-a custom fabrication shop (sign and wrap installer, designer). Users
-are skilled tradespeople, not designers, not data-entry clerks. They're
-often on a phone or tablet, sometimes mid-install, sometimes between
-calls. Annoying or confusing forms get abandoned and the data goes
-into a notes field instead of structured columns.
-The form needs to capture jobs with multiple components — e.g., a
-single press box install might involve vinyl wrap on three sides,
-window perforation on the front, and dimensional letters mounted
-on a substrate. Each component has its own material, surface,
-dimensions, and install difficulty.
-Research and document UX patterns for this use case. Specifically:
-A. MULTI-COMPONENT FORM PATTERNS
-Find UX research, case studies, and product examples for intake forms
-that capture variable numbers of line items / components per parent
-record. Common patterns to evaluate:
+## Research outputs to preserve for future reference
 
-Repeater pattern (single form with "Add another" button)
-Wizard/stepper pattern (component-by-component multi-step flow)
-Spreadsheet-style table input
-Card-based component builder (drag and drop)
-Template-driven pre-fill ("Choose job type" pre-populates components)
-Hybrid (template seed + manual edit)
+All three research documents captured in this session. Should be accessible from next chat:
 
-For each pattern, find:
-
-Where it's used successfully (cite specific products: ServiceTitan, Jobber, Housecall Pro, Buildertrend, PlanGrid, Fieldwire, etc. — focus on field-service and construction software)
-User research on cognitive load, error rate, completion time
-Where it fails (forums, reviews, abandoned-cart equivalents)
-Mobile vs desktop variations
-
-B. FIELD ORDER AND COGNITIVE FLOW
-For trades workers entering job data, what is the empirically-supported
-order of fields? Some hypotheses to test:
-
-"Who is this for" first (client) — concrete identity anchors the rest
-"What is being made" first (product) — task-oriented anchors
-"Where is it going" first (install location) — spatial anchors
-"When is it due" first (deadline) — urgency anchors
-
-Find research from field-service software UX studies, contractor
-software case studies, and trades-industry intake form design.
-C. PROGRESSIVE DISCLOSURE
-For forms that need to handle both simple jobs (one banner) and
-complex jobs (multi-component install), how do best-in-class tools
-hide complexity from simple cases without making complex cases
-require navigation away? Specifically:
-
-Default to simplest form, expand on user request
-Always-show all sections but auto-collapse unused
-Conditional sections that appear based on prior answers
-"Quick mode" vs "Detailed mode" toggle
-
-D. FIELD WORKER SPECIFIC CONSTRAINTS
-What's known about form design for users who are:
-
-On mobile in non-ideal conditions (sun glare, gloves, dust)
-Interrupted constantly (calls, customers, deliveries)
-Domain-expert but not data-entry-trained
-Resistant to "more fields" because it slows real work
-
-What design principles consistently surface in research from companies
-that build software for plumbers, electricians, contractors, installers,
-HVAC techs?
-E. ANTI-PATTERNS THAT FAIL IN FIELD-SERVICE INTAKE
-What patterns consistently fail in trades intake forms? Find specific
-examples from product reviews, support threads, and UX postmortems.
-F. SPECIFIC PRODUCT TEARDOWN
-Take 3 field-service / trades software products and document the
-exact intake flow with screenshots or detailed descriptions:
-
-ServiceTitan (HVAC/plumbing)
-Jobber (general field service)
-Either Buildertrend or Fieldwire (construction)
-
-For each, walk through: how does a field worker enter a new job?
-What fields, in what order, with what defaults? How does the form
-handle a job with multiple line items / phases?
-Deliver as a structured document. Cite every claim with sources
-(case studies, product documentation, user research papers, forum
-threads). End with a synthesis of the 3-5 strongest UX principles
-for this specific use case — what patterns I should adopt, what
-patterns I should avoid, and what tradeoffs to be aware of.
-
----
-
-## Prompt W3 — Pricing engine audit (paste into Claude Code on Windows)
-Audit-only task. NO file edits. NO changes. Pure documentation pass.
-PREFLIGHT
-─────────
-
-Confirm git status is clean on main, up to date with origin/main.
-If src/lib/productTypes.js exists as untracked, leave it alone.
-Do not edit, do not delete, do not stage.
-
-TASK
-────
-Read in full:
-
-backend/routes/quotes.py
-backend/prompts/pricing_finance.py
-backend/services/material_advisor.py
-src/pages/QuoteCalc.jsx
-src/components/job/QuoteCalc.jsx (if it exists — embedded version)
-Any other file with pricing logic — grep for: 'calculate', 'price', 'margin', 'cost', 'sqft', 'multiplier', 'tier'
-
-For each pricing rule found, document in this format:
-RULE: [name]
-LOCATION: [file:line]
-TRIGGER: [what condition fires it]
-INPUT: [what fields/values it reads]
-CALCULATION: [the actual math, in plain language and code]
-OUTPUT: [what it produces]
-EDGE CASES: [null handling, division-by-zero, negative values]
-PRODUCT-TYPE BRANCHES: [if it behaves differently for different products, list each branch]
-DEPENDENCIES: [other rules it calls or is called by]
-After cataloging every rule, produce:
-
-A flow diagram (text/ASCII) showing the order of operations from
-intake input → final price.
-A list of every product type currently handled, with notes on
-which ones have custom pricing logic vs default.
-A list of every place where pricing logic exists in BOTH frontend
-and backend (the audit bug #14 problem) — flag each as a
-reconciliation risk.
-A list of every pricing rule that depends on the current single-
-product-per-job assumption, and how each would need to change to
-support a multi-component model.
-A list of any pricing rules that look broken, inconsistent, or
-suspicious — places where you'd flag for human review.
-
-Output as a single markdown document committed to docs/audits/
-pricing-engine-audit-2026-04-20.md. Push to main.
-CONSTRAINTS
-───────────
-
-main branch only, no branches
-audit document only — no code changes
-if you find something genuinely broken, document it but DO NOT fix
-No edits to src/lib/productTypes.js (it's a draft from a prior session)
-Do not create or modify any migration files
-Push the docs/ file when done. Report commit SHA.
-
-
----
-
-## Migration state note
-
-Latest applied migration as of handoff: `046_*.sql` (per Mac session). Commit #2 was going to add `047_stencil_intake_support.sql` but was abandoned. Next migration number when work resumes: `047`. No migrations applied or modified this session.
-
-## Repo state at handoff
-
-- **Active asf-graphics-app clone (Windows):** `C:\Users\logan\Documents\GitHub\asf-graphics-app`
-- **HEAD:** `6399d39` — `docs(learnings): capture pwa polish + auth fix root causes`
-- **origin/main:** `6399d39` (fully synced, `0 0` ahead/behind)
-- **Status:** clean (assuming flooring docs salvage hasn't run yet)
-- **Branch:** main
-- **Pending cleanup:** OneDrive clone at `C:\Users\logan\OneDrive\Documents\GitHub\asf-graphics-app` (delete after salvage), Projects clone at `C:\Users\logan\Projects\asf-graphics-app` (delete after confirming nothing unique)
-- **Claudious repo (Windows):** `C:\Users\logan\Projects\claudious\`
-
-## Court Designer scope (confirmed this session)
-
-Lives in asf-graphics-app for now. No separate flooring internal site exists. The flooring-schema/scope docs salvaged from OneDrive are reference material for eventual flooring expansion (architectural decision deferred). Do not act on flooring-schema/scope docs as if they're current build plans — they're future-state planning artifacts.
+- **W1:** Industry ERP data model analysis (Cyrious, ShopVox, SignTracker, EstiMate, PrintSmith Vision, CoreBridge). Not committed to repo. Inline in prior chat messages. Logan may save to `docs/research/W1-industry-erp-data-models.md` per original handoff plan.
+- **W2:** Field Worker Intake Form UX patterns. Uploaded file: `Field_Worker_Intake_Form_UX__Multi-Component_Job_Entry_Patterns.md`. Not committed to repo. Logan may save to `docs/research/W2-ux-trades-intake-patterns.md` per original handoff plan.
+- **W3:** Pricing engine audit. Committed to repo at `docs/audits/pricing-engine-audit-2026-04-20.md`, commit `8a744cc`.
 
 ## END OF HANDOFF
