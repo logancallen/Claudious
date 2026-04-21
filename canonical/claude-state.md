@@ -1,7 +1,7 @@
 # Claude Model Ecosystem — Current State
 
-**Last updated:** 2026-04-20
-**Status:** Opus 4.7 is the current flagship. Opus 4.6 retains specific use cases (cloud Ultraplan).
+**Last updated:** 2026-04-21
+**Status:** Opus 4.7 is the current flagship (GA launched 2026-04-16). Opus 4.6 retains specific use cases (cloud Ultraplan).
 
 ---
 
@@ -21,7 +21,7 @@ Pricing on Opus 4.7 is unchanged from 4.6. Context windows on Opus/Sonnet 4.6 an
 - **Claude Max ($200/mo)** — 1M context for Opus 4.7 + Sonnet 4.6 in Claude Code and Claude.ai.
 - **Routines quota:** 15 cloud routine runs / day (shared with interactive subscription token budget).
 - **Cowork:** context dropped silently from 1M → 200K after Claude Desktop v1.1.7714 (confirmed Apr 17 intake). Issue filed, rollback in progress.
-- **Peak-hour throttling:** weekdays 8am–2pm ET / 5am–11am PT burn session limits faster. Schedule long cloud runs off-peak.
+- **Peak-hour throttling:** weekdays 5am–11am PT / 1pm–7pm GMT burn **5-hour session** limits faster; weekly limits unchanged. Schedule long cloud runs off-peak. (OFFICIAL window, confirmed 2026-04-21.)
 
 ## Opus 4.7 Breaking Changes from 4.6
 
@@ -49,6 +49,10 @@ Treat these as **literal 400-error hazards**, not warnings:
 ## Managed Agents (Public Beta)
 
 Claude Managed Agents is in public beta behind the `managed-agents-2026-04-01` beta header. Anthropic-hosted agent runtime — alternative to self-hosted Routines and SDK loops. Evaluate before committing to a hosting model.
+
+## Advisor Tool (Public Beta)
+
+The advisor tool is in public beta behind the `advisor-tool-2026-03-01` beta header (launched 2026-04-09). Pairs a faster executor model with a higher-intelligence advisor model that provides strategic guidance mid-generation — long-horizon agentic workloads approach advisor-solo quality while most token generation happens at executor-model rates. Candidate for any Opus-gated long-running loop Logan runs.
 
 ## Claude.ai Features Logan Uses
 

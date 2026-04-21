@@ -1,12 +1,26 @@
 # Claude Code — Current State
 
-**Last updated:** 2026-04-20
-**Version:** 2.1.113 (released 2026-04-17)
+**Last updated:** 2026-04-21
+**Version:** 2.1.116 (latest shipped; 2.1.113 baseline, 2.1.114 bugfix, 2.1.116 perf + safety)
 **Default model:** Opus 4.7
 
 ---
 
-## Features Shipped 2.1.105 → 2.1.113 (Logan-relevant)
+## Features Shipped 2.1.105 → 2.1.116 (Logan-relevant)
+
+### v2.1.116 additions
+- **`/resume` perf on large sessions** — significantly faster on 40MB+ transcripts.
+- **MCP startup faster** — deferred `resources/templates/list` at connect time.
+- **Thinking-spinner inline progress indicators** — mid-response progress.
+- **`/config` search matches option values** — not only keys.
+- **`/doctor` accessible mid-response** — can diagnose without interrupting the turn.
+- **Plugin auto-update installs missing dependencies** — no manual follow-up after plugin refresh.
+- **Dangerous-path safety checks for `rm`/`rmdir`** — protects critical system directories.
+- **Bash GitHub API rate-limit hints** — surface-level hint when API limits trigger.
+- **Usage tab zero-delay metrics** — immediate visibility instead of polling lag.
+- **Agent frontmatter `hooks:` in main-thread mode** — hooks fire on main-thread agents, not only worker agents.
+
+### v2.1.113 (prior baseline, full detail)
 
 - **PreCompact hooks** — run before auto-compact to preserve or reshape context.
 - **Plugin monitors** — background processes surface events via the Monitor tool.
@@ -29,6 +43,18 @@
 - **`/team-onboarding`** — generates a personalized ramp-up guide for a new teammate from local usage patterns, commands, and MCP usage.
 - **`/autofix-pr`** — terminal-side PR auto-fix against a GitHub PR.
 - **Computer Use in CLI (research preview)** — Claude opens native apps, clicks through UI, and verifies changes from the terminal.
+- **Claude Desktop "Customize" section** — groups skills, plugins, and connectors in one place in Claude Desktop (announced alongside Cowork GA).
+- **`sandbox.network.deniedDomains` setting** — domain blocklist for sandboxed network access (v2.1.113).
+- **Multiline input logical-line navigation** — `Ctrl+A` / `Ctrl+E` move to logical line boundaries (v2.1.113).
+- **Windows `Ctrl+Backspace`** — deletes the previous word (v2.1.113).
+- **`/ultrareview` parallelized** — now emits diffstat and animation (v2.1.113).
+- **Subagent 10-min timeout surface** — clear timeout message instead of silent hang.
+- **`Bash(find:*)` no longer auto-approves `find -exec`** — closes auto-approval gap (v2.1.113).
+- **Bash deny-rule wrapper matching** — rules match commands wrapped in `env`/`sudo`/`watch` (v2.1.113).
+- **macOS `/private/{etc,var,tmp,home}` dangerous for `rm`** — prompt required before rm against these paths (v2.1.113).
+
+### Anthropic announcement anchor
+- **2026-04-14 "Redesigning Claude Code on desktop for parallel agents"** — OFFICIAL dated announcement of the sidebar-based parallel-agent layout already listed above.
 
 ## Active Environment Variables (Logan's PowerShell `$PROFILE`)
 

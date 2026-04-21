@@ -1,6 +1,6 @@
 # Active Findings — Last 7 Days
 
-**Last updated:** 2026-04-20
+**Last updated:** 2026-04-21
 **Scope:** Intake findings captured in the last 7 days that have not yet graduated to `prompting-rules.md` / `antipatterns.md` or been archived.
 **Refresh:** Maintained by the `intake` routine — new findings appended, items graduated or >7 days old removed.
 
@@ -213,6 +213,122 @@
 **Credibility:** COMMUNITY
 **Type:** TECHNIQUE
 **Summary:** Emerging OS-for-AI-dev framework: (1) keep always-on context small; (2) procedures → skills/commands; (3) protect active sessions from context pollution; (4) parallelize only with supervision + isolation; (5) short focused sessions over marathons.
+**Action:** queued
+
+---
+
+## 2026-04-21 Intake (novelty=high, 16 findings)
+
+### [2026-04-21] claude-code-2-1-116-release
+**Source:** https://raw.githubusercontent.com/anthropics/claude-code/refs/heads/main/CHANGELOG.md
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.116 ships `/resume` perf for 40MB+ sessions, faster MCP startup via deferred `resources/templates/list`, inline thinking-spinner progress, `/config` value search, `/doctor` mid-response, plugin auto-update installs missing deps, dangerous-path rm/rmdir safety, Bash GitHub rate-limit hints, zero-delay Usage tab metrics, agent frontmatter `hooks:` in main-thread mode.
+**Action:** queued
+
+### [2026-04-21] claude-code-2-1-113-new-details
+**Source:** https://raw.githubusercontent.com/anthropics/claude-code/refs/heads/main/CHANGELOG.md
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** v2.1.113 also added `sandbox.network.deniedDomains` setting, logical-line `Ctrl+A`/`Ctrl+E` in multiline input, Windows `Ctrl+Backspace` deletes previous word, `/loop` Esc-cancel wakeups, `/extra-usage` from Remote Control, parallelized `/ultrareview` with diffstat, subagent 10-min timeout surface, `Bash(find:*)` no longer auto-approve `find -exec`, bash deny rules match `env`/`sudo`/`watch` wrappers, macOS `/private/{etc,var,tmp,home}` dangerous-for-`rm`.
+**Action:** queued
+
+### [2026-04-21] claude-opus-4-7-launch-official
+**Source:** https://platform.claude.com/docs/en/release-notes/overview
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Claude Opus 4.7 launched April 16, 2026 at $5/$25 per MTok (same as 4.6). API breaking changes vs 4.6 documented. Already in canonical/claude-state.md — this is the OFFICIAL launch-date source confirmation.
+**Action:** queued
+
+### [2026-04-21] advisor-tool-public-beta
+**Source:** https://platform.claude.com/docs/en/release-notes/overview
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Advisor tool public beta (April 9, 2026, header `advisor-tool-2026-03-01`). Pairs a faster executor model with a higher-intelligence advisor model providing strategic guidance mid-generation — long-horizon agentic workloads approach advisor-solo quality at executor-model token rates.
+**Action:** queued
+
+### [2026-04-21] bedrock-open-to-all-customers
+**Source:** https://platform.claude.com/docs/en/release-notes/overview
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Claude in Amazon Bedrock now open to all Bedrock customers (April 16, 2026). Opus 4.7 and Haiku 4.5 self-serve via `/anthropic/v1/messages` in 27 AWS regions. Logan relevance: LOW (not on Bedrock).
+**Action:** queued
+
+### [2026-04-21] claude-mythos-glasswing-preview
+**Source:** https://platform.claude.com/docs/en/release-notes/overview
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Claude Mythos Preview (April 7, 2026) — gated research preview for defensive cybersecurity under Project Glasswing. Invitation-only access. Logan relevance: LOW.
+**Action:** queued
+
+### [2026-04-21] anthropic-desktop-parallel-agents-announcement
+**Source:** https://www.anthropic.com/news (April 14, 2026)
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** OFFICIAL announcement of Claude Code desktop redesign enabling parallel agents side-by-side in the sidebar. Feature already listed in canonical/claude-code-state.md; this is the dated announcement anchor.
+**Action:** queued
+
+### [2026-04-21] cowork-schedule-recurring-tasks
+**Source:** https://claude.com/product/cowork
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Claude Cowork adds the ability to create and schedule recurring and on-demand tasks from Claude Desktop.
+**Action:** queued
+
+### [2026-04-21] customize-section-claude-desktop
+**Source:** https://claude.com/product/cowork
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Desktop adds a "Customize" section grouping skills, plugins, and connectors in one place.
+**Action:** queued
+
+### [2026-04-21] peak-hour-session-limit-adjustment
+**Source:** https://releasebot.io/updates/anthropic/claude
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Anthropic adjusted 5-hour session limits during peak hours for Free/Pro/Max. Weekday 5am–11am PT / 1pm–7pm GMT, session limits burn faster. Weekly limits unchanged. Refines prior peak-hour finding with the exact window + session-vs-weekly clarification.
+**Action:** queued
+
+### [2026-04-21] boris-cherny-vanilla-setup
+**Source:** https://x.com/bcherny/status/2017742741636321619
+**Credibility:** OFFICIAL
+**Type:** TECHNIQUE
+**Summary:** CC creator's team uses a single checked-in CLAUDE.md with multiple team contributions per week — updated whenever Claude does something incorrectly. Most sessions start in Plan mode; switch to auto-accept edits once plan approved.
+**Action:** queued
+
+### [2026-04-21] claude-md-ruthless-pruning
+**Source:** https://alirezarezvani.medium.com/boris-chernys-claude-code-tips-are-now-a-skill-here-is-what-the-complete-collection-reveals-b410a942636b
+**Credibility:** COMMUNITY
+**Type:** TECHNIQUE
+**Summary:** If CLAUDE.md is too long, Claude ignores half of it because important rules get lost in the noise — prune ruthlessly. Always provide verification (tests, scripts, screenshots); if you can't verify, don't ship.
+**Action:** queued
+
+### [2026-04-21] session-checkpoint-rollback-third-citation
+**Source:** https://www.aitooldiscovery.com/guides/claude-code-reddit
+**Credibility:** COMMUNITY
+**Type:** TECHNIQUE
+**Summary:** Reddit consensus: commit a git checkpoint before autonomous runs; rollback instead of fix-forward when result is wrong. Third independent citation for prior `session-checkpointing-before-autonomous-runs` — clears 3-citation graduation threshold for `canonical/prompting-rules.md`.
+**Action:** queued
+
+### [2026-04-21] config-proposal-stale-max-price-in-learnings
+**Source:** learnings/platforms/claude.md:8
+**Credibility:** VERIFIED
+**Type:** BEHAVIOR
+**Summary:** `learnings/platforms/claude.md` line 8 says Claude Max is $100/month; canonical/logan-current-stack.md says $200/month. Stale reference — safe pointer fix.
+**Action:** queued
+
+### [2026-04-21] config-proposal-toolchain-retired-names
+**Source:** canonical/toolchain.md:74
+**Credibility:** VERIFIED
+**Type:** BEHAVIOR
+**Summary:** `canonical/toolchain.md` line 74 names KAIROS, Chyros, AutoDream as watchlist items; scheduled-tasks/scout-additions.md has retired all three. toolchain.md is manual-only per write-authority matrix — flagged for Logan update.
+**Action:** queued
+
+### [2026-04-21] config-proposal-scout-additions-hardcoded-mcp-list
+**Source:** scheduled-tasks/scout-additions.md:21
+**Credibility:** VERIFIED
+**Type:** BEHAVIOR
+**Summary:** scout-additions.md line 21 hardcodes Logan's MCP integration list (Google Drive, Supabase, Stripe, Linear, Cloudflare, Hugging Face). Violates no-hardcoded-entities-in-routines rule — should point to canonical/logan-current-stack.md instead.
 **Action:** queued
 
 ---
