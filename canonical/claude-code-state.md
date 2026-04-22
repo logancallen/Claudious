@@ -1,12 +1,12 @@
 # Claude Code — Current State
 
-**Last updated:** 2026-04-20
-**Version:** 2.1.113 (released 2026-04-17)
+**Last updated:** 2026-04-22
+**Version:** 2.1.116 (released 2026-04-20)
 **Default model:** Opus 4.7
 
 ---
 
-## Features Shipped 2.1.105 → 2.1.113 (Logan-relevant)
+## Features Shipped 2.1.105 → 2.1.116 (Logan-relevant)
 
 - **PreCompact hooks** — run before auto-compact to preserve or reshape context.
 - **Plugin monitors** — background processes surface events via the Monitor tool.
@@ -29,6 +29,15 @@
 - **`/team-onboarding`** — generates a personalized ramp-up guide for a new teammate from local usage patterns, commands, and MCP usage.
 - **`/autofix-pr`** — terminal-side PR auto-fix against a GitHub PR.
 - **Computer Use in CLI (research preview)** — Claude opens native apps, clicks through UI, and verifies changes from the terminal.
+- **`/powerup`** (v2.1.89/90, 2026-04-01) — first-party in-terminal interactive learning system; animated feature demos inline instead of doc link-outs.
+- **`/tui` slash command + `tui` setting** — `/tui fullscreen` switches to flicker-free rendering mid-conversation.
+- **`defer` value for `permissionDecision`** (PreToolUse hooks) — headless `-p` sessions pause at a tool call, exit with a `deferred_tool_use` payload for an SDK/custom UI to surface, then resume via `--resume`. Enables inter-agent dependencies and staged automated workflows.
+- **`/cost` per-model breakdown** — session spend split by model; useful when mixing Opus 4.7 main + Sonnet 4.6 subagents.
+- **Plugin dep auto-install** — `/reload-plugins` and background plugin auto-update now auto-install missing plugin dependencies from marketplaces.
+- **Faster MCP stdio startup** (2.1.116) — parallelized connection to multiple stdio MCP servers; relevant to Logan's 12-MCP setup.
+- **`/doctor` during-response** (2.1.116) — open `/doctor` without waiting for the current turn to finish.
+- **2.1.116 security fix** — closes a sandbox `rm` bypass. Upgrading from 2.1.113 or earlier is recommended.
+- **`/resume` 67% faster** (2.1.116) — large-session resume (40MB+) and dead-fork handling optimized.
 
 ## Active Environment Variables (Logan's PowerShell `$PROFILE`)
 

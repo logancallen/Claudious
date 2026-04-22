@@ -1,6 +1,6 @@
 # Active Findings — Last 7 Days
 
-**Last updated:** 2026-04-20
+**Last updated:** 2026-04-22
 **Scope:** Intake findings captured in the last 7 days that have not yet graduated to `prompting-rules.md` / `antipatterns.md` or been archived.
 **Refresh:** Maintained by the `intake` routine — new findings appended, items graduated or >7 days old removed.
 
@@ -213,6 +213,89 @@
 **Credibility:** COMMUNITY
 **Type:** TECHNIQUE
 **Summary:** Emerging OS-for-AI-dev framework: (1) keep always-on context small; (2) procedures → skills/commands; (3) protect active sessions from context pollution; (4) parallelize only with supervision + isolation; (5) short focused sessions over marathons.
+**Action:** queued
+
+---
+
+---
+
+## 2026-04-22 Intake (novelty=high, 11 findings)
+
+### [2026-04-22] claude-code-2-1-116-release
+**Source:** https://www.claudeupdates.dev/version/2.1.116
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.116 (2026-04-20) — 8 terminal input fixes, 67% faster `/resume` on large sessions, and a security fix closing a sandbox `rm` bypass. Canonical previously listed 2.1.113.
+**Action:** queued
+
+### [2026-04-22] claude-code-tui-fullscreen
+**Source:** https://allthings.how/claude-code-changelog/
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** New `/tui` slash command and `tui` setting. `/tui fullscreen` switches to flicker-free rendering mid-conversation.
+**Action:** queued
+
+### [2026-04-22] claude-code-powerup-interactive-lessons
+**Source:** https://claudefa.st/blog/guide/mechanics/claude-powerup
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** `/powerup` (shipped v2.1.89/90, 2026-04-01) — first-party in-terminal interactive learning system; animated feature demos inline rather than doc link-outs.
+**Action:** queued
+
+### [2026-04-22] claude-code-defer-permission-hook
+**Source:** https://daily1bite.com/en/blog/ai-tutorial/claude-code-april-2026-update
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** New `defer` value for `permissionDecision` in `PreToolUse` hooks. Headless `-p` sessions pause at a tool call, exit with `deferred_tool_use` payload for SDK/UI to surface, then resume via `--resume`. Enables inter-agent dependencies and staged automated workflows.
+**Action:** queued
+
+### [2026-04-22] claude-code-per-model-cost
+**Source:** https://daily1bite.com/en/blog/ai-tutorial/claude-code-april-2026-update
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** `/cost` now breaks down spend per model in the session. Relevant when mixing Opus 4.7 main + Sonnet 4.6 subagents.
+**Action:** queued
+
+### [2026-04-22] claude-code-plugin-auto-install-deps
+**Source:** https://www.claudeupdates.dev/version/2.1.116
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** `/reload-plugins` and background plugin auto-update now auto-install missing plugin dependencies from marketplaces.
+**Action:** queued
+
+### [2026-04-22] claude-code-mcp-stdio-startup-faster
+**Source:** https://www.claudeupdates.dev/version/2.1.116
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** 2.1.116 speeds MCP startup when multiple stdio servers are configured. Relevant to Logan's 12-MCP setup.
+**Action:** queued
+
+### [2026-04-22] claude-code-doctor-during-response
+**Source:** https://www.claudeupdates.dev/version/2.1.116
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** `/doctor` can now be opened while Claude is responding without waiting for the current turn to finish.
+**Action:** queued
+
+### [2026-04-22] claude-code-thinking-spinner-inline
+**Source:** https://www.claudeupdates.dev/version/2.1.116
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Thinking spinner shows inline progress labels ("still thinking", "thinking more", "almost done thinking") replacing the separate hint row. Cosmetic.
+**Action:** queued
+
+### [2026-04-22] claude-mythos-preview
+**Source:** https://red.anthropic.com/2026/mythos-preview/
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Claude Mythos Preview announced 2026-04-07 — new general-purpose model, strikingly capable on computer-security tasks. Paired with Project Glasswing initiative. NOT generally available — limited to 40 partner orgs (Amazon, Apple, Broadcom, Cisco, CrowdStrike, Linux Foundation, Microsoft, Palo Alto Networks, others). Controlled evals showed autonomous discovery/exploitation of thousands of high-severity vulnerabilities across major OS/browsers.
+**Action:** queued
+
+### [2026-04-22] claude-design-capabilities-detail
+**Source:** https://www.anthropic.com/news/claude-design-anthropic-labs
+**Credibility:** OFFICIAL
+**Type:** TOOL
+**Summary:** Claude Design (launched 2026-04-17, research preview, Pro/Max/Team/Enterprise). Powered by Opus 4.7. Builds a design system from codebase/design files; accepts prompts, DOCX/PPTX/XLSX, or codebase input; exports to Canva, PDF, PPTX, standalone HTML; packages a handoff bundle for Claude Code.
 **Action:** queued
 
 ---
