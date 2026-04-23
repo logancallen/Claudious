@@ -82,4 +82,16 @@ Candidate for future consideration (not yet proposed):
 4. Surface the three pending decisions (settings.json commit, path discrepancy, Desktop-only skill port) before Logan moves on.
 5. If verdict is EXTEND or SELECTIVE: scope the next-step CC prompt for `supabase-schema-evolution` build using `writing-skills` methodology. If ROLLBACK: scope the CC prompt for the pattern-extract-and-fold-into-existing-skills path instead.
 
+## Queued from 2026-04-22 PM ASF session
+
+Items surfaced during ASF handoff restructure that belong in Mastery scope (cross-project infrastructure, not ASF-specific):
+
+1. **User Preferences edit — handoff path update.** The Handoff Protocol section currently says `canonical/handoff-active.md`. Reality is now per-project: `canonical/handoff-active-[PROJECT].md` with an index at `canonical/handoff-index.md`. Archive filename also takes `-[PROJECT]` suffix. One-line edit, ships next Mastery session.
+
+2. **Mac canonical Claudious path — verify next Studio session.** Windows canonical confirmed `C:\Users\logan\Projects\Claudious\`. Mac canonical *claimed* by this handoff is `~/Documents/GitHub/Claudious/`. Run `ls ~/Documents/GitHub/Claudious/.git/HEAD 2>/dev/null && echo OK` next time on the Mac Studio to close the loop. Update memory if wrong.
+
+3. **clear-git-locks.ps1 pre-flight hook evaluation — after 30-day soak (~2026-05-22).** Script committed this session at `scripts/clear-git-locks.ps1`. Decision point: wire it as a CC pre-flight hook in `.claude/settings.json` for auto-cleanup on session start. Defer until 30 days of manual invocation validate there are no edge cases, since auto-running lock removal on every CC start means a script bug silently corrupts repos.
+
+4. **.claude/settings.json Day-7 verdict — 2026-04-29.** Already in the trial mechanism this handoff describes. Flagging here so the ASF-side ignore/commit decision doesn't drift.
+
 ## END OF HANDOFF
