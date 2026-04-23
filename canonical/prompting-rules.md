@@ -1,6 +1,6 @@
 # Prompting Rules — Universal
 
-**Last updated:** 2026-04-19
+**Last updated:** 2026-04-23
 **Scope:** Rules that have proven universal (all models, all projects). Project-specific rules belong in that project's CLAUDE.md.
 
 ---
@@ -8,7 +8,7 @@
 ## Opus 4.7 Calibration
 
 ### literal-instruction-interpretation
-Opus 4.7 stopped silently repairing ambiguous prompts. Write what you mean — if a prompt worked on 4.6 via inferred intent, 4.7 may interpret literally and regress.
+Opus 4.7 stopped silently repairing ambiguous prompts. Write what you mean — if a prompt worked on 4.6 via inferred intent, 4.7 may interpret literally and regress. If a prompt is ambiguous, flag it in one sentence and proceed under the most likely interpretation. Do not rely on Claude to silently fix under-specified prompts.
 *Source: `canonical/claude-state.md`; intake 2026-04-17.*
 
 ### explicit-effort-levels
@@ -22,6 +22,14 @@ For production agentic loops, use Task Budgets beta (`task-budgets-2026-03-13`, 
 ### no-sampling-params-4-7
 Never include `temperature`, `top_p`, or `top_k` on Opus 4.7 — they return a 400 error. Scrub SDK calls and CI configs.
 *Source: `canonical/claude-state.md`; Anthropic 4.7 breaking changes.*
+
+### thinking-content-summarized-4-7
+Thinking content is omitted from responses by default in Opus 4.7. Set `display:"summarized"` in the `thinking` parameter to surface reasoning traces when you need to see Claude's intermediate steps (debugging, adversarial review, spec-gap analysis).
+*Source: `canonical/claude-state.md`; Anthropic 4.7 release notes.*
+
+### tokenizer-inflation-4-7
+Opus 4.7 uses a new tokenizer consuming 1.0×–1.35× more tokens than 4.6 on the same text. Account for this when planning token budgets for long contexts — a prompt that fit comfortably in 4.6's 1M window may not in 4.7. Measure before relying on historical token counts.
+*Source: `canonical/claude-state.md`; Anthropic 4.7 release notes.*
 
 ## Universal Prompting Technique
 

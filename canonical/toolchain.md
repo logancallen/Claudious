@@ -1,6 +1,6 @@
 # Toolchain — Active Stack
 
-**Last updated:** 2026-04-19
+**Last updated:** 2026-04-23
 **Scope:** Tools, skills, plugins, and MCP servers Logan actively uses. If something is listed here, it's connected and in rotation.
 
 ---
@@ -42,6 +42,19 @@ Skills trigger on name + description only — semantic match. 14-skill surface t
 | `health-optimizer` | Training, recovery, nutrition advisor |
 | `macro-intelligence` | Investment analysis, portfolio allocation |
 | `harvest` | Session knowledge extraction into learnings.md |
+
+## Anthropic Ecosystem Tools (Cowork Stack)
+
+Single highest-ROI category for the Max subscription — the moat is shared-context across apps eliminating copy-paste version drift.
+
+| Tool | Usage note |
+|---|---|
+| **Cowork** | Cross-app shared context spanning Excel + PowerPoint + Gmail + Drive. Route all multi-app knowledge-work output here. |
+| **Claude for Excel** | Paid Mac/Windows add-in, live since March 11, 2026. Spreadsheet creation, formula generation, data analysis inline. |
+| **Claude for PowerPoint** | Paid. Deck generation with Cowork context — preserves source chain from research to slide. |
+| **Claude for Chrome** | Beta, paid. Browser agent — see `antipatterns.md` → Browser Agent Permission Hygiene before granting account access. |
+| **Claude Design** | Launched April 17, 2026. Design generation and iteration (research preview → GA). |
+| **Claude Code v2.1.113+** | CLI/desktop coding agent with `/ultrareview` multi-agent adversarial review (shipped with Opus 4.7, 3 free reviews at launch). See `canonical/claude-code-state.md`. |
 
 ## Claude Code Plugins
 

@@ -1,6 +1,6 @@
 # Active Findings — Last 7 Days
 
-**Last updated:** 2026-04-20
+**Last updated:** 2026-04-23
 **Scope:** Intake findings captured in the last 7 days that have not yet graduated to `prompting-rules.md` / `antipatterns.md` or been archived.
 **Refresh:** Maintained by the `intake` routine — new findings appended, items graduated or >7 days old removed.
 
@@ -214,6 +214,53 @@
 **Type:** TECHNIQUE
 **Summary:** Emerging OS-for-AI-dev framework: (1) keep always-on context small; (2) procedures → skills/commands; (3) protect active sessions from context pollution; (4) parallelize only with supervision + isolation; (5) short focused sessions over marathons.
 **Action:** queued
+
+---
+
+## 2026-04-23 Intake (routing-table refresh)
+
+### 2026-04-23-routing-table-refresh
+**Source:** Three-way deep research synthesis (Grok DeepSearch, GPT-5.5 Pro, Claude Deep Research)
+**Category:** CROSS-PLATFORM
+**Credibility:** VERIFIED (3-source convergence, dated official sources)
+**Severity:** HIGH
+**Summary:** Routing table refreshed post-GPT-5.5 launch. Key routing changes:
+- Multi-file refactor stays with Claude Opus 4.7 (64.3% SWE-Bench Pro beats GPT-5.3-Codex 56.8%)
+- Terminal/agentic flips to GPT-5.5 / Codex CLI (77.3% Terminal-Bench 2.0 vs Claude 69.4%)
+- Code review corrected to cross-model pair mandatory (never same-model review)
+- Video generation winner flips to Veo 3.1 — Sora 2 shutdown April 26
+- Perplexity Model Council demoted from neutral arbiter to fast convergence check (running stale models)
+- ChatGPT Agent wins browser agent routing (68.9% BrowseComp SOTA)
+- Knowledge work stays with Claude via Cowork stack (single highest-ROI for Max subscription)
+- Three new compounding chains documented (research/synthesis/sentiment, build/review/final, deep research/verification/deliverable)
+
+**Action taken:** Routing table, compounding chains file, and three canonical files updated in commit `claude/routing-table-2026-04-23`.
+**Flag:** GPT-5.5 API not yet live; do not update automated routing for API-dependent paths until OpenAI ships API access.
+
+### 2026-05-07-gpt-55-benchmark-reverification
+**Source:** Self-scheduled follow-up from 2026-04-23 routing refresh
+**Category:** CROSS-PLATFORM
+**Credibility:** N/A (forward-looking task)
+**Severity:** LOW
+**Re-verify:** 2026-05-07
+**Summary:** GPT-5.5 wins in terminal/agentic and architecture categories were assigned based on OpenAI launch-day claims + GPT-5.3-Codex benchmarks + inference. Independent benchmarks (Artificial Analysis, SWE-bench, Terminal-Bench, Simon Willison blog) were not yet published. Re-verify these routing calls once third-party measurements land.
+**Action:** On May 7, 2026, `web_fetch` independent benchmark sources and compare against current routing table. Adjust if measured GPT-5.5 performance differs materially from launch-day claims.
+
+### 2026-04-23-gpt-55-api-pricing-tbc
+**Source:** Source disagreement across three deep research outputs
+**Category:** CROSS-PLATFORM
+**Credibility:** COMMUNITY (unverified)
+**Severity:** LOW
+**Summary:** GPT-5.5 API pricing disputed across sources. Grok research cited $5/$30 per MTok. Claude Deep Research cited "unspecified API pricing." OpenAI's help page states GPT-5.5 API access "coming very soon" without dated commitment. Do not commit routing decisions or cost projections dependent on specific GPT-5.5 API rates until OpenAI publishes official pricing.
+**Action:** Monitor OpenAI pricing page weekly. Re-verify when API access launches.
+
+### 2026-04-23-claudious-oauth-crackdown-check
+**Source:** Claude Deep Research flag (shareuhack Cursor vs Claude Code 2026 article)
+**Category:** CLAUDIOUS
+**Credibility:** COMMUNITY (unverified direct impact)
+**Severity:** LOW
+**Summary:** Claude Deep Research flagged "Anthropic OAuth crackdown affecting third-party tools using Claude Code's OAuth flow." Claudious runs scheduled Claude Code routines (Intake 6am, Process 7am, Curate 8pm + weekly Health Check). If these use OAuth, they could be affected.
+**Action:** Investigate whether Claudious routines authenticate via OAuth or API key. Document in `canonical/claudious-state.md`. If OAuth-based, check for impact from Anthropic's policy change.
 
 ---
 

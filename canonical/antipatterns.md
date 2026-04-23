@@ -1,6 +1,6 @@
 # Antipatterns — Known Failure Modes
 
-**Last updated:** 2026-04-19
+**Last updated:** 2026-04-23
 **Scope:** Patterns that waste tokens, degrade output, or cause silent failures. Universal unless noted.
 
 ---
@@ -114,3 +114,28 @@ Scheduled routines (intake/process/curate) can fail with no telemetry beyond the
 ### age-based-alert-archival
 Never archive alerts purely by age. Archive only when `deployed.log` shows the underlying issue resolved. Age-based pruning silently drops real unresolved problems.
 *Source: `scheduled-tasks/curate.md` 3.2.*
+
+## Browser Agent Permission Hygiene
+
+**Never grant a browser agent write-access across trust boundaries in a single session.** Verified failure modes as of April 2026:
+
+- **Claude for Chrome:** Anthropic's own data reports 23.6% prompt injection success without mitigations, 11.2% with current mitigations.
+- **Claude Desktop:** The Register reported (April 20, 2026) that Claude Desktop installs a Native Messaging bridge pre-authorizing three Chrome extension identifiers without a permission prompt. Audit and remove bridges for unused tools.
+- **CVE-2025-53773 (CVSS 9.6):** demonstrated hidden prompt injection in GitHub pull request descriptions enabling remote code execution via GitHub Copilot.
+- **EchoLeak (Microsoft 365 Copilot):** zero-click prompt injection accessing enterprise data.
+
+### browser-agent-cross-trust-writes
+Do not use browser agents with Gmail/Drive/financial account access in the same session where untrusted web content is loaded. Prompt injection from web pages escalates to data exfiltration.
+*Source: intake 2026-04-23; Anthropic Claude for Chrome data, The Register report, CVE-2025-53773, EchoLeak.*
+
+### native-messaging-bridge-pre-authorization
+Review all auto-installed Native Messaging bridges monthly; remove for any Claude/OpenAI/Perplexity tool not in active use. Claude Desktop pre-authorizes three Chrome extension identifiers without prompting.
+*Source: The Register, April 20, 2026.*
+
+### consumer-ai-agent-primary-auth-scope
+Use a separate browser profile or agent account with least-privilege connectors for business operations — do not give consumer AI agents the same auth scope as your primary Gmail. A compromised agent inherits the scope it was granted.
+*Source: intake 2026-04-23; browser-agent threat model.*
+
+### agent-write-access-without-per-session-approval
+Never grant agents write access to financial accounts, code repositories (push), or email without a human approval step on every session. Standing write access + prompt injection = silent exfiltration.
+*Source: intake 2026-04-23; browser-agent threat model.*

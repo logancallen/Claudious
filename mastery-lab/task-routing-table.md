@@ -1,8 +1,17 @@
 # Task Routing Table
 ## When Logan asks "where should I do X?" — answer from this table. No hedging.
 
-**Last Updated:** April 14, 2026
-**Plans active:** Claude Max ($200/mo) | ChatGPT Business ($63.84/mo) | Perplexity Max ($200/mo) | Grok Premium+ ($40/mo)
+**Last Updated:** 2026-04-23
+**Plans active:**
+- Claude Max ($200/mo, Claude Opus 4.7 flagship — `claude-opus-4-7`)
+- ChatGPT Pro ($200/mo, GPT-5.5 and GPT-5.5 Pro — ChatGPT UI only, API access pending)
+- Perplexity Max ($200/mo, Model Council running Opus 4.6 + GPT-5.2 + Gemini 3.1 Pro — STALE relative to frontier, treat as convergence check not arbiter)
+- Grok Premium+ ($40/mo, Grok 4.2 access; 4.3 Beta locked to SuperGrok Heavy $300/mo)
+
+**Cross-references:**
+- For multi-platform workflow recipes (3-platform chains), see [mastery-lab/compounding-chains.md](compounding-chains.md)
+- For prompting rule changes tied to Opus 4.7 behavioral shifts, see [canonical/prompting-rules.md](../canonical/prompting-rules.md)
+- For browser agent permission hygiene, see [canonical/antipatterns.md](../canonical/antipatterns.md)
 
 ---
 
@@ -17,55 +26,27 @@
 
 ---
 
-## Platform Rankings by Category
+## Platform Rankings by Category (2026-04-23 refresh)
 
-| # | Category | Winner | 2nd | 3rd | 4th |
-|---|----------|--------|-----|-----|-----|
-| 1 | Core reasoning | Claude | ChatGPT | Grok | Perplexity |
-| 2 | Live web search | Perplexity | ChatGPT | Grok | Claude |
-| 3 | Deep research | Perplexity | ChatGPT | Claude | Grok |
-| 4 | Citation quality | Perplexity | ChatGPT | Claude | Grok |
-| 5 | Memory | ChatGPT | Claude | Grok | Perplexity |
-| 6 | File / doc analysis | Claude | ChatGPT | Perplexity | Grok |
-| 7 | Coding | Claude | ChatGPT | Grok | Perplexity |
-| 8 | Image generation | ChatGPT | Grok | Perplexity | Claude |
-| 9 | Video generation | ChatGPT | Perplexity | Grok | Claude |
-| 10 | Voice / audio | ChatGPT | Perplexity | Grok | Claude |
-| 11 | Agentic execution (info) | Perplexity | ChatGPT | Claude | Grok |
-| 12 | Agentic execution (action) | ChatGPT | Perplexity | Claude | Grok |
-| 13 | Browser / computer use | Perplexity | ChatGPT | Claude | Grok |
-| 14 | Multi-model synthesis | Perplexity | Claude | ChatGPT | Grok |
-| 15 | Connectors / integrations | ChatGPT | Perplexity | Claude | Grok |
-| 16 | Projects / workspaces | Claude | ChatGPT | Perplexity | Grok |
-| 17 | Output tools (docs/slides) | Claude | ChatGPT | Perplexity | Grok |
-| 18 | Real-time social / X | Grok | Perplexity | ChatGPT | Claude |
-| 19 | Pricing / value | Grok | Claude | Perplexity | ChatGPT |
+Narrative routing — each row names the primary platform, runner-up where relevant, and evidence/rationale. Use this as the source of truth. Legacy 19-row winner/2nd/3rd/4th table was retired in this refresh because it couldn't carry nuance required post-GPT-5.5 launch.
 
-### When Claude wins
-- Core reasoning, nuanced analysis, extended thinking
-- File and document analysis (1M context, multi-file)
-- Projects and workspaces (persistent context, skills, knowledge files)
-- Coding — multi-file architecture, refactoring, Claude Code workflows
-- All document creation (docx, xlsx, pptx, pdf via skills)
-
-### When Perplexity wins
-- Any research requiring citations by default
-- Quick factual lookups with source verification
-- Deep Research for competitive intelligence and domain briefings
-- Computer for structured data extraction from known URLs
-- Orchestrator for multi-site automated research sweeps
-- Model Council for stress-testing high-stakes decisions across 3 models simultaneously
-
-### When ChatGPT wins
-- Image generation (DALL-E), video generation (Sora), voice (Advanced Voice Mode)
-- Transactional agentic tasks (booking, purchasing, form-filling with actions)
-- Overflow deep research when Perplexity credits are low (unlimited on Business plan)
-- IDE-integrated coding (Copilot ecosystem)
-
-### When Grok wins
-- Real-time X / social monitoring (exclusive firehose)
-- School-board sentiment, community pulse, trending topics
-- Best value when budget is primary constraint
+| Category | Routing |
+|----------|---------|
+| Coding — multi-file refactor (5+ files, dependency-aware) | Claude Opus 4.7 (xhigh effort) in Claude Code. Runner-up: Codex CLI w/ GPT-5.3-Codex when task is terminal-heavy. Evidence: 64.3% SWE-Bench Pro vs 56.8%, CursorBench 70% (+12 pts from 4.6). |
+| Coding — terminal / agentic computer-use / CLI / DevOps | Codex CLI w/ GPT-5.3-Codex today; auto-upgrade to GPT-5.5 Codex when it ships. Evidence: 77.3% Terminal-Bench 2.0 vs Claude 69.4%. |
+| Architecture / system reasoning | GPT-5.5 Pro (ChatGPT Pro, max reasoning) primary. Claude Opus 4.7 inside Project for contrarian cross-check and ADR-format design docs. Cross-reference Perplexity Model Council for convergence check (not final arbiter). |
+| Document analysis (long PDFs, contracts, procurement specs) | Claude Opus 4.7 inside Claude Project — compound-context moat from 8 Projects; 3.75MP vision upgrade handles scanned PDFs; 128K output tokens handles full contract summaries. Switch to Gemini 3.1 Pro via Perplexity ONLY when document pack exceeds ~700K effective tokens. |
+| Knowledge work output (proposals, spreadsheets, decks) | Claude Opus 4.7 via Cowork + Claude for Excel + Claude for PowerPoint — single highest-ROI category for the Max subscription. Cowork's shared-context across apps eliminates copy-paste version drift. Caveat: GPT-5.5 competitive on standalone deliverables (GDPval 84.9% wins-or-ties vs Claude 80.3%); Claude's moat is the Cowork + Projects integration. |
+| Deep research — strategic synthesis | OpenAI Deep Research (ChatGPT Pro, GPT-5.5 Pro reasoning, 250 runs/mo). Switch to Claude Research when output must land in a Claude Project or research ties to Project files. |
+| Deep research — breadth/speed scan | Perplexity Deep Research (Max, running on Opus 4.5/4.6). 2–3 min completion; ~500 runs/mo quota. |
+| Deep research — citation-grade artifact | Perplexity Deep Research primary (full source traceability). NotebookLM (free) as source-grounded pair-verification for citations. Never publish without spot-checking 5+ citations. |
+| Cross-model synthesis / high-stakes stress test | Perplexity Model Council for FAST CONVERGENCE CHECK ONLY — currently running Opus 4.6 + GPT-5.2 + Gemini 3.1 Pro (1–2 versions behind frontier). For true high-stakes calls, manual 3-way diff across Claude Opus 4.7 + GPT-5.5 Pro + Grok 4.2. |
+| Autonomous browser / computer agent execution | ChatGPT Agent (Pro tier) primary — 68.9% BrowseComp SOTA. Perplexity Comet + Computer (10K credits/mo) as runner-up for cognitive-workflow agents. Cross-reference antipatterns.md for permission hygiene before granting any agent write access. |
+| Code review / adversarial second opinion | CROSS-MODEL PAIR MANDATORY — never same-model review. Default pair: GPT-5.5 (Codex CLI or ChatGPT Pro) reviewing Claude Code output. Inverse pair: Claude Opus 4.7 `/ultrareview` reviewing Codex output. Grok 4.3 Heavy disqualified (gated $300/mo). |
+| Video generation | Veo 3.1 (Google AI Studio, free tier for testing; paid via Gemini API) primary. Grok Imagine 1.0 in-stack fallback (10s max, 720p max). **CRITICAL ALERT:** Sora 2 shuts down April 26, 2026 — migrate any active workflow by April 25. |
+| Image generation | In-stack: ChatGPT Images 2.0 / GPT-image-2 (bundled in Pro). Out-of-stack superior: Midjourney V7 ($30/mo standalone, NOT currently subscribed). Do not adopt Midjourney unless image gen becomes a daily driver. |
+| Real-time X sentiment | Grok 4.2 via Grok Premium+ web app (Logan's tier) — confirmed sufficient per eToro/Tori deployment April 16, 2026. 4.3 DeepSearch locked to Heavy $300/mo, not recommended upgrade for this workflow alone. |
+| Voice / audio workflows (split by subtask) | Voice cloning (professional): ElevenLabs Creator $22/mo (external, NOT in stack). Document-to-podcast: NotebookLM (free, external). Conversational / voice-to-voice: ChatGPT Advanced Voice (bundled in Pro). Real-time voice agent: OpenAI Realtime API (GPT-realtime-1.5) for production; xAI Grok Voice API for cost-sensitive builds ($4.20/1M chars TTS). |
 
 ---
 
@@ -303,6 +284,11 @@ BUDGET: [Max pages/sites/iterations — default: 5 sites max, skip login-require
 - Never start a multi-file code project in ChatGPT — Claude Code handles this better
 - Never use Model Council for tasks with obvious right answers — paying 3x for nothing
 - When Perplexity credits are low, route heavy research to ChatGPT Deep Research (unlimited on Business plan)
+- Never route API or Codex CLI programmatic calls to GPT-5.5 until OpenAI ships API access — falls back to GPT-5.4 under the hood
+- Never treat Perplexity Model Council as neutral arbiter for frontier decisions — runs 1-2 versions behind Claude Max and ChatGPT Pro. Use for fast convergence checks, not final calls.
+- Never use same model family for code generation + review — cross-model pair is mandatory
+- Never build new workflows on Sora 2 — shuts down April 26, 2026
+- Never grant browser agents (Claude for Chrome, ChatGPT Agent, Perplexity Comet) write-access to Gmail/Drive/financial accounts in same session where untrusted web content is loaded — see [canonical/antipatterns.md](../canonical/antipatterns.md) for full permission hygiene rules
 
 ---
 
@@ -312,7 +298,7 @@ BUDGET: [Max pages/sites/iterations — default: 5 sites max, skip login-require
 |---|---|---|
 | Search | Free | Quick factual lookups, spec checks, news |
 | Deep Research | 150–2,500 | Multi-source synthesis, domain briefings, competitive intel |
-| Model Council | ~3x query | Stress-testing high-stakes decisions across GPT-5.4 + Claude Opus 4.6 + Gemini 3.1 Pro |
+| Model Council | ~3x query | Opus 4.6 + GPT-5.2 + Gemini 3.1 Pro — STALE (1-2 versions behind frontier as of 2026-04-23); monitor for upgrade to Opus 4.7 + GPT-5.5 |
 | Computer | 30–1,500 | Structured data extraction from known auth-free URLs |
 | Orchestrator | 1,000–5,000+ | Multi-site automated research sweeps — define tightly |
 | Labs | Included | Quick formatted/shareable research outputs, Sora 2 Pro video |

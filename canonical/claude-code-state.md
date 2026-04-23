@@ -1,6 +1,6 @@
 # Claude Code — Current State
 
-**Last updated:** 2026-04-20
+**Last updated:** 2026-04-23
 **Version:** 2.1.113 (released 2026-04-17)
 **Default model:** Opus 4.7
 
@@ -13,9 +13,9 @@
 - **Skill description cap raised 250 → 1,536 chars** (v2.1.105). Re-expand all 15+ custom skill descriptions for better trigger accuracy — still pending Logan action (see `open-decisions.md`).
 - **`/ultraplan`** — cloud multi-agent planning on Opus 4.6, 3 parallel exploration agents + 1 critique agent.
 - **`/less-permission-prompts`** — scans transcripts for common read-only tool calls and writes an allowlist.
-- **`/ultrareview`** — adversarial review skill.
+- **`/ultrareview`** — multi-agent adversarial review pass; shipped with Opus 4.7 on April 16, 2026. 3 free reviews offered at launch on Pro/Max plans.
 - **Auto mode for Max** — risk-classifier-gated permissions (safe → execute, risky → prompt).
-- **`xhigh` effort level** — above `high`. Paired with Opus 4.7 for hardest reasoning tasks.
+- **`xhigh` effort level** — superset of prior `high`. Recommended for coding/agentic work on Opus 4.7 (hardest reasoning tasks, multi-file architecture, adversarial review).
 - **Windows PowerShell tool** — native PowerShell execution without going through bash.
 - **Claude Code desktop redesign** — new UI; keybindings changed (see below).
 - **Routines research preview** — cloud scheduled tasks (claude.ai/code/routines).
@@ -81,3 +81,10 @@ Classifier per tool call. Safe reads + non-destructive edits auto-execute; destr
 ## Subscription Surface
 
 Interactive sessions + Routines share the Max subscription token budget. Don't schedule heavy routines alongside heavy interactive work; stagger across peak/off-peak windows.
+
+## Opus 4.7 API Behavior (Claude Code config hazards)
+
+- `temperature`, `top_p`, and `top_k` return HTTP 400 on Opus 4.7 — **do not set these parameters in Claude Code config, SDK calls, or CI scripts**. Remove any carry-over settings from Opus 4.6 configs.
+- `thinking.budget_tokens` removed — use `/effort high` or `/effort xhigh` to control reasoning depth.
+- Thinking content stripped by default — set `display:"summarized"` in the thinking parameter to surface reasoning traces.
+- New tokenizer inflates 1.0×–1.35× vs Opus 4.6 on the same text — account for this when budgeting long contexts.
