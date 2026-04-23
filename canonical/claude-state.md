@@ -1,7 +1,9 @@
 # Claude Model Ecosystem — Current State
 
-**Last updated:** 2026-04-20
-**Status:** Opus 4.7 is the current flagship. Opus 4.6 retains specific use cases (cloud Ultraplan).
+**Last updated:** 2026-04-23
+**Status:** Opus 4.7 is the current flagship (launched April 16, 2026). Opus 4.6 retains specific use cases (cloud Ultraplan).
+
+**Key benchmarks (Opus 4.7 at launch):** SWE-Bench Verified 87.6%, SWE-Bench Pro 64.3%, CursorBench 70% (+12 pts from 4.6). Effective recall on 1M context ~600–700K tokens; plan accordingly for long-context work.
 
 ---
 
@@ -57,3 +59,7 @@ Projects, Artifacts, Memory (MEMORY.md auto-load), Web Search, Deep Research, Co
 ## Migration Status
 
 Opus 4.7 is the default on this machine as of 2026-04-19. Pre-migration checklist (`mastery-lab/opus-47-migration-checklist.md`) passed 3 of 4 gates; remaining item is Agent Teams multi-agent regression test — open until next coordinator-worker run.
+
+## Frontier Models Not Available to Logan
+
+- **Claude Mythos Preview** — scored 93.9% SWE-Bench Verified in Anthropic's April 16 launch; restricted to Project Glasswing cybersecurity partners; not on Claude Max. Monitor for access expansion.
