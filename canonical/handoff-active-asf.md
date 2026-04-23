@@ -1,120 +1,134 @@
-# Handoff — 2026-04-22 (ASF RM-021 + RM-022 design complete, 40 gaps closed)
+# Handoff — 2026-04-23 (ASF RM-021 + RM-022 specs archived, RM-022 Phase 1 ready to build)
 
-**Recommended next-chat title:** `2026-04-22 — ASF — RM-021 + RM-022 Spec Drafting + CC Prompts`
+**Recommended next-chat title:** `2026-04-23 — ASF — RM-022 Phase 1a Build Kickoff`
 
 ---
 
 ## Current focus
 
-Design complete for two linked features:
-- **RM-021** — Design Library bulk upload (frictionless drop + async classification + inline client create)
-- **RM-022** — Universal feedback/flagging system (platform-wide, any surface, any user)
+RM-022 Phase 1 is fully specced and CC-prompt-ready. Next session starts the build.
 
-Both fully specced through **40 gap-closure passes** (up from the 24 in the first-pass handoff). The additional 16 gaps surfaced in Class B/C/D/E sweeps (execution risk, production rollout, adversarial/abuse, lifecycle) and materially change the schema, RLS model, and sequencing.
+Specs committed to repo:
+- `docs/specs/rm-021-design-library-bulk-upload.md` (850 lines)
+- `docs/specs/rm-022-universal-feedback-system.md` (941 lines)
 
-**IMPORTANT:** This handoff contains the updated gap list but NOT the full architectural reasoning. Next chat should use `conversation_search` on the prior design chat AND the April 22 gap-closure chat to pull full context.
+Commit: `a15b8b2` on main. Pushed and verified against origin/main.
 
-Search queries that will match:
-- `universal feedback system gaps library bulk upload`
-- `24 gaps universal feedback triage keyboard explain and close`
-- `40 gaps RLS rollback abuse lifecycle feedback`
+Three CC prompts drafted and saved to downloads (not yet in repo):
+- `cc-prompt-1a-rm022-schema-backend.md` (380 lines) — migrations 058–062 + backend routes
+- `cc-prompt-1b-rm022-capture-ui.md` (456 lines) — FeedbackButton + CaptureModal + offline queue
+- `cc-prompt-1c-rm022-triage-notifications.md` (541 lines) — Triage + Health dashboard + notifications, closes RM-022 Phase 1
 
----
-
-## Gaps closed (40 total — delta from prior handoff)
-
-**Gaps 1–24** (prior handoff, still authoritative):
-1. Explain-and-close resolution path for false positives
-2. MyFeedback personal history
-3. PII redaction (client-side pattern mask)
-4. Data-vs-code resolution scope rubric
-5. Resolution log with rollback
-6. Subject-deleted handling (now reworked via Gap 26)
-7. (merged into Gap 6)
-8. Aging cron — weekly sweep of stale reports
-9. Role-based inline-fix permission matrix
-10. Offline queue (localStorage)
-11. AI model version tracking
-12. Dedup + correlation detection (similarity clustering)
-13. Feedback type selector (bug/ai_error/data_error/ux/feature_request/idea/question)
-14. (merged into Gap 13)
-15. Threaded comments for clarification
-16. Reporter edit/delete own open reports
-17. Follow-up attachments
-18. Court Designer canvas-state capture (not DOM)
-19. Iframe surface capture (Grimco, QBO cross-origin)
-20. Happened-at vs reported-at timestamps
-21. Per-user notification preferences
-22. Free-form labels beyond AI classification
-23. Full-text search + filters
-24. Export for M&A due diligence
-
-**Gaps 25–40** (this session, new):
-
-25. **Dropped `report_count` denorm column** — aggregate from `feedback_reporters` on read. Prevents drift.
-26. **Dropped `subject_status` from feedback table** — replaced with `subject_exists` computed at read time via JOIN. Subject state belongs on subject table, not frozen snapshot on feedback.
-27. **Rollback scripts required for each migration** — inverse DROP block in comment or split 058-apply + 058-verify.
-28. **Missing indexes added** — `(status, created_at DESC)`, `(reported_by)`, `(subject_table, subject_id)`, `labels USING gin`.
-29. **Phase 1 splits into 3 CC prompts** — (1a) schema+backend, (1b) capture UI, (1c) triage UI+notifications. Single-prompt Phase 1 guarantees partial execution.
-30. **RLS mandatory in same migration as table creation** — post-apply verification must confirm `rowsecurity=true` on every new table.
-31. **AI columns get CHECK constraint** — `ai_source NOT NULL` implies `ai_model_version` and `ai_confidence` NOT NULL. Phase 2 can't half-populate.
-32. **Screenshot storage specified** — R2 `asf-feedback` bucket, presigned upload, 90-day TTL on resolved-item screenshots. PII redaction client-side before upload.
-33. **Feedback button visibility tuned down** — bottom-right, 32px, 40% opacity → 100% on hover. No pulse, no badge, no CTA copy.
-34. **Resolution notifications batched** — 30-minute digest window for email, individual for in-app. Prevents notification firehose.
-35. **Offline queue dedup** — client-side `client_uuid` on every offline report; `ON CONFLICT (client_uuid) DO NOTHING` on insert. Retry-safe.
-36. **Deploy ordering explicit** — migrations (MCP) → backend (Railway) → frontend (Netlify). Each step gated on prior.
-37. **Peer-privacy RLS hard rule** — Brady and Chanté cannot SELECT each other's feedback. Only `owner`/`admin` sees cross-user. Hard rule, not warn-don't-block.
-38. **Export endpoint owner-only** — Logan-only; every export logged to audit_log with user/timestamp/row-count/filters. M&A exports filtered by Logan.
-39. **Feedback Health dashboard in Phase 1** — Admin page section with median time-to-resolution (rolling 30d), reports by status, reporter engagement, oldest open. Not deferred.
-40. **Three-bucket resolution status for M&A** — `legitimate_open` / `duplicates_of` / `false_positive_documented`. Due diligence exports filter to the clean set. Buyer narrative preserved.
+Sequencing locked: RM-022 Phase 1 runs **parallel to pricing engine Prompt 3** (different files, no merge conflicts, must NOT be in same CC session).
 
 ---
+
+## Completed this session
+
+- RM-021 spec fully drafted reusing existing infrastructure (presigned upload, PyMuPDF, auto_categorize, batch-confirm, regenerate-preview). Core change: async decoupling via FastAPI BackgroundTasks. Not a greenfield build.
+- RM-022 spec fully drafted integrating all 40 gaps from prior chats (Classes A through E). Peer-privacy RLS locked as the ONLY hard block in the platform (documented exception to warn-don't-block).
+- Schema: migrations 058–062 with rollback blocks per Gap 27, RLS in-same-migration per Gap 30, CHECK constraint on AI columns per Gap 31, indexes per Gap 28.
+- 5 pending questions from prior handoff answered and locked:
+  - Q1 upload pattern: bulk absorbs mixed batches, sticky default for common case
+  - Q2 preview service: PyMuPDF stays (already in code), async decouple
+  - Q3 AI classification: Opus 4.7 in Phase 2
+  - Q4 phasing: phased ship (Phase 1 → 2 → 3)
+  - Q5 RM-022 slot: parallel to pricing engine Prompt 3
+- 6th pending question deferred: S10 tax-exempt status (CPA/legal, non-architectural)
+- 2 specs committed to `docs/specs/` via commit `a15b8b2`
 
 ## In-flight
 
-None. Design state is complete + hardened.
+Nothing. Design and spec state is complete. Build has not started.
 
-## Pending confirmations needed from Logan
+## DesignStudio.jsx incident
 
-- **Sticky default upload pattern** — confirm with Chanté: one-client-per-session is her actual rhythm?
-- **Phase 1 server-side rasterization of .ai/.psd** — defer to Phase 2? (Recommended: yes)
-- **Phase 2 classification: Claude vision API?** (Recommended: yes)
-- **Phase 1 deploy as 3 CC prompts vs 1?** (Recommended: 3 — Gap 29)
-- **Sequencing — RM-022 before/during/after Prompts 3–7?** (Recommended: **Option 3**, after Prompt 6; pricing engine ships first)
-- **Open from prior session** — S10 tax-exempt booster-club-funded jobs (CPA/legal)
+During spec archival, CC surfaced a pre-existing dirty working tree:
+- `src/pages/DesignStudio.jsx` was deleted locally, uncommitted
+- Forensics confirmed: file intact on origin/main (2,341 lines, blob `271449d`, last touched in commit `699bba2` 2026-04-20 — a normal bugfix)
+- No commit on any branch deleted or renamed it
+- Restored via `git checkout HEAD -- src/pages/DesignStudio.jsx`, NOT committed (restoration is a clean revert, not a code change)
 
-## Pending from prior session (still authoritative)
+Root cause: local-only deletion from an editor/script/Finder — classic machine-drift pattern from User Preferences. File is recovered. Remaining dirty state is only `.DS_Store` noise.
 
-- **Prompt 3** — `POST /api/quotes/calculate-v2` + write-guard triggers (`app.engine_context` GUC)
-- **Prompt 4** — Frontend `src/lib/pricing_v2.js` + Vitest harness
-- **Prompt 5** — Migration 051 backfill (10 platform-native jobs)
-- **Prompt 6** — IntakeFormV3 + ComponentCard + JobDetail components tab + QuoteCalc v2
-- **Prompt 7** — Migration 053 (drop deprecated scalar cols) + pricing constants extraction
-- **RM-003 P0** — QBO import sync audit
+## Pending (carryover to next chat)
 
-## Decisions made this session
+**RM-022 Phase 1a build** (fresh CC session, paste `cc-prompt-1a-rm022-schema-backend.md`):
+- Apply migrations 058–062 via Supabase MCP (not via CC — per learned pattern)
+- Build `backend/routes/feedback.py`, `notification_service.py` (email as TODO for 1c), `s3_storage.py` feedback-bucket helpers, `feedback_tasks.py` crons, `models/feedback.py`
+- Register router in `main.py`
+- Add `R2_FEEDBACK_BUCKET` to env var documentation
 
-- **Class B/C/D/E gap hunting found 16 material additions** — prior "asymptotic" framing was wrong. The right question was which *class* of gap hadn't been hunted yet, not whether more gaps existed on the same axes.
-- **Single-prompt Phase 1 is a known failure mode** — split into 3 sequenced prompts to guard against partial execution.
-- **Privacy-between-peers is a hard rule, not warn-don't-block** — the warn-don't-block doctrine applies to workflow gates, not to reading other users' flagged issues about each other. Different category.
-- **Denormalized counters and frozen subject snapshots cause silent bit-rot** — schema changed to compute on read.
-- **Screenshot TTL (90 days post-resolution)** — storage discipline at scale; prevents silent cost creep.
+**RM-022 Phase 1b** (after 1a committed, fresh CC session):
+- Install `html2canvas` + `uuid`
+- `FeedbackButton`, `FeedbackCaptureModal`, `PendingSyncBanner`, `FeedbackContext`
+- `feedback-offline-queue.js`, `html2canvas-pii-redact.js`
+- `useFeedback`, `useFeedbackQueue` hooks
+- Mount in `App.jsx`
+
+**RM-022 Phase 1c** (after 1b committed, fresh CC session):
+- Migration 063 (notifications + digest queue) if not pre-existing
+- `FeedbackTriage`, `FeedbackHealth`, `MyFeedback`, `FeedbackDetail`, `NotificationPreferences` pages
+- `NotificationBell` in header
+- Wire `notification_service.py` to SMTP (digest queue, 30m flush cron)
+- Close RM-022 in `docs/roadmap.md` via commit message
+
+**RM-021 CC prompts** — draft AFTER RM-022 Phase 1 ships. RM-021 benefits from having the feedback surface live (library misclassifications flow into universal feedback).
+
+**Pricing engine Prompts 3–7** (from prior handoff, still authoritative):
+- Prompt 3 — `POST /api/quotes/calculate-v2` endpoint + write-guard triggers
+- Prompt 4 — Frontend `src/lib/pricing_v2.js` + Vitest harness
+- Prompt 5 — Migration 051 backfill
+- Prompt 6 — IntakeFormV3 + ComponentCard + JobDetail components tab + QuoteCalc v2
+- Prompt 7 — Migration 053 (drop deprecated scalar cols)
+
+**RM-003 P0** — QBO import sync audit (unchanged from prior).
+
+## Deferred / non-blocking
+
+- PyMuPDF reliability measurement in Phase 1 telemetry → triggers CloudConvert fallback decision at Phase 2.5 if `needs_manual_preview` rate > 15%
+- Folder upload (ship file-drop first, folder-drop next sprint)
+- Duplicate detection in design library (don't block upload, flag in Phase 2)
+- AI 30.0 PDF-compat requirement documentation in onboarding
+- S10 tax-exempt status (CPA/legal, non-architectural)
+
+## Decisions made with reasoning
+
+- **Scoped `git add docs/specs/...` over stash-pop** for spec archival commit. Honored "only two new files staged" invariant without touching unrelated dirty state. Clean commit landed.
+- **Push-block hook honored** — commit and push executed by Logan's hand via `!` prefix in CC, not bypassed via one-shot permission. Matches global CLAUDE.md rule.
+- **DesignStudio.jsx restored via `git checkout HEAD --`**, not committed. Restoration reverts to HEAD state; no new code change to commit.
+- **Parallel Prompt 3 + RM-022 Phase 1a sequencing** — confirmed viable because different files/code paths, but MUST be in separate CC sessions to avoid context blowup.
+- **FastAPI BackgroundTasks for Phase 1 async work** — deferred Celery/RQ upgrade until measured CPU pressure on Railway.
+- **Opus 4.7 locked for Phase 2 vision classification** — cost ceiling $50/mo at ASF volume.
+- **Sticky session defaults with 4h expiry + dismissible chip** over per-file modal — explicitly rejected per-file modal as "terrible" from prior chats.
 
 ## Files recently changed
 
-None. Design-only session. Last code commit unchanged:
-- `asf-graphics-app` main at `2c9cb03` (Prompt 2 session-close)
-- Canonical clone: `~/Documents/GitHub/asf-graphics-app`
+- `docs/specs/rm-021-design-library-bulk-upload.md` (new, 850 lines, in `a15b8b2`)
+- `docs/specs/rm-022-universal-feedback-system.md` (new, 941 lines, in `a15b8b2`)
+- `src/pages/DesignStudio.jsx` — restored from HEAD, working tree now clean minus `.DS_Store` noise. No new commit.
+
+Repo state:
+- `asf-graphics-app` main at `a15b8b2`
+- Canonical Mac clone: `~/Documents/GitHub/asf-graphics-app`
 
 ## Frustration signals
 
-- "Ensure no more gaps" bar triggered the Class B/C/D/E sweep. Next chat: if Logan asks for gap hunting, go straight to the full 5-class taxonomy, don't stop at plan-integrity gaps.
-- Per-file modal workflow explicitly rejected as "terrible."
-- Any claim that a plan is complete without explicit class-coverage justification is a regression.
+- "It should be in my downloads folder" — I had assumed file downloads were accessible to CC when they aren't. Next chat: when presenting files from Claude.ai chat, immediately clarify that CC cannot read them until they're moved onto disk, and walk through the manual `mv` step explicitly. Don't assume file-download context carries.
+- Push-block hook was hit mid-commit. Recovery was clean, but the hook's existence wasn't pre-loaded into this chat's context. Next chat: before giving any CC prompt that ends with `git push`, explicitly call out that push is user-run via `!` prefix.
+- DesignStudio.jsx dirty state surfaced unexpectedly. Next chat: always pre-check `git status` before any repo operation, don't assume a "clean tree" state.
 
 ## User Preferences changes pending
 
-None.
+Queued for next Mastery Lab chat (alongside four items already there):
+
+> **Handoff-artifact surface discipline.** Always label destination surface explicitly: Claude.ai-web, Claude.ai-desktop, Claude Code CLI, or Claude in Chrome. "New chat" is ambiguous across surfaces with different tool availability (conversation_search, project_knowledge_search, MCP connectors, file I/O all vary).
+
+> **File-delivery discipline between Claude.ai and CC.** When presenting artifact files in Claude.ai chat, explicitly state: "CC cannot read Claude.ai artifact downloads. You must manually move the file to disk before CC can access it." Don't assume the download is end-to-end.
+
+> **Pre-check `git status` before every repo operation.** A "clean tree" assumption is a documented failure mode. Every prompt that touches `git add/commit/push` starts with `git fetch && git status` and a stop-if-dirty gate.
+
+> **Push-block hook awareness.** Before generating any CC prompt that ends with `git push`, flag that the push will hit the hook and must be run by Logan via `!` prefix. Never assume CC can push — it cannot, and the hook will block it correctly.
 
 ## Environment state
 
@@ -122,27 +136,47 @@ None.
 - Claudious clone: `~/Documents/GitHub/Claudious`
 - Python 3.9 local (with `__future__` shim); Python 3.11+ on Railway
 - Pydantic 2.12.5
-- No active CC session-scoped allowlists
-- `.claude/settings.json` deliberately untracked through 2026-04-29 per mastery Day-7 trial — do not gitignore until verdict.
+- Supabase MCP available for `apply_migration`
+- Push to main is hook/permission-blocked — use `!` prefix for user-run push
+- `.claude/settings.json` untracked through 2026-04-29 per mastery Day-7 trial
 
 ## Next chat first actions
 
 1. Read this handoff.
-2. `conversation_search` on "universal feedback system gaps library bulk upload" for rounds 1–4 architectural reasoning.
-3. `conversation_search` on "40 gaps RLS rollback abuse lifecycle feedback" for rounds 5 context (Class B/C/D/E).
-4. Confirm the 6 pending questions with Logan before spec drafting.
-5. Add RM-021 and RM-022 to `docs/roadmap.md` under P1 FEATURE.
-6. Draft formal specs integrating all 40 gaps:
-   - `docs/specs/rm-021-design-library-bulk-upload.md`
-   - `docs/specs/rm-022-universal-feedback-system.md`
-7. Draft 3 sequenced Phase 1 CC prompts (1a schema+backend, 1b capture UI, 1c triage+notifications+Feedback-Health dashboard). Each prompt:
-   - Assumption-free read-codebase-first instruction
-   - grep verification requirements on every claimed fix
-   - "main branch only, no branches"
-   - Explicit file-change summary mapping to every item
-   - `<!-- PROMOTE TO CLAUDIOUS: ... -->` block for cross-project learnings
-   - Roadmap close directive on final commit
+2. `project_knowledge_search` on `"rm-022 spec"` to confirm `docs/specs/rm-022-universal-feedback-system.md` is visible in project knowledge (may lag a few hours after commit — OK to proceed with repo path if not).
+3. Verify Mac clone state before anything else:
+   - `cd ~/Documents/GitHub/asf-graphics-app && git fetch && git status`
+   - Expect: on main, clean working tree, up to date with `a15b8b2` or newer
+   - If dirty: stop and diagnose before continuing
+4. Open a fresh CC session (do NOT reuse a session running pricing engine work).
+5. Paste `cc-prompt-1a-rm022-schema-backend.md` contents into CC.
+6. After CC creates the migration files + backend code, STOP. Do not let CC apply migrations.
+7. Apply migrations 058–062 via Supabase MCP from this Claude.ai chat (`apply_migration`), one at a time, verify `rowsecurity=true` after each via `execute_sql`.
+8. Once migrations applied, let CC commit the code. Push blocked by hook — Logan runs push via `!` prefix.
+9. Smoke test backend: curl `/api/feedback/health` with admin token, verify 200.
+10. Queue Prompt 1b for next session.
 
 ## Context carryover for memory retrieval
 
-Full design rationale and rejected alternatives live in the April 22 design chat + the April 22 gap-closure chat. Do not re-derive — search. Key phrases: "universal feedback," "design library bulk upload," "40 gaps," "Class B execution risk," "peer privacy RLS," "feedback health dashboard," "screenshot TTL," "client_uuid dedup," "three-bucket resolution."
+Full spec rationale lives in `docs/specs/rm-022-universal-feedback-system.md` (941 lines). Search queries that surface design context:
+- `"universal feedback system gaps library bulk upload"` → rounds 1–4 architectural reasoning
+- `"40 gaps RLS rollback abuse lifecycle feedback"` → Class B/C/D/E sweep
+- `"peer privacy RLS hard rule workflow gates visibility"` → the one hard-block exception
+- `"client_uuid dedup offline queue feedback"` → offline-safe submission pattern
+- `"feedback health dashboard three-bucket resolution M&A"` → admin dashboard + export format
+
+Commit SHA for specs: `a15b8b2` (both files in single commit).
+
+---
+
+**End of handoff.**
+
+<!-- PROMOTE TO CLAUDIOUS:
+- Handoff-artifact surface discipline: label destination surface (Claude.ai-web, Claude.ai-desktop, Claude Code CLI, Claude in Chrome). "New chat" is ambiguous.
+- File-delivery discipline between Claude.ai and CC: Claude.ai artifact downloads are not visible to CC until manually moved to disk.
+- Pre-check `git status` before every repo operation — "clean tree" assumption is a documented failure mode.
+- Push-block hook awareness: before any CC prompt ending in git push, flag that user must run push via `!` prefix.
+- Scoped `git add <path>` over stash-pop when committing into a dirty tree — honors single-invariant commit without touching unrelated state.
+- Async spec delivery via download in Claude.ai chat: confirm user has file in downloads BEFORE writing the CC archive prompt; don't assume end-to-end file flow.
+- DesignStudio.jsx pattern: when a deletion surfaces with no commit graph evidence, restore via `git checkout HEAD -- <path>` without committing — it's a revert, not a change.
+-->
