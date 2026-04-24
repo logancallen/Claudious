@@ -1,11 +1,11 @@
 # Active Handoffs — Index
 
-Last updated: 2026-04-25
+Last updated: 2026-04-24
 
 | Project | File | Last Written |
 |---------|------|--------------|
 | ASF Graphics | handoff-active-asf.md | 2026-04-22 PM |
-| Claude Mastery Lab | handoff-active-mastery.md | 2026-04-25 |
+| Claude Mastery Lab | handoff-active-mastery.md | 2026-04-24 PM |
 | PC Optimization (Arc Raiders) | handoff-active.md | 2026-04-22 PM |
 
 When starting a new chat in any project, read the matching handoff file.
