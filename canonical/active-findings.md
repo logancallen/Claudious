@@ -272,6 +272,80 @@
 
 ---
 
+## 2026-04-24 Intake (Scout + Config)
+
+### [2026-04-24] cc-2-1-118-release
+**Source:** https://code.claude.com/docs/en/changelog
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.118 released 2026-04-23. Adds vim visual mode (`v`) + visual-line (`V`), merges `/cost`+`/stats` into `/usage`, custom named themes via `/theme`, hooks can invoke MCP tools directly, `DISABLE_UPDATES` env var, WSL inherits Windows-side managed settings.
+**Action:** queued
+
+### [2026-04-24] cc-2-1-118-fix-stdio-mcp-and-headless
+**Source:** https://code.claude.com/docs/en/changelog
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.118 fixes stdio MCP servers disconnecting on stray non-JSON stdout lines, corrects headless/SDK session auto-title requests, resolves excessive memory allocation with piped output, fixes `/skills` menu scrolling, patches Remote Control session bugs. Directly relevant to Claudious headless routines + MCP heartbeat.
+**Action:** queued
+
+### [2026-04-24] hooks-invoke-mcp-directly
+**Source:** https://code.claude.com/docs/en/changelog
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code hooks can now invoke MCP tools directly (no shell-out intermediary required). Potential cleaner implementation path for Claudious SessionStart preflight/heartbeat.
+**Action:** queued
+
+### [2026-04-24] cowork-computer-use-ga
+**Source:** https://support.claude.com/en/articles/12138966-release-notes
+**Credibility:** OFFICIAL
+**Type:** TOOL
+**Summary:** Computer Use available in Claude Cowork and Claude Code for Pro/Max subscribers. Claude can open files, run dev tools, click, and navigate the desktop. Previously labeled "research preview" in Claudious state files; scope has expanded.
+**Action:** queued
+
+### [2026-04-24] cowork-mobile-control
+**Source:** https://support.claude.com/en/articles/12138966-release-notes
+**Credibility:** OFFICIAL
+**Type:** TOOL
+**Summary:** Cowork mobile control — persistent agent thread in Claude Desktop + iOS/Android lets users manage Cowork tasks from phone. Max rollout first, Pro follows over subsequent days.
+**Action:** queued
+
+### [2026-04-24] zoom-mcp-connector
+**Source:** https://www.nojitter.com/ai-automation/zoom-accelerates-work-with-claude-cowork-and-code
+**Credibility:** OFFICIAL
+**Type:** TOOL
+**Summary:** Zoom + Anthropic released a Zoom MCP connector. Claude Cowork/Code can query Zoom meeting insights, summaries, and action items.
+**Action:** queued
+
+### [2026-04-24] cc-removed-from-new-pro
+**Source:** https://www.theregister.com/2026/04/22/anthropic_removes_claude_code_pro/
+**Credibility:** VERIFIED
+**Type:** NEWS
+**Summary:** Anthropic removed Claude Code from the Pro plan ($20/mo) for new signups starting 2026-04-21. Existing Pro users retain web-app access. Max plan unaffected. Signal of tier repricing around long-running agents and Cowork.
+**Action:** queued
+
+### [2026-04-24] boris-claudemd-prune-aggressively
+**Source:** https://code.claude.com/docs/en/best-practices
+**Credibility:** COMMUNITY
+**Type:** TECHNIQUE
+**Summary:** Over-specified `CLAUDE.md` causes Claude to ignore parts of it as important rules get lost in noise. Pattern: ruthlessly prune; delete instructions Claude already follows correctly; convert repeatable rules to hooks. Candidate prompting rule — not yet canonical.
+**Action:** queued
+
+### [2026-04-24] constitutional-rule-no-hardcoded-entities-in-routines
+**Source:** archive/intake/2026-04-24.md § Section D (re-seeded from 2026-04-19 audit)
+**Credibility:** OFFICIAL
+**Type:** TECHNIQUE
+**Summary:** Re-seed of constitutional-rule draft: routine prompts, scans, and pipelines must reference canonical config files rather than inlining people/products/URLs/versions/org state. Exceptions for zero-rot entities (protocol/company names). Quarterly staleness audit across canonical config files. Target `canonical/prompting-rules.md`. IMPACT: H | EFFORT: T | RISK: SAFE.
+**Action:** queued
+
+### [2026-04-24] constitutional-rule-verification-prompts-suppress-self-report
+**Source:** archive/intake/2026-04-24.md § Section D (re-seeded from 2026-04-19 handoff session)
+**Credibility:** OFFICIAL
+**Type:** TECHNIQUE
+**Summary:** Re-seed of constitutional-rule draft: prompts that request verification outputs (commit SHAs, file contents, git status) must explicitly instruct CC to suppress the Confidence/Assumptions/Context-health self-report block, otherwise the self-report overrides the requested literal output. Target `canonical/prompting-rules.md`. IMPACT: H | EFFORT: T | RISK: SAFE.
+**Action:** queued
+
+---
+
 ## Graduation Rules
 
 - Finding referenced 3+ times across `learnings/*.md` or confirmed by Logan → promote to `prompting-rules.md` or `antipatterns.md`.

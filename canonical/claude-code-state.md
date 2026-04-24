@@ -1,10 +1,23 @@
 # Claude Code — Current State
 
-**Last updated:** 2026-04-23
-**Version:** 2.1.113 (released 2026-04-17)
+**Last updated:** 2026-04-24
+**Version:** 2.1.118 (released 2026-04-23)
 **Default model:** Opus 4.7
 
 ---
+
+## Features Shipped 2.1.114 → 2.1.118 (Logan-relevant)
+
+- **Vim visual mode** — `v` enters character-wise visual mode, `V` enters visual-line mode, with selection, operators, and visual feedback.
+- **`/usage` merge** — `/cost` and `/stats` combined into a single `/usage` command.
+- **Custom named themes via `/theme`** — create and switch between user-defined themes.
+- **Hooks can invoke MCP tools directly** — no shell-out intermediary needed. Cleaner path for Claudious preflight/heartbeat hooks.
+- **`DISABLE_UPDATES` env var** — opt out of background update checks.
+- **WSL managed settings inheritance** — WSL-on-Windows now inherits Windows-side managed settings.
+- **Stdio MCP non-JSON stdout no longer disconnects** — servers that print stray non-JSON lines to stdout are no longer dropped.
+- **Headless/SDK session auto-title requests fixed** — directly relevant to Claudious scheduled routines.
+- **Piped-output memory bug fixed** — excessive memory allocation on piped output resolved.
+- **Minor fixes** — `/skills` menu scrolling; Remote Control session bugs; Homebrew install update-prompt loop; ctrl+e in multiline prompts; fullscreen scrolling; Write tool diff compute speed on large files.
 
 ## Features Shipped 2.1.105 → 2.1.113 (Logan-relevant)
 
