@@ -297,16 +297,130 @@ Update in place ONLY IF: credibility `OFFICIAL` AND type `CC-STATE` (new CC vers
 
 If a finding's OFFICIAL claim is narrow, update only that fact — do not rewrite the section. If the claim conflicts with existing canonical content, do NOT edit. Instead, add the conflict to `archive/intake/${TODAY}.md` Section D and let process handle it as a proposal.
 
-## 6. Commit & Push
+### 5.5 Deterministic ledger emission
+
+Runs unconditionally at the end of Section 5.
 
 ```bash
-git add -A
-git commit -m "intake: ${TODAY} output + canonical updates" || echo "nothing new"
-git push origin main
+INTAKE="archive/intake/${TODAY}.md"
 
-TOTAL=$(grep -oE 'Total for Process: [0-9]+' "$INTAKE" | grep -oE '[0-9]+' || echo 0)
-STATUS="COMPLETE"
-[ "$TOTAL" = "0" ] && STATUS="COMPLETE_NO_WORK"
+# Count findings emitted to the dated archive (sections B/C/D under their headings).
+# A finding is any "### " heading inside the B/C/D sections.
+INTAKE_FINDINGS_COUNT=$(awk '/^## [BCD]\. /{on=1; next} /^## /{on=0} on && /^### /{n++} END{print n+0}' "$INTAKE" 2>/dev/null || echo 0)
+
+# Count new entries appended to canonical/active-findings.md in this run's staged changes.
+ACTIVE_FINDINGS_APPENDED=$(git diff --cached --unified=0 canonical/active-findings.md 2>/dev/null | grep -cE '^\+### ' || echo 0)
+
+# Did OFFICIAL-gated state files get touched in this run?
+CLAUDE_STATE_TOUCHED=$(git diff --cached --name-only 2>/dev/null | grep -c '^canonical/claude-state\.md$' || echo 0)
+CLAUDE_CODE_STATE_TOUCHED=$(git diff --cached --name-only 2>/dev/null | grep -c '^canonical/claude-code-state\.md$' || echo 0)
+
+# Does the dated archive contain an OFFICIAL + MODEL-STATE or CC-STATE finding that would have required those touches?
+OFFICIAL_MODEL_STATE=$(awk '/^### /{name=$0; c=""; t=""} /^\*\*Credibility:\*\*/{c=$0} /^\*\*Type:\*\*/{t=$0} (c ~ /OFFICIAL/ && t ~ /MODEL-STATE/){print; c=""; t=""}' "$INTAKE" 2>/dev/null | wc -l | tr -d ' ')
+OFFICIAL_CC_STATE=$(awk '/^### /{name=$0; c=""; t=""} /^\*\*Credibility:\*\*/{c=$0} /^\*\*Type:\*\*/{t=$0} (c ~ /OFFICIAL/ && t ~ /CC-STATE/){print; c=""; t=""}' "$INTAKE" 2>/dev/null | wc -l | tr -d ' ')
+
+echo "LEDGER: intake-findings-count=$INTAKE_FINDINGS_COUNT"
+echo "LEDGER: active-findings-appended=$ACTIVE_FINDINGS_APPENDED"
+echo "LEDGER: claude-state-touched=$CLAUDE_STATE_TOUCHED (required=$([ "$OFFICIAL_MODEL_STATE" -gt 0 ] && echo yes || echo no))"
+echo "LEDGER: claude-code-state-touched=$CLAUDE_CODE_STATE_TOUCHED (required=$([ "$OFFICIAL_CC_STATE" -gt 0 ] && echo yes || echo no))"
+```
+
+### 5.6 Phase Z — Post-run assertions
+
+After ledger emission, run these assertions before committing. Any FAIL surfaces to `canonical/active-findings.md` and blocks the normal commit in Section 6.
+
+**Z.1 — If Sections B/C/D produced findings, active-findings.md MUST have been appended.**
+
+```bash
+if [ "$INTAKE_FINDINGS_COUNT" -gt 0 ] && [ "$ACTIVE_FINDINGS_APPENDED" -eq 0 ]; then
+  echo "ASSERT FAIL Z.1: $INTAKE_FINDINGS_COUNT findings in $INTAKE but zero new entries appended to canonical/active-findings.md"
+  ASSERT_Z1="FAIL"
+else
+  ASSERT_Z1="PASS"
+fi
+```
+
+**Z.2 — If OFFICIAL MODEL-STATE finding present, canonical/claude-state.md MUST have been touched.**
+
+```bash
+if [ "$OFFICIAL_MODEL_STATE" -gt 0 ] && [ "$CLAUDE_STATE_TOUCHED" -eq 0 ]; then
+  echo "ASSERT FAIL Z.2: OFFICIAL MODEL-STATE finding present ($OFFICIAL_MODEL_STATE item(s)) but canonical/claude-state.md not touched"
+  ASSERT_Z2="FAIL"
+else
+  ASSERT_Z2="PASS"
+fi
+```
+
+**Z.3 — If OFFICIAL CC-STATE finding present, canonical/claude-code-state.md MUST have been touched.**
+
+```bash
+if [ "$OFFICIAL_CC_STATE" -gt 0 ] && [ "$CLAUDE_CODE_STATE_TOUCHED" -eq 0 ]; then
+  echo "ASSERT FAIL Z.3: OFFICIAL CC-STATE finding present ($OFFICIAL_CC_STATE item(s)) but canonical/claude-code-state.md not touched"
+  ASSERT_Z3="FAIL"
+else
+  ASSERT_Z3="PASS"
+fi
+```
+
+**Z.4 — Summary + loud emission on FAIL.**
+
+```bash
+if [ "$ASSERT_Z1" = "FAIL" ] || [ "$ASSERT_Z2" = "FAIL" ] || [ "$ASSERT_Z3" = "FAIL" ]; then
+  cat >> canonical/active-findings.md <<EOF
+
+### $(date -u +%Y-%m-%d) — intake-routine-assertion-fail
+**Severity:** CRITICAL
+**Source:** scheduled-tasks/intake.md Phase Z (section 5.6)
+**What:** Intake run $(date -u +%Y-%m-%d_%H:%M) failed post-run assertions.
+- Z.1 (active-findings appended if intake findings): $ASSERT_Z1
+- Z.2 (claude-state touched if OFFICIAL MODEL-STATE): $ASSERT_Z2
+- Z.3 (claude-code-state touched if OFFICIAL CC-STATE): $ASSERT_Z3
+**Action:** Manually propagate dated archive → canonical, commit with \`[intake-assert-fix]\` marker, investigate root cause.
+EOF
+
+  LEDGER_STATUS="FAILED"
+  echo "LEDGER: status=FAILED (Phase Z assertion)"
+else
+  LEDGER_STATUS="COMPLETE"
+  echo "LEDGER: status=COMPLETE (Phase Z assertions passed)"
+fi
+```
+
+## 6. Commit & Push
+
+Before any git commit/push: check the `LEDGER_STATUS` set by Section 5.6. If it is `FAILED`, do NOT commit Sections A–D + Section 5 outputs normally — Phase Z already wrote the assertion-fail block to `canonical/active-findings.md`. Commit only that plus a FAILED run-log entry, push, and exit.
+
+```bash
+if [ "${LEDGER_STATUS:-}" = "FAILED" ]; then
+  # Unstage everything, keep only the assertion-fail append to active-findings.
+  git reset HEAD -- .
+  git add canonical/active-findings.md
+
+  mkdir -p archive/runs
+  RUNS_LOG="archive/runs/${TODAY}.md"
+  {
+    echo ""
+    echo "### ${NOW} intake [FAILED]"
+    echo "- Phase Z assertion failure"
+    echo "- Z.1 active-findings-appended: ${ASSERT_Z1}"
+    echo "- Z.2 claude-state-touched: ${ASSERT_Z2}"
+    echo "- Z.3 claude-code-state-touched: ${ASSERT_Z3}"
+    echo "- See canonical/active-findings.md (intake-routine-assertion-fail block)"
+  } >> "$RUNS_LOG"
+  git add "$RUNS_LOG"
+  git commit -m "intake: ${TODAY} FAILED (Phase Z assertion)" || echo "nothing to commit"
+  git push origin main
+
+  STATUS="ABORT"
+else
+  git add -A
+  git commit -m "intake: ${TODAY} output + canonical updates" || echo "nothing new"
+  git push origin main
+
+  TOTAL=$(grep -oE 'Total for Process: [0-9]+' "$INTAKE" | grep -oE '[0-9]+' || echo 0)
+  STATUS="COMPLETE"
+  [ "$TOTAL" = "0" ] && STATUS="COMPLETE_NO_WORK"
+fi
 
 END=$(date +%s)
 DUR=$((END - START))
@@ -320,8 +434,9 @@ Use str_replace or sed equivalent to replace the `[IN_PROGRESS]` line with final
 ### ${NOW} intake [${STATUS}]
 - commit: $(git rev-parse HEAD)
 - inputs: web, canonical/, learnings/, local repos (if accessible)
-- outputs: archive/intake/${TODAY}.md, canonical/active-findings.md (+N), canonical/claude-state.md (<updated|unchanged>), canonical/claude-code-state.md (<updated|unchanged>)
-- summary: Scout=X, Drift=X, Config=X (total=X, novelty=<flag>), canonical-edits=N
+- outputs: archive/intake/${TODAY}.md, canonical/active-findings.md (+${ACTIVE_FINDINGS_APPENDED}), canonical/claude-state.md ($([ "$CLAUDE_STATE_TOUCHED" -gt 0 ] && echo updated || echo unchanged)), canonical/claude-code-state.md ($([ "$CLAUDE_CODE_STATE_TOUCHED" -gt 0 ] && echo updated || echo unchanged))
+- assertions: Z.1=${ASSERT_Z1}, Z.2=${ASSERT_Z2}, Z.3=${ASSERT_Z3}
+- summary: Scout=X, Drift=X, Config=X (total=X, novelty=<flag>), findings-emitted=${INTAKE_FINDINGS_COUNT}
 - duration: ${DUR}s
 ```
 

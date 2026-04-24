@@ -194,6 +194,15 @@ git add -A
 git commit -m "process: deployed $DEPLOY_COUNT items" || echo "no deploys"
 ```
 
+**Phase 2 ledger emission — runs unconditionally at end of phase 2.**
+
+```bash
+# Count canonical mirror files that actually changed in this run.
+# Uses HEAD commit diff since Phase 2 just committed; if no-op, value = 0.
+CANONICAL_MIRRORS=$(git show --name-only --format= HEAD 2>/dev/null | grep -cE '^canonical/(prompting-rules|antipatterns)\.md$' || echo 0)
+echo "LEDGER: canonical-mirrors=$CANONICAL_MIRRORS"
+```
+
 ### Phase 3 — Regenerate `canonical/open-decisions.md`
 
 This is the only source of truth for proposals awaiting Logan. Regenerate the whole file from `archive/proposals/*.md`:
@@ -233,6 +242,21 @@ done
 
 The exact extraction may need per-proposal fallback (older proposals don't match the newer header schema). When extraction returns empty, fall back to "(see file)" — do not fabricate summaries.
 
+**Phase 3 ledger emission — runs unconditionally at end of phase 3.**
+
+```bash
+# Compare disk state (proposal files) against file state (open-decisions headings).
+# If equal, Phase 3 regenerated correctly; if not, it skipped or partial-ran.
+COUNT_ON_DISK=$(ls archive/proposals/*.md 2>/dev/null | grep -v '\.gitkeep' | wc -l | tr -d ' ')
+COUNT_IN_OPEN_DECISIONS=$(grep -c "^### " canonical/open-decisions.md 2>/dev/null || echo 0)
+if [ "$COUNT_ON_DISK" = "$COUNT_IN_OPEN_DECISIONS" ]; then
+  OPEN_DECISIONS_REGENERATED="yes"
+else
+  OPEN_DECISIONS_REGENERATED="no"
+fi
+echo "LEDGER: open-decisions-regenerated=$OPEN_DECISIONS_REGENERATED (disk=$COUNT_ON_DISK, file=$COUNT_IN_OPEN_DECISIONS)"
+```
+
 ### Phase 4 — Verify (Evidence Loop)
 
 Read last 7 days of `archive/queue/deployed.log`. For each `DEPLOYED` line deployed >24hr ago (skip today's):
@@ -245,16 +269,105 @@ Read last 7 days of `archive/queue/deployed.log`. For each `DEPLOYED` line deplo
 
 Skip items >7 days old already tagged WORKING (bloat control).
 
-## 5. Commit & Push
+### Phase Z — Post-run assertions
+
+After Phases 1–4 complete, run these assertions before committing. Any FAIL aborts the run with an incomplete status and surfaces loudly via `canonical/active-findings.md`. The commit+push in Section 5 does NOT run on FAIL — Section 5 inspects the ledger `status=` field emitted here.
+
+**Z.1 — Phase 3 ran if Phase 1 or 2 produced deployable output.**
 
 ```bash
-git add -A
-git commit -m "process: ${TODAY} verify + canonical regen" || echo "nothing new"
-git push origin main
+# If Phase 1 added proposals OR Phase 2 deployed items, Phase 3 MUST have regenerated open-decisions.
+PROPOSALS_ADDED=$(git diff --cached --name-only 2>/dev/null | grep -cE '^archive/proposals/.*\.md$' || echo 0)
+DEPLOYED_TODAY=$(grep -c "^${TODAY} DEPLOYED" archive/queue/deployed.log 2>/dev/null || echo 0)
 
-STATUS="COMPLETE"
-if [ "$TRIAGED" = "0" ] && [ "$DEPLOYED" = "0" ] && [ "$VERIFIED" = "0" ]; then
-  STATUS="COMPLETE_NO_WORK"
+if [ "${OPEN_DECISIONS_REGENERATED:-unset}" = "unset" ]; then
+  echo "ASSERT FAIL Z.1: OPEN_DECISIONS_REGENERATED ledger field missing (Phase 3 did not run to completion)"
+  ASSERT_Z1="FAIL"
+elif [ "$OPEN_DECISIONS_REGENERATED" = "no" ] && { [ "$PROPOSALS_ADDED" -gt 0 ] || [ "$DEPLOYED_TODAY" -gt 0 ]; }; then
+  echo "ASSERT FAIL Z.1: Phase 1/2 produced work ($PROPOSALS_ADDED proposals, $DEPLOYED_TODAY deploys) but open-decisions.md count does not match disk"
+  ASSERT_Z1="FAIL"
+else
+  ASSERT_Z1="PASS"
+fi
+```
+
+**Z.2 — Mirror ran if Phase 2 deployed a TECHNIQUE/PATTERN/ANTIPATTERN/GOTCHA.**
+
+```bash
+# If Phase 2's deploy commit's message (or any staged/committed deployed.log lines) indicate
+# a mirror-triggering type was deployed today, the canonical-mirrors ledger count must be > 0.
+MIRROR_TRIGGERING_DEPLOYS=$(grep "^${TODAY} DEPLOYED" archive/queue/deployed.log 2>/dev/null | grep -cE '\b(TECHNIQUE|PATTERN|ANTIPATTERN|GOTCHA)\b' || echo 0)
+
+if [ "${CANONICAL_MIRRORS:-unset}" = "unset" ]; then
+  echo "ASSERT FAIL Z.2: CANONICAL_MIRRORS ledger field missing (Phase 2 mirror sub-step did not run)"
+  ASSERT_Z2="FAIL"
+elif [ "$MIRROR_TRIGGERING_DEPLOYS" -gt 0 ] && [ "$CANONICAL_MIRRORS" -eq 0 ]; then
+  echo "ASSERT FAIL Z.2: Mirror-triggering type deployed ($MIRROR_TRIGGERING_DEPLOYS item(s)) but zero canonical mirrors written"
+  ASSERT_Z2="FAIL"
+else
+  ASSERT_Z2="PASS"
+fi
+```
+
+**Z.3 — Assertion summary + active-findings emission.**
+
+```bash
+if [ "$ASSERT_Z1" = "FAIL" ] || [ "$ASSERT_Z2" = "FAIL" ]; then
+  # Append loud entry to active-findings so the next daily briefing surfaces it
+  cat >> canonical/active-findings.md <<EOF
+
+### $(date -u +%Y-%m-%d) — process-routine-assertion-fail
+**Severity:** CRITICAL
+**Source:** scheduled-tasks/process.md Phase Z
+**What:** Process run $(date -u +%Y-%m-%d_%H:%M) failed post-run assertions.
+- Z.1 (Phase 3 ran if deployables): $ASSERT_Z1
+- Z.2 (mirror ran if mirror-triggering type): $ASSERT_Z2
+**Action:** Manually regenerate missing outputs, commit with \`[process-assert-fix]\` marker, investigate root cause.
+EOF
+
+  LEDGER_STATUS="FAILED"
+  echo "LEDGER: status=FAILED (Phase Z assertion)"
+else
+  LEDGER_STATUS="COMPLETE"
+  echo "LEDGER: status=COMPLETE (Phase Z assertions passed)"
+fi
+```
+
+## 5. Commit & Push
+
+Before any git commit/push in this section: check the ledger `LEDGER_STATUS` set by Phase Z. If it is `FAILED`, do NOT commit Phase 1–4 outputs — Phase Z already appended to `canonical/active-findings.md`; that's the only file that should ship so the failure surfaces on main. Discard other staged changes.
+
+```bash
+if [ "${LEDGER_STATUS:-}" = "FAILED" ]; then
+  # Phase Z wrote canonical/active-findings.md — unstage everything else, commit only that.
+  git reset HEAD -- .
+  git add canonical/active-findings.md
+
+  # Append a FAILED entry to today's run log so the failure is visible in runs history.
+  mkdir -p archive/runs
+  RUNS_LOG="archive/runs/${TODAY}.md"
+  {
+    echo ""
+    echo "### ${NOW} process [FAILED]"
+    echo "- Phase Z assertion failure"
+    echo "- Z.1 open-decisions-regenerated: ${ASSERT_Z1}"
+    echo "- Z.2 canonical-mirrors-written: ${ASSERT_Z2}"
+    echo "- See canonical/active-findings.md (process-routine-assertion-fail block)"
+  } >> "$RUNS_LOG"
+  git add "$RUNS_LOG"
+  git commit -m "process: ${TODAY} FAILED (Phase Z assertion)" || echo "nothing to commit"
+  git push origin main
+
+  STATUS="ABORT"
+else
+  git add -A
+  git commit -m "process: ${TODAY} verify + canonical regen" || echo "nothing new"
+  git push origin main
+
+  STATUS="COMPLETE"
+  if [ "$TRIAGED" = "0" ] && [ "$DEPLOYED" = "0" ] && [ "$VERIFIED" = "0" ]; then
+    STATUS="COMPLETE_NO_WORK"
+  fi
 fi
 
 END=$(date +%s)
@@ -267,7 +380,8 @@ DUR=$((END - START))
 ### ${NOW} process [${STATUS}]
 - commit: $(git rev-parse HEAD)
 - inputs: archive/intake/${TODAY}.md, archive/queue/, archive/queue/deployed.log, archive/proposals/
-- outputs: queue=+X, proposals=+X, deployed=X, verified=X, canonical-mirrors=X, open-decisions-regenerated=<yes|no>
+- outputs: queue=+X, proposals=+X, deployed=X, verified=X, canonical-mirrors=${CANONICAL_MIRRORS}, open-decisions-regenerated=${OPEN_DECISIONS_REGENERATED}
+- assertions: Z.1=${ASSERT_Z1}, Z.2=${ASSERT_Z2}
 - summary: Triage X, Deploy X W/X F, Verify X W/X B/X R
 - duration: ${DUR}s
 ```
