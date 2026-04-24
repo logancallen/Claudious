@@ -262,6 +262,14 @@
 **Summary:** Claude Deep Research flagged "Anthropic OAuth crackdown affecting third-party tools using Claude Code's OAuth flow." Claudious runs scheduled Claude Code routines (Intake 6am, Process 7am, Curate 8pm + weekly Health Check). If these use OAuth, they could be affected.
 **Action:** Investigate whether Claudious routines authenticate via OAuth or API key. Document in `canonical/claudious-state.md`. If OAuth-based, check for impact from Anthropic's policy change.
 
+### 2026-04-23-open-decisions-regen-stale
+**Source:** manual diagnostic (Session #3, CC prompt Part B)
+**Category:** CLAUDIOUS
+**Credibility:** OFFICIAL (measured)
+**Severity:** MEDIUM
+**Summary:** `canonical/open-decisions.md` `Last updated:` stamp was 2026-04-19 as of 2026-04-23. Current proposals dir has 40 entries, but stamped file claimed 28. `git log canonical/open-decisions.md` shows ONLY the original 2026-04-17 seed commit (`cc3fc9d`) — no Process run has ever committed a regen to main. Process on 2026-04-20 completed with `proposals-created: claudemd-200-line-cap, mcp-spec-oauth-2-1, cowork-ga-desktop, operating-model-5-parts` and a `branch-note: developed on claude/intelligent-lamport-oLzsB per task assignment; PR to main to follow` — that PR presumably never merged, so Phase 3's regen never reached main. Session #3 Part B rebuilt the file (249 lines, 40 proposals) and committed it on `claude/preflight-hook-and-diagnostics`.
+**Action:** Regen committed this session. Root-cause proposal filed at `archive/proposals/process-open-decisions-regen-not-landing-on-main.md` for routine-side fix. Cross-reference `cc-prompt-03-preflight-hook-and-diagnostics` Part B.
+
 ---
 
 ## Graduation Rules

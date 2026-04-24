@@ -26,6 +26,9 @@ Intake (6am) → Process (7am) → Curate (8pm).
 ### `.claudious-heartbeat/` — Machine state tracking (committed)
 One JSON per machine, e.g. `logan-pc.json`, `mac-studio.json`. Each file records when this machine last ran, what SHA every tracked repo is at locally, and whether any repo is ahead/behind/dirty. Intake reads these at 6am and surfaces cross-machine drift (stale machines, unpulled commits, abandoned WIP) to `canonical/active-findings.md`. Write via `scripts/update-heartbeat.sh` (Mac/Linux/Git Bash) or `scripts/update-heartbeat.ps1` (Windows). Schema in `.claudious-heartbeat/SCHEMA.md`.
 
+### `.claude/hooks/preflight.sh` — Session Start hook (installed in Claudious, asf-graphics-app, courtside-pro)
+Fires at the start of every Claude Code session in a tracked repo via `.claude/settings.json` `SessionStart`. Calls `Claudious/scripts/update-heartbeat.sh --preflight <repo-name>`, which: (1) updates this machine's heartbeat and auto-commits it to Claudious main (gated on `branch == main`), (2) runs `git fetch --all --prune` on the current repo, (3) halts the CC session with exit codes 2/3/4 if the current repo is behind origin, has stale WIP (≥5 dirty AND oldest >24h), or a sibling machine pushed more recent commits in the last 4h. Fail-open on infra errors (exit 0 with `[WARN] preflight-degraded`) — CC stays reachable even when Claudious is unavailable.
+
 ### `learnings/` — Raw capture stream
 Written to by routines and manual harvest. Graduates into `canonical/` via process auto-deploys and curate Sunday graduations.
 

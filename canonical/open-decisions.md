@@ -1,164 +1,249 @@
 # Open Decisions — Proposals Awaiting Logan
 
-**Last updated:** 2026-04-19
-**Scope:** Every proposal in `proposals/` that needs Logan's judgment (can't auto-deploy as SAFE+HIGH+TRIVIAL).
-**Refresh:** Maintained by the `process` routine — proposals added on triage, removed on approve/reject/prune.
+**Last updated:** 2026-04-23
+**Total open:** 40
+
+Proposals are improvements that cannot auto-deploy (TEST-FIRST, REVIEW-REQUIRED, CONFLICT, or larger than TRIVIAL). Each entry points to the full proposal file in archive/proposals/.
 
 ---
 
-## Format per decision
-
-```
-### <kebab-id>
-**Summary:** <1 sentence>
-**Why a proposal:** <what makes it non-auto-deployable>
-**Logan action needed:** <specific decision or step>
-```
-
----
-
-## Active — 28 proposals
+### 1m-context-rollback-investigation
+**File:** archive/proposals/1m-context-rollback-investigation.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** COMMUNITY source needs verification; EFFORT=L (not TRIVIAL) → PROPOSE
+**Logan action:** review + approve/reject
 
 ### agent-skills-spec-cross-platform
-**Summary:** Adopt Agent Skills Spec (codified Skills metadata) across Codex CLI + ChatGPT alongside Claude Code.
-**Why a proposal:** Requires cross-platform changes and judgment on portability vs Claude-native fidelity.
-**Logan action needed:** Decide whether to port 8+ custom skills to the spec. Review benefit vs lock-in.
+**File:** archive/proposals/agent-skills-spec-cross-platform.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
+
+### audit-autodream-status
+**File:** archive/proposals/audit-autodream-status.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** IMPACT=L → PROPOSE
+**Logan action:** review + approve/reject
 
 ### background-monitor-plugin-manifest
-**Summary:** Add `background-monitor` manifest key to relevant plugins to surface long-running processes via Monitor tool.
-**Why a proposal:** Plugin-by-plugin manifest edits; benefit depends on which plugins Logan runs long tasks with.
-**Logan action needed:** Pick which plugins (typescript-lsp, pyright-lsp, Codex?) get the manifest key.
+**File:** archive/proposals/background-monitor-plugin-manifest.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### bash-permission-bypass-patch
-**Summary:** Update Claude Code to v2.1.98+ to close the backslash-escaped-flag bypass.
-**Why a proposal:** Security update — verify current version first, then confirm upgrade.
-**Logan action needed:** Check `claude --version`; update if <2.1.98. (Likely already done: running 2.1.113 per `canonical/claude-code-state.md` — this may be auto-resolvable.)
+**File:** archive/proposals/bash-permission-bypass-patch.md
+**Summary:** (see file)
+**Why proposal:** Priority:** HIGH — Security
+**Logan action:** review + approve/reject
+
+### clarify-rollback-script-windows
+**File:** archive/proposals/clarify-rollback-script-windows.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** IMPACT=L → PROPOSE
+**Logan action:** review + approve/reject
+
+### close-bash-permission-bypass-proposal
+**File:** archive/proposals/close-bash-permission-bypass-proposal.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** Judgment call — Logan should confirm the resolution before the proposal is archived (version verification on BOTH machines matters for a security patch) → PROPOSAL
+**Logan action:** review + approve/reject
 
 ### compile-time-feature-flags-radar
-**Summary:** Monitor Anthropic's GrowthBook / tengu_* runtime flags for roadmap signal — Anthropic can remote-kill features (Agent Teams, Fast Mode) without user notice.
-**Why a proposal:** Requires building a monitoring script + weekly review cadence.
-**Logan action needed:** Decide whether to build the radar, or rely on community Discord signal.
+**File:** archive/proposals/compile-time-feature-flags-radar.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
+
+### confirm-onedrive-mirror-retired
+**File:** archive/proposals/confirm-onedrive-mirror-retired.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** IMPACT=M (not HIGH) → PROPOSE
+**Logan action:** review + approve/reject
 
 ### context-mode-mcp-plugin
-**Summary:** Install `context-mode` MCP plugin (github.com/mksglu/context-mode) — claimed 50–90% token reduction for MCP-heavy sessions.
-**Why a proposal:** Third-party plugin; requires testing vs Logan's 12-MCP setup before rollout.
-**Logan action needed:** 1-session test. High priority given 12 connected servers.
+**File:** archive/proposals/context-mode-mcp-plugin.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
+
+### cowork-ga-desktop
+**File:** archive/proposals/cowork-ga-desktop.md
+**Summary:** Claude Cowork is now GA on macOS + Windows in Claude Desktop. Adds expanded analytics, OpenTelemetry support, and RBAC for Enterprise. Does NOT resolve the 1M → 200K Cowork regression tracked in 04-
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### env-var-trio-effort-teams-thinking
-**Summary:** Set `CLAUDE_CODE_EFFORT_LEVEL`, `CLAUDE_CODE_MAX_THINKING_TOKENS`, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` as a coordinated trio.
-**Why a proposal:** Interaction effects between the three; values depend on Logan's preferred defaults.
-**Logan action needed:** Pick values per env var; add to PowerShell `$PROFILE`.
+**File:** archive/proposals/env-var-trio-effort-teams-thinking.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### exclude-dynamic-prompt-sections-flag
-**Summary:** Add `--exclude-dynamic-system-prompt-sections` flag to print-mode / CI invocations for reproducibility.
-**Why a proposal:** Changes CI output surface; needs validation CI doesn't rely on excluded sections.
-**Logan action needed:** Verify no CI workflows read excluded sections; add flag to relevant scripts.
+**File:** archive/proposals/exclude-dynamic-prompt-sections-flag.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### frontend-design-skill-official
-**Summary:** Install Anthropic's official Frontend-Design skill (277K+ installs).
-**Why a proposal:** Requires manual `claude skills add` in CLI; may conflict with existing skills.
-**Logan action needed:** Install and audit trigger overlap with current design skills.
+**File:** archive/proposals/frontend-design-skill-official.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
+
+### graduate-crlf-gitattributes
+**File:** archive/proposals/graduate-crlf-gitattributes.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** IMPACT=M → PROPOSE; also graduation (non-trivial routing)
+**Logan action:** review + approve/reject
 
 ### growthbook-tengu-feature-gates
-**Summary:** Treat GrowthBook runtime gates (tengu_*) as remote kill-switch awareness — add "check remote gate status" as step 0 in feature-break triage.
-**Why a proposal:** Behavioral change to triage process; needs integration into MCP-break / feature-break runbooks.
-**Logan action needed:** Approve rule; integrate into relevant skills.
+**File:** archive/proposals/growthbook-tengu-feature-gates.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### hook-session-title-output
-**Summary:** `UserPromptSubmit` hook can emit `hookSpecificOutput.sessionTitle` to rename the Claude Code tab.
-**Why a proposal:** Requires hook code + testing; benefit is convenience only.
-**Logan action needed:** Low priority — approve/defer.
+**File:** archive/proposals/hook-session-title-output.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### implement-handoff-directive
-**Summary:** Implement `SessionEnd` / `SessionStart` handoff directive in global CLAUDE.md — auto-write `.claude/handoff.md` at session end, auto-read at start.
-**Why a proposal:** Already partially in `~/.claude/CLAUDE.md` Session Lifecycle section. This formalizes as a hook rather than instruction.
-**Logan action needed:** Decide: hook-enforced vs instruction-based. Both exist now.
+**File:** archive/proposals/implement-handoff-directive.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### mcp-allowlist-env-security-hardening
-**Summary:** Set `CLAUDE_CODE_MCP_ALLOWLIST_ENV` to restrict env inheritance to MCP servers.
-**Why a proposal:** Security hardening given 12 active MCP servers. Requires curating the allowlist.
-**Logan action needed:** Define the allowlist; set env var.
+**File:** archive/proposals/mcp-allowlist-env-security-hardening.md
+**Summary:** Current setup inherits the full parent-process environment into every MCP server. Logan runs 5+ MCP servers (Playwright, TranscriptAPI, GitHub + Supabase/Stripe/Netlify from Claude.ai). Any secret in 
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### mcp-circuit-breaker-pattern
-**Summary:** Add circuit breaker (50%/30s) to MCP calls to prevent cascade failures when one server misbehaves.
-**Why a proposal:** Requires implementation at MCP client layer; upstream feature request.
-**Logan action needed:** Defer until Anthropic-side support or user-level library emerges.
+**File:** archive/proposals/mcp-circuit-breaker-pattern.md
+**Summary:** Wrap MCP tool invocations in retry-with-jitter + circuit breaker. Config: 50% failure rate over 10s sliding window opens the breaker; 30s cooldown → half-open test. Exponential backoff with full jit
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### mcp-gateway-pattern
-**Summary:** Run MCP behind a gateway for tool visibility + auth enforcement.
-**Why a proposal:** Infrastructure addition; benefit at team scale, marginal solo.
-**Logan action needed:** Defer — not worth complexity for 1 user.
+**File:** archive/proposals/mcp-gateway-pattern.md
+**Summary:** Production enterprise pattern: insert a lightweight proxy between Claude Code and MCP servers that enforces per-identity tool visibility, auth, rate limits, and structured logging. Buildable in ~200 L
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### mcp-stateless-redis-sessions
-**Summary:** Stateless MCP session design backed by Redis for horizontal scale.
-**Why a proposal:** Relevant only for team / multi-device MCP scenarios.
-**Logan action needed:** Defer — not needed for current setup.
+**File:** archive/proposals/mcp-stateless-redis-sessions.md
+**Summary:** Production MCP servers should be stateless with session state in Redis, 10-20 connections per instance, deployed behind NGINX `ip_hash` or ALB sticky sessions. Solves the "MCP server crashes lose all 
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
+
+### multi-property-design-tokens
+**File:** archive/proposals/multi-property-design-tokens.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** IMPACT=M → PROPOSE
+**Logan action:** review + approve/reject
 
 ### perplexity-comet-grok-deep-search
-**Summary:** Add Perplexity Comet Browser + Grok Deep Search to research routing.
-**Why a proposal:** Updates task-routing-table.md; requires testing actual quality.
-**Logan action needed:** Run 2–3 test queries on each; decide on routing.
+**File:** archive/proposals/perplexity-comet-grok-deep-search.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### perplexity-session-memory-pages
-**Summary:** Use Perplexity Session Memory + Pages for cross-platform research persistence.
-**Why a proposal:** Changes research workflow; needs habit shift.
-**Logan action needed:** Evaluate after 1 week of use.
+**File:** archive/proposals/perplexity-session-memory-pages.md
+**Summary:** Perplexity added (a) cross-session memory (remembers prior research context) and (b) Pages (shareable, citation-rich published research documents). Both on Pro/Max tiers. Makes Perplexity more viable 
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### plan-v2-agent-count
-**Summary:** Tune `CLAUDE_CODE_PLAN_V2_AGENT_COUNT` env var to control plan mode parallelism.
-**Why a proposal:** Value depends on Logan's typical plan complexity; defaults may suffice.
-**Logan action needed:** Test values 2 / 4 / 6 on 3 plans; pick best.
+**File:** archive/proposals/plan-v2-agent-count.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### plugin-hooks-yaml-fix
-**Summary:** Plugin hooks YAML frontmatter bug fix (requires manual `claude update`).
-**Why a proposal:** Already moved to proposals 2026-04-12 as MOVED-TO-PROPOSALS (manual CLI action).
-**Logan action needed:** Run `claude update` in next CLI session.
+**File:** archive/proposals/plugin-hooks-yaml-fix.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### precompact-hook-blocking
-**Summary:** PreCompact hook can block compaction (v2.1.105+). Use to preserve critical context before compact.
-**Why a proposal:** Requires hook implementation + criteria for when to block.
-**Logan action needed:** Write the hook or skip — depends on whether manual compact protocol suffices.
+**File:** archive/proposals/precompact-hook-blocking.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
+
+### process-claudeignore-antipatterns
+**File:** archive/proposals/process-claudeignore-antipatterns.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** IMPACT=L; requires manual action (scope exclusion in queue processor)
+**Logan action:** review + approve/reject
+
+### reconcile-mcp-count-inconsistency
+**File:** archive/proposals/reconcile-mcp-count-inconsistency.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** Needs Logan to confirm the authoritative number via `/mcp` on both machines → PROPOSAL
+**Logan action:** review + approve/reject
+
+### refresh-current-setup-v5
+**File:** archive/proposals/refresh-current-setup-v5.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** EFFORT=M + requires cross-machine manual verification → PROPOSAL (not queue)
+**Logan action:** review + approve/reject
 
 ### skill-claudemd-optimizer
-**Summary:** New skill `claudemd-optimizer` — runs Arize prompt-learning loop on CLAUDE.md files.
-**Why a proposal:** Graduation from technique to skill; needs skill file authored.
-**Logan action needed:** Approve skill creation or defer.
+**File:** archive/proposals/skill-claudemd-optimizer.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### skill-description-1536-chars-audit
-**Summary:** Expand all 15+ custom skill descriptions to use the new 1,536-char limit (was 250).
-**Why a proposal:** Requires per-skill rewrite. HIGH priority per alerts.md 2026-04-13.
-**Logan action needed:** Audit + rewrite session (~45 min).
+**File:** archive/proposals/skill-description-1536-chars-audit.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### skill-knowledge-sync-setup
-**Summary:** New skill `knowledge-sync-setup` — wire docs/ knowledge-sync pattern in a new repo.
-**Why a proposal:** Graduation candidate; needs skill authored.
-**Logan action needed:** Approve skill creation.
+**File:** archive/proposals/skill-knowledge-sync-setup.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### skill-skill-triggering-guide
-**Summary:** New skill `skill-triggering-guide` — authoring guide for future skills (description patterns, exclusion phrases, semantic matching rules).
-**Why a proposal:** Meta-skill; affects skill authoring going forward.
-**Logan action needed:** Approve skill creation.
+**File:** archive/proposals/skill-skill-triggering-guide.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### subagent-invocation-quality-framework
-**Summary:** 4 required components for quality subagent invocation (context, task, format, cap).
-**Why a proposal:** Behavioral framework; graduates to prompting-rules.md once validated across 3+ uses.
-**Logan action needed:** Approve and promote to `canonical/prompting-rules.md` after next use.
+**File:** archive/proposals/subagent-invocation-quality-framework.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
+
+### superpowers-trial-log
+**File:** archive/proposals/superpowers-trial-log.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### user-preferences-adaptive-thinking-bypass
-**Summary:** Add `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1` guidance to User Preferences.
-**Why a proposal:** Affects User Preferences (restricted surface per process.md scope).
-**Logan action needed:** Paste into User Preferences in Settings > Profile.
+**File:** archive/proposals/user-preferences-adaptive-thinking-bypass.md
+**Summary:** Anthropic shipped an adaptive thinking throttle in early April 2026 that reduces reasoning depth on tasks the model classifies as routine. The Claude Code fix is the env var `CLAUDE_CODE_DISABLE_ADAPT
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
 ### v2-1-x-command-awareness
-**Summary:** Awareness pack for v2.1.x slash commands (`/ultraplan`, `/less-permission-prompts`, `/ultrareview`, `/autofix-pr`, `/team-onboarding`).
-**Why a proposal:** Cross-surface awareness doc; needs placement decision.
-**Logan action needed:** Already covered in `canonical/claude-code-state.md`; this proposal is now redundant.
+**File:** archive/proposals/v2-1-x-command-awareness.md
+**Summary:** (see file)
+**Why proposal:** (see file)
+**Logan action:** review + approve/reject
 
----
+### vite-vs-esbuild-decision-framework
+**File:** archive/proposals/vite-vs-esbuild-decision-framework.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** IMPACT=M; domain-specific decision → PROPOSE for Logan to validate scope
+**Logan action:** review + approve/reject
 
-## Summary
-
-- **Total active:** 28 (seeded from `proposals/*.md` as of 2026-04-19).
-- **Security-critical:** `bash-permission-bypass-patch` (likely resolved by version upgrade), `mcp-allowlist-env-security-hardening`.
-- **High-leverage quick wins:** `skill-description-1536-chars-audit`, `context-mode-mcp-plugin`, `user-preferences-adaptive-thinking-bypass`.
-- **Candidates to defer / close:** `mcp-circuit-breaker-pattern`, `mcp-gateway-pattern`, `mcp-stateless-redis-sessions`, `v2-1-x-command-awareness` (redundant).
