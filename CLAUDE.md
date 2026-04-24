@@ -23,6 +23,9 @@ Dated intake, runs ledger, digests, proposals, queue, scout reports, retrospecti
 ### `scheduled-tasks/` — Cloud routine prompts
 Intake (6am) → Process (7am) → Curate (8pm).
 
+### `.claudious-heartbeat/` — Machine state tracking (committed)
+One JSON per machine, e.g. `logan-pc.json`, `mac-studio.json`. Each file records when this machine last ran, what SHA every tracked repo is at locally, and whether any repo is ahead/behind/dirty. Intake reads these at 6am and surfaces cross-machine drift (stale machines, unpulled commits, abandoned WIP) to `canonical/active-findings.md`. Write via `scripts/update-heartbeat.sh` (Mac/Linux/Git Bash) or `scripts/update-heartbeat.ps1` (Windows). Schema in `.claudious-heartbeat/SCHEMA.md`.
+
 ### `learnings/` — Raw capture stream
 Written to by routines and manual harvest. Graduates into `canonical/` via process auto-deploys and curate Sunday graduations.
 

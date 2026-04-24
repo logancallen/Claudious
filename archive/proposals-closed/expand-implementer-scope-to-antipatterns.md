@@ -34,3 +34,8 @@ Next Implementer run on an antipattern-targeting SAFE+HIGH+TRIVIAL item should a
 
 ## Rollback
 Single-line revert. Routine is idempotent.
+
+---
+
+## Resolution — 2026-04-23
+Shipped on branch `claude/heartbeat-layer-01` alongside the cross-machine heartbeat layer. Current `scheduled-tasks/process.md` scope is `learnings/*.md (SAFE+HIGH+TRIVIAL+md-only)` with an explicit note at Phase 2 (`Do NOT exclude by filename. learnings/antipatterns.md is an allowed target for ANTIPATTERN/GOTCHA queue items`). The `ANTIPATTERN`/`GOTCHA` → `canonical/antipatterns.md` mirror routing was already in place; the scope clarification removes any residual ambiguity. Next Process run with an antipattern-targeting SAFE+HIGH+TRIVIAL item should auto-deploy rather than SKIP_OUT_OF_SCOPE — track via `archive/queue/deployed.log`.

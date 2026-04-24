@@ -120,4 +120,16 @@
 **Learning:** Keep root CLAUDE.md under 200 lines. Push domain details into skills (`.claude/skills/*.md`) or `@imports` for modular composition. Use nested CLAUDE.md files in subdirectories as scoped indexes so Claude loads only the relevant context per path. If a root CLAUDE.md grows past 200, extract the largest section into a skill or split a subdirectory index rather than trimming content indiscriminately. Flag for canonical/prompting-rules.md promotion once a second independent citation surfaces.
 **Applies to:** All Claude Code projects with a root CLAUDE.md — Claudious, ASF Graphics, Courtside Pro, Allen Sports Floors, and user-global `~/.claude/CLAUDE.md`
 
+## Cross-Machine Heartbeat Layer — 2026-04-23
+
+**Pattern:** Commit per-machine state JSON to a tracked directory so the autonomous intake pipeline can detect when one machine is working against stale state. Each machine runs a heartbeat script that captures hostname, OS, and per-repo (SHA, branch, dirty count, ahead, behind, last_fetch). Intake at 6am reads these files and emits findings when machines go stale, repos sit behind origin, or WIP sits abandoned.
+
+**Why it works:** Filesystem-native. No external service. Survives Claudious being offline. Scales to N machines. Every heartbeat commit is git-visible, so history of "which machine did what when" is free.
+
+**Gotcha:** Heartbeat commits create routine git noise. Acceptable tradeoff — metadata IS the signal. If noise becomes a problem, migrate to a dedicated `heartbeat/` branch with a cron-pull.
+
+**Follow-up (Layer 2):** SessionStart hook in global `~/.claude/CLAUDE.md` will read the heartbeat of this machine before any work starts — halts on dirty trees, unpulled commits, or stale sibling machines.
+
+<!-- PROMOTE TO CLAUDIOUS: N/A — this IS Claudious. Pattern is cross-project relevant: any multi-machine dev environment benefits from committed heartbeat files. -->
+
 ## Archive

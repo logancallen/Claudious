@@ -147,6 +147,7 @@ For each queue item:
 **Re-verify SAFE+HIGH+TRIVIAL+md-only:**
 - Parse header
 - Target must end `.md` and be in `learnings/` or Claudious root
+- Do NOT exclude by filename. `learnings/antipatterns.md` is an allowed target for `ANTIPATTERN`/`GOTCHA` queue items (previous narrower list of `[techniques.md, patterns.md, gotchas.md]` was a scope bug — closed 2026-04-23).
 - If fails → move to `archive/proposals/` with `auto-downgraded: violates queue rules` in deployed.log
 
 **Deploy to learnings:**
