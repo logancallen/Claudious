@@ -1,0 +1,303 @@
+name: Orphan claude-branch reconciler
+
+# Opens PRs for orphan claude/* branches produced by cloud-routine runs
+# that the runtime leaves isolated (no gh CLI available, per
+# archive/tests/gh-availability-2026-04-24.md). Works downstream of
+# .github/workflows/auto-merge-claude.yml which auto-squash-merges any
+# PR opened against main from a claude/* head.
+#
+# Cadence: hourly. Investigation doc (docs/investigations/2026-04-24-process-regen-investigation.md)
+# Step (g) recommends "Every 1h (or finer)" with a 1-hour worst-case
+# drift window. Session #5 prompt proposed 6h for cost reasons, but the
+# project's authority rule ("doc wins") resolves to hourly.
+#
+# Seven guardrails (all must pass or the branch is skipped/logged):
+#   1. Merge-base age <= 2 days
+#   2. Diff regression check — skip if branch would revert files modified on main
+#   3. Routine eligibility — HEAD contains [routine] OR branch matches
+#      cloud-runtime slug pattern ^claude/[a-z]+-[a-z]+-[A-Za-z0-9]{5}$
+#   4. Tripwire status marker (WORKING/FAILED) to archive/reconciler-log/YYYY-MM-DD.md
+#   5. PR description template (source branch, merge-base SHA, drift, guardrail results)
+#   6. Daily summary append to canonical/briefing-today.md under "Orphan reconciliation"
+#   7. Max 10 orphans per run (fail if exceeded)
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: orphan-claude-branch-reconciler
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "orphan-reconciler[bot]"
+          git config user.email "orphan-reconciler@users.noreply.github.com"
+
+      - name: Reconcile orphan claude/* branches
+        uses: actions/github-script@v7
+        env:
+          GH_REPO: ${{ github.repository }}
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const { execSync } = require('child_process');
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const today = new Date().toISOString().slice(0, 10);
+            const logDir = 'archive/reconciler-log';
+            const logPath = `${logDir}/${today}.md`;
+            const MAX_ORPHANS = 10;
+            const MERGE_BASE_MAX_AGE_DAYS = 2;
+            const SLUG_PATTERN = /^claude\/[a-z]+-[a-z]+-[A-Za-z0-9]{5}$/;
+            const HAND_NAMED_PREFIXES = [
+              'claude/handoff-',
+              'claude/reject-',
+              'claude/fix-',
+              'claude/session-',
+              'claude/canonical-',
+              'claude/grok-scan-',
+              'claude/intake-',
+              'claude/preflight-',
+              'claude/heartbeat-',
+              'claude/routing-',
+              'claude/superpowers-',
+            ];
+
+            const runId = context.runId;
+            const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${runId}`;
+            const entries = [];
+            const openedPrs = [];
+
+            function sh(cmd) {
+              return execSync(cmd, { encoding: 'utf8' }).trim();
+            }
+
+            function shSafe(cmd) {
+              try { return { ok: true, out: sh(cmd) }; }
+              catch (e) { return { ok: false, out: (e.stdout || '') + (e.stderr || ''), err: e.message }; }
+            }
+
+            async function writeTripwire(status, body) {
+              if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+              const header = `# Reconciler run — ${today}\n\n`;
+              const section = `## Run ${runId} — ${status}\n\n` +
+                `- Run URL: ${runUrl}\n` +
+                `- Triggered by: ${context.eventName}\n` +
+                `- Timestamp (UTC): ${new Date().toISOString()}\n\n` +
+                `${body}\n\n---\n\n`;
+              let existing = '';
+              if (fs.existsSync(logPath)) existing = fs.readFileSync(logPath, 'utf8');
+              else existing = header;
+              fs.writeFileSync(logPath, existing + section);
+            }
+
+            async function commitLogAndSummary(message, files) {
+              try {
+                for (const f of files) sh(`git add ${JSON.stringify(f)}`);
+                const diff = shSafe('git diff --cached --quiet');
+                if (diff.ok) return null;
+                sh(`git commit -m ${JSON.stringify(message)}`);
+                sh(`git push origin HEAD:main`);
+                return sh('git rev-parse HEAD');
+              } catch (e) {
+                core.warning(`commit/push failed: ${e.message}`);
+                return null;
+              }
+            }
+
+            core.info('Fetching remote branches…');
+            sh('git fetch origin --prune');
+
+            const mainSha = sh('git rev-parse origin/main');
+            const remoteBranches = sh('git for-each-ref --format="%(refname:short)" refs/remotes/origin')
+              .split('\n')
+              .map(b => b.replace(/^origin\//, ''))
+              .filter(b => b.startsWith('claude/') && b !== 'HEAD');
+
+            core.info(`Found ${remoteBranches.length} claude/* branches on origin.`);
+
+            // Pre-filter to candidates with commits not on main
+            const candidates = [];
+            for (const branch of remoteBranches) {
+              const behind = shSafe(`git rev-list --count origin/${branch}..origin/main`);
+              const ahead = shSafe(`git rev-list --count origin/main..origin/${branch}`);
+              if (!ahead.ok || Number(ahead.out) === 0) continue;
+              candidates.push({ branch, ahead: Number(ahead.out), behind: Number(behind.out || '0') });
+            }
+
+            // Guardrail 7: max orphans
+            if (candidates.length > MAX_ORPHANS) {
+              const msg = `Detected ${candidates.length} orphan candidates (max ${MAX_ORPHANS}). Refusing to proceed.`;
+              await writeTripwire('FAILED', `**Failure:** ${msg}\n\nCandidates:\n${candidates.map(c => `- ${c.branch} (+${c.ahead}/-${c.behind})`).join('\n')}`);
+              await commitLogAndSummary('reconciler: FAILED (max-orphans guardrail)', [logPath]);
+              core.setFailed(msg);
+              return;
+            }
+
+            // Check existing open PRs per branch
+            const existingPrs = new Map();
+            const prList = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', per_page: 100 });
+            for (const pr of prList) existingPrs.set(pr.head.ref, pr.number);
+
+            for (const cand of candidates) {
+              const { branch } = cand;
+              const entry = { branch, ahead: cand.ahead, behind: cand.behind, decision: null, skipReason: null, prNumber: null, mergeBase: null, filesTouched: [] };
+
+              // Guardrail 3 pre-check — hand-named exclusion
+              if (HAND_NAMED_PREFIXES.some(p => branch.startsWith(p))) {
+                entry.decision = 'SKIPPED_HAND_NAMED';
+                entry.skipReason = 'Branch name matches hand-named exclusion prefix';
+                entries.push(entry);
+                continue;
+              }
+
+              // Already has an open PR
+              if (existingPrs.has(branch)) {
+                entry.decision = 'SKIPPED_EXISTING_PR';
+                entry.skipReason = `Open PR #${existingPrs.get(branch)} already tracks this branch`;
+                entry.prNumber = existingPrs.get(branch);
+                entries.push(entry);
+                continue;
+              }
+
+              // Compute merge-base
+              const mbRes = shSafe(`git merge-base origin/main origin/${branch}`);
+              if (!mbRes.ok) {
+                entry.decision = 'SKIPPED_NO_MERGE_BASE';
+                entry.skipReason = `merge-base computation failed: ${mbRes.err || mbRes.out}`;
+                entries.push(entry);
+                continue;
+              }
+              const mergeBase = mbRes.out;
+              entry.mergeBase = mergeBase;
+
+              // Guardrail 1: merge-base age
+              const mbAgeSec = Number(shSafe(`git show -s --format=%ct ${mergeBase}`).out || '0');
+              const ageDays = (Date.now() / 1000 - mbAgeSec) / 86400;
+              if (ageDays > MERGE_BASE_MAX_AGE_DAYS) {
+                entry.decision = 'SKIPPED_OLD_MERGE_BASE';
+                entry.skipReason = `merge-base ${mergeBase.slice(0,7)} is ${ageDays.toFixed(2)}d old (> ${MERGE_BASE_MAX_AGE_DAYS}d bound)`;
+                entries.push(entry);
+                continue;
+              }
+
+              // Guardrail 3: routine eligibility — [routine] marker OR cloud-slug pattern
+              const headMsg = shSafe(`git log -1 --format=%B origin/${branch}`).out || '';
+              const hasRoutineTag = headMsg.includes('[routine]');
+              const matchesSlug = SLUG_PATTERN.test(branch);
+              if (!hasRoutineTag && !matchesSlug) {
+                entry.decision = 'SKIPPED_NOT_ROUTINE';
+                entry.skipReason = 'HEAD message lacks [routine] marker AND branch does not match cloud-runtime slug pattern';
+                entries.push(entry);
+                continue;
+              }
+
+              // Files touched by branch relative to merge-base
+              const filesRes = shSafe(`git diff --name-only ${mergeBase}..origin/${branch}`);
+              entry.filesTouched = filesRes.ok ? filesRes.out.split('\n').filter(Boolean) : [];
+
+              // Guardrail 2: diff regression check
+              let regression = null;
+              for (const f of entry.filesTouched) {
+                const branchHasFile = shSafe(`git cat-file -e origin/${branch}:${JSON.stringify(f).slice(1,-1)}`);
+                const mainHasFile = shSafe(`git cat-file -e origin/main:${JSON.stringify(f).slice(1,-1)}`);
+                if (!branchHasFile.ok || !mainHasFile.ok) continue;
+                // Check if main modified this file since merge-base
+                const mainChanges = shSafe(`git rev-list ${mergeBase}..origin/main -- ${JSON.stringify(f)}`);
+                const mainChangedSinceBase = mainChanges.ok && mainChanges.out.length > 0;
+                if (!mainChangedSinceBase) continue;
+                // Main modified it after merge-base; branch version != main version = potential regression
+                const branchBlob = shSafe(`git rev-parse origin/${branch}:${JSON.stringify(f).slice(1,-1)}`);
+                const mainBlob = shSafe(`git rev-parse origin/main:${JSON.stringify(f).slice(1,-1)}`);
+                if (branchBlob.ok && mainBlob.ok && branchBlob.out !== mainBlob.out) {
+                  regression = { file: f, branchBlob: branchBlob.out, mainBlob: mainBlob.out };
+                  break;
+                }
+              }
+              if (regression) {
+                entry.decision = 'SKIPPED_REGRESSION';
+                entry.skipReason = `File ${regression.file} modified on main since merge-base; branch version would revert main`;
+                entries.push(entry);
+                continue;
+              }
+
+              // All guardrails passed — open PR via API (guardrail 5: PR description template)
+              const branchSha = shSafe(`git rev-parse origin/${branch}`).out;
+              const title = `reconciler: merge orphan ${branch}`;
+              const body = [
+                `Auto-opened by \`orphan-claude-branch-reconciler\` workflow.`,
+                ``,
+                `- **Source branch:** \`${branch}\``,
+                `- **Branch SHA:** \`${branchSha}\``,
+                `- **Merge-base with main:** \`${mergeBase}\` (${ageDays.toFixed(2)} days old)`,
+                `- **Commits ahead of main:** ${entry.ahead}`,
+                `- **Commits behind main:** ${entry.behind}`,
+                `- **Files touched:** ${entry.filesTouched.length ? entry.filesTouched.map(f => `\`${f}\``).join(', ') : '(none)'}`,
+                ``,
+                `## Guardrail results`,
+                `- Guardrail 1 (merge-base age ≤ ${MERGE_BASE_MAX_AGE_DAYS}d): PASS (${ageDays.toFixed(2)}d)`,
+                `- Guardrail 2 (no regression against main): PASS`,
+                `- Guardrail 3 (routine-eligibility): PASS (${hasRoutineTag ? '[routine] tag' : 'cloud-slug pattern'})`,
+                `- Guardrail 7 (orphan count ≤ ${MAX_ORPHANS}): PASS`,
+                ``,
+                `Downstream: \`.github/workflows/auto-merge-claude.yml\` will squash-merge on PR-open event.`,
+                ``,
+                `Run: ${runUrl}`,
+              ].join('\n');
+
+              try {
+                const pr = await github.rest.pulls.create({ owner, repo, head: branch, base: 'main', title, body });
+                await github.rest.issues.addLabels({ owner, repo, issue_number: pr.data.number, labels: ['routine-reconciled'] });
+                entry.decision = 'PR_OPENED';
+                entry.prNumber = pr.data.number;
+                openedPrs.push(pr.data.number);
+              } catch (e) {
+                entry.decision = 'FAILED_PR_CREATE';
+                entry.skipReason = `pulls.create failed: ${e.message}`;
+              }
+              entries.push(entry);
+            }
+
+            // Guardrail 4: tripwire log
+            const rows = entries.map(e => {
+              const extra = e.skipReason ? ` — ${e.skipReason}` : (e.prNumber ? ` (PR #${e.prNumber})` : '');
+              return `- \`${e.branch}\` (+${e.ahead}/-${e.behind}) → **${e.decision}**${extra}`;
+            });
+            const body = `**Branches examined:** ${candidates.length}\n**PRs opened:** ${openedPrs.length}\n\n### Decisions\n${rows.join('\n') || '_(no candidates)_'}`;
+            await writeTripwire('WORKING', body);
+
+            // Guardrail 6: daily briefing append
+            const briefingPath = 'canonical/briefing-today.md';
+            if (openedPrs.length > 0 && fs.existsSync(briefingPath)) {
+              const briefingLine = `- ${new Date().toISOString()} — Reconciled ${openedPrs.length} orphan branch(es): PR(s) ${openedPrs.map(n => '#' + n).join(', ')} — run ${runUrl}`;
+              let briefing = fs.readFileSync(briefingPath, 'utf8');
+              const heading = '## Orphan reconciliation';
+              if (briefing.includes(heading)) {
+                briefing = briefing.replace(heading, `${heading}\n${briefingLine}`);
+              } else {
+                briefing = briefing.trimEnd() + `\n\n${heading}\n${briefingLine}\n`;
+              }
+              fs.writeFileSync(briefingPath, briefing);
+            }
+
+            const filesToCommit = [logPath];
+            if (openedPrs.length > 0 && fs.existsSync(briefingPath)) filesToCommit.push(briefingPath);
+            await commitLogAndSummary(`reconciler: run ${runId} — ${openedPrs.length} PRs opened, ${entries.length - openedPrs.length} skipped`, filesToCommit);
+
+            core.notice(`Reconciler complete. Opened ${openedPrs.length} PR(s). See ${logPath}.`);
