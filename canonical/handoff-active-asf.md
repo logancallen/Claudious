@@ -1,182 +1,105 @@
-# Handoff — 2026-04-23 (ASF RM-021 + RM-022 specs archived, RM-022 Phase 1 ready to build)
+# Handoff — 2026-04-24 PM (ASF Prompt 6a SHIPPED, 6b ready)
 
-**Recommended next-chat title:** `2026-04-23 — ASF — RM-022 Phase 1a Build Kickoff`
-
----
+**Recommended next-chat title:** `2026-04-24 — ASF — Prompt 6b — Save path + JobDetail components tab`
 
 ## Current focus
 
-RM-022 Phase 1 is fully specced and CC-prompt-ready. Next session starts the build.
+Prompt 6a shipped commit `88458cc`. IntakeFormV3 shell + ComponentCard + live-preview wired against backend `POST /api/quotes/calculate-v2`. Save button renders disabled. Next session: 6b — save path wrapped in `public.set_engine_context('true')` GUC transaction + JobDetail components tab (read view).
 
-Specs committed to repo:
-- `docs/specs/rm-021-design-library-bulk-upload.md` (850 lines)
-- `docs/specs/rm-022-universal-feedback-system.md` (941 lines)
+## What shipped 2026-04-24 PM (Prompt 6a)
 
-Commit: `a15b8b2` on main. Pushed and verified against origin/main.
+- `88458cc` — feat(intake): IntakeFormV3 shell + ComponentCard + live-preview (6a)
+  - `src/components/intake/ComponentCard.jsx` (new) — props contract locked at top of file as JSDoc block; binding for 6b/6c/6d
+  - `src/pages/IntakeFormV3.jsx` (new) at `/intake/v3` — additive, IntakeFormV2 untouched
+  - `src/App.jsx` — route registration at L12 + L534
+  - `src/lib/pricing_v2_constants.js` (new) — canonical enum exports: COMPONENT_TYPE_VALUES, DESIGN_SOURCE_VALUES, INSTALL_TYPE_VALUES, PRICING_TIER_VALUES, MATERIAL_ROLE_VALUES (scope expansion accepted — spec required single canonical export, none existed)
+  - `docs/codebase-state.md` + `docs/learnings.md` — synchronized
+  - Prior commit: `3195451` (docs session-close from Prompt 5)
 
-Three CC prompts drafted and saved to downloads (not yet in repo):
-- `cc-prompt-1a-rm022-schema-backend.md` (380 lines) — migrations 058–062 + backend routes
-- `cc-prompt-1b-rm022-capture-ui.md` (456 lines) — FeedbackButton + CaptureModal + offline queue
-- `cc-prompt-1c-rm022-triage-notifications.md` (541 lines) — Triage + Health dashboard + notifications, closes RM-022 Phase 1
+## Verification — all gates green
 
-Sequencing locked: RM-022 Phase 1 runs **parallel to pricing engine Prompt 3** (different files, no merge conflicts, must NOT be in same CC session).
+- Grep C1: 4/4 + 0-hit save-path guard ✅
+- Vitest: 163 pass, 5 pre-existing GeometryEngine fails unchanged
+- Build: 273ms clean, no new warnings from 6a files
+- Working tree clean, ahead of origin by 1 (Logan pushes)
 
----
+## Engine-authoritative pattern held
 
-## Completed this session
+Backend `POST /api/quotes/calculate-v2` = source of truth on save. Frontend `pricing_v2.js` = read-side live-preview only. Debounced 300ms + AbortController + runToken guard. No frontend compute-and-display-as-total.
 
-- RM-021 spec fully drafted reusing existing infrastructure (presigned upload, PyMuPDF, auto_categorize, batch-confirm, regenerate-preview). Core change: async decoupling via FastAPI BackgroundTasks. Not a greenfield build.
-- RM-022 spec fully drafted integrating all 40 gaps from prior chats (Classes A through E). Peer-privacy RLS locked as the ONLY hard block in the platform (documented exception to warn-don't-block).
-- Schema: migrations 058–062 with rollback blocks per Gap 27, RLS in-same-migration per Gap 30, CHECK constraint on AI columns per Gap 31, indexes per Gap 28.
-- 5 pending questions from prior handoff answered and locked:
-  - Q1 upload pattern: bulk absorbs mixed batches, sticky default for common case
-  - Q2 preview service: PyMuPDF stays (already in code), async decouple
-  - Q3 AI classification: Opus 4.7 in Phase 2
-  - Q4 phasing: phased ship (Phase 1 → 2 → 3)
-  - Q5 RM-022 slot: parallel to pricing engine Prompt 3
-- 6th pending question deferred: S10 tax-exempt status (CPA/legal, non-architectural)
-- 2 specs committed to `docs/specs/` via commit `a15b8b2`
+## Deviations from 6a spec (all accepted)
 
-## In-flight
+1. Field names use engine wire shape: `width_inches`, `height_inches`, `component_type`, `label` (NOT spec's `width_in`, `height_in`, `product_type`, `zone_count`). Engine wins. Lock in 6b props audit.
+2. `masonry_upcharge` rendered inside Install collapse per ComponentInstall wire shape, not on component root.
+3. Lift fields (rental, delivery, markup) NOT on ComponentCard — belong on JobPricingContext per engine. Surface in 6b or 6c.
+4. Inline hex → Tailwind classes (`bg-[#1D1D1F]`, `bg-yellow-100`, etc.) per `.claude/rules/frontend.md` Tailwind-only mandate.
+5. Save-button feedback uses native `alert()` — no toast primitive in repo. Replace with toast in 6c when QuoteCalc v2 rewrite happens.
+6. asf-ux-design evaluation engine NOT invoked — skill not loaded in 6a session. Load explicitly at 6b start.
 
-Nothing. Design and spec state is complete. Build has not started.
+## Row 1 UUID locked for smoke + 6b dev fixture
 
-## DesignStudio.jsx incident
+`cdba13e5-5def-44f2-97c5-3c949d20fe9d` — `[TEST] WFHS Press Box Wraps` — 3 components, quote phase, mixed design_sources (library_reuse + new_composition + library_modify), district_po + po_required.
 
-During spec archival, CC surfaced a pre-existing dirty working tree:
-- `src/pages/DesignStudio.jsx` was deleted locally, uncommitted
-- Forensics confirmed: file intact on origin/main (2,341 lines, blob `271449d`, last touched in commit `699bba2` 2026-04-20 — a normal bugfix)
-- No commit on any branch deleted or renamed it
-- Restored via `git checkout HEAD -- src/pages/DesignStudio.jsx`, NOT committed (restoration is a clean revert, not a code change)
+## Manual smoke checklist (post-push, pending Logan)
 
-Root cause: local-only deletion from an editor/script/Finder — classic machine-drift pattern from User Preferences. File is recovered. Remaining dirty state is only `.DS_Store` noise.
+1. `/intake/v3?clone=cdba13e5-5def-44f2-97c5-3c949d20fe9d`
+2. Confirm 3 ComponentCards render
+3. Confirm preview panel shows total (backend round-trip)
+4. Edit quantity on Component 1 — preview updates ~300ms
+5. Save button disabled + tooltip on hover
+6. No console errors
+7. No blue anywhere
 
-## Pending (carryover to next chat)
+## Pending items
 
-**RM-022 Phase 1a build** (fresh CC session, paste `cc-prompt-1a-rm022-schema-backend.md`):
-- Apply migrations 058–062 via Supabase MCP (not via CC — per learned pattern)
-- Build `backend/routes/feedback.py`, `notification_service.py` (email as TODO for 1c), `s3_storage.py` feedback-bucket helpers, `feedback_tasks.py` crons, `models/feedback.py`
-- Register router in `main.py`
-- Add `R2_FEEDBACK_BUCKET` to env var documentation
+- **Push `88458cc` to origin/main on asf-graphics-app.**
+- **Run smoke checklist 1-7** on Logan's side.
+- **Prompt 6b** — save path + JobDetail components tab (read view). Wraps DB writes in `public.set_engine_context('true')` GUC transaction to pass migration 063 write-guard triggers. Consumes locked ComponentCard props contract.
+- **Prompt 6c** — QuoteCalc v2 rewrite against `pricing_v2.js`. Replace native `alert()` with toast primitive (added to scope).
+- **Prompt 6d** — Row 1 smoke: clone → edit → save → read back → engine total matches stored total.
+- **Prompt 7** — Migration 053 (drop deprecated scalar cols on `jobs` — `total_cost` removed from scope, never existed per Prompt 5) + jobs-table write-guard triggers + `edit_requests.py` retirement + retire legacy `src/lib/pricing.js` + retire v1 Vitest harness.
+- **Prompt 5.5 (proposed, not scheduled)** — `jobs.is_test_data` column + filter audit across all non-admin views + admin toggle. Clears 11 `[TEST]` jobs from Brady/Chanté work queue before first real-job intake. Ship order: before Brady/Chanté real-job use of IntakeFormV3 production path. Filed as RM-XXX pending roadmap-additions commit (staged CC prompt exists — see separate artifact).
+- **RM-022 Phase 1b** — feedback capture UI (separate CC session, parallel track).
+- **RM-003 P0** — QBO import sync audit (unchanged).
 
-**RM-022 Phase 1b** (after 1a committed, fresh CC session):
-- Install `html2canvas` + `uuid`
-- `FeedbackButton`, `FeedbackCaptureModal`, `PendingSyncBanner`, `FeedbackContext`
-- `feedback-offline-queue.js`, `html2canvas-pii-redact.js`
-- `useFeedback`, `useFeedbackQueue` hooks
-- Mount in `App.jsx`
+## Living-system discipline change applied 2026-04-24 PM
 
-**RM-022 Phase 1c** (after 1b committed, fresh CC session):
-- Migration 063 (notifications + digest queue) if not pre-existing
-- `FeedbackTriage`, `FeedbackHealth`, `MyFeedback`, `FeedbackDetail`, `NotificationPreferences` pages
-- `NotificationBell` in header
-- Wire `notification_service.py` to SMTP (digest queue, 30m flush cron)
-- Close RM-022 in `docs/roadmap.md` via commit message
+Session-start protocol for ASF chats must `project_knowledge_search` `docs/roadmap.md` + `docs/codebase-state.md` + `handoff-active-asf.md` BEFORE any inventory/status response. `userMemories` is biographical/preference only — never cited as roadmap authority. `docs/roadmap.md` wins on state conflicts. Pending integration into userPreferences via Mastery Lab session.
 
-**RM-021 CC prompts** — draft AFTER RM-022 Phase 1 ships. RM-021 benefits from having the feedback surface live (library misclassifications flow into universal feedback).
+Proposed sync mechanisms (not yet built):
+1. `scripts/sync-user-memories.sh` — CC reads `docs/roadmap.md` CLOSED, emits `memory_user_edits` batch for stale-memory prune.
+2. `scripts/drift-detect.sh` — weekly diff of roadmap vs live schema vs file existence.
+3. Sunday Mastery Lab standing agenda — userMemories reconciliation against living docs.
 
-**Pricing engine Prompts 3–7** (from prior handoff, still authoritative):
-- Prompt 3 — `POST /api/quotes/calculate-v2` endpoint + write-guard triggers
-- Prompt 4 — Frontend `src/lib/pricing_v2.js` + Vitest harness
-- Prompt 5 — Migration 051 backfill
-- Prompt 6 — IntakeFormV3 + ComponentCard + JobDetail components tab + QuoteCalc v2
-- Prompt 7 — Migration 053 (drop deprecated scalar cols)
-
-**RM-003 P0** — QBO import sync audit (unchanged from prior).
-
-## Deferred / non-blocking
-
-- PyMuPDF reliability measurement in Phase 1 telemetry → triggers CloudConvert fallback decision at Phase 2.5 if `needs_manual_preview` rate > 15%
-- Folder upload (ship file-drop first, folder-drop next sprint)
-- Duplicate detection in design library (don't block upload, flag in Phase 2)
-- AI 30.0 PDF-compat requirement documentation in onboarding
-- S10 tax-exempt status (CPA/legal, non-architectural)
-
-## Decisions made with reasoning
-
-- **Scoped `git add docs/specs/...` over stash-pop** for spec archival commit. Honored "only two new files staged" invariant without touching unrelated dirty state. Clean commit landed.
-- **Push-block hook honored** — commit and push executed by Logan's hand via `!` prefix in CC, not bypassed via one-shot permission. Matches global CLAUDE.md rule.
-- **DesignStudio.jsx restored via `git checkout HEAD --`**, not committed. Restoration reverts to HEAD state; no new code change to commit.
-- **Parallel Prompt 3 + RM-022 Phase 1a sequencing** — confirmed viable because different files/code paths, but MUST be in separate CC sessions to avoid context blowup.
-- **FastAPI BackgroundTasks for Phase 1 async work** — deferred Celery/RQ upgrade until measured CPU pressure on Railway.
-- **Opus 4.7 locked for Phase 2 vision classification** — cost ceiling $50/mo at ASF volume.
-- **Sticky session defaults with 4h expiry + dismissible chip** over per-file modal — explicitly rejected per-file modal as "terrible" from prior chats.
-
-## Files recently changed
-
-- `docs/specs/rm-021-design-library-bulk-upload.md` (new, 850 lines, in `a15b8b2`)
-- `docs/specs/rm-022-universal-feedback-system.md` (new, 941 lines, in `a15b8b2`)
-- `src/pages/DesignStudio.jsx` — restored from HEAD, working tree now clean minus `.DS_Store` noise. No new commit.
-
-Repo state:
-- `asf-graphics-app` main at `a15b8b2`
-- Canonical Mac clone: `~/Documents/GitHub/asf-graphics-app`
-
-## Frustration signals
-
-- "It should be in my downloads folder" — I had assumed file downloads were accessible to CC when they aren't. Next chat: when presenting files from Claude.ai chat, immediately clarify that CC cannot read them until they're moved onto disk, and walk through the manual `mv` step explicitly. Don't assume file-download context carries.
-- Push-block hook was hit mid-commit. Recovery was clean, but the hook's existence wasn't pre-loaded into this chat's context. Next chat: before giving any CC prompt that ends with `git push`, explicitly call out that push is user-run via `!` prefix.
-- DesignStudio.jsx dirty state surfaced unexpectedly. Next chat: always pre-check `git status` before any repo operation, don't assume a "clean tree" state.
-
-## User Preferences changes pending
-
-Queued for next Mastery Lab chat (alongside four items already there):
-
-> **Handoff-artifact surface discipline.** Always label destination surface explicitly: Claude.ai-web, Claude.ai-desktop, Claude Code CLI, or Claude in Chrome. "New chat" is ambiguous across surfaces with different tool availability (conversation_search, project_knowledge_search, MCP connectors, file I/O all vary).
-
-> **File-delivery discipline between Claude.ai and CC.** When presenting artifact files in Claude.ai chat, explicitly state: "CC cannot read Claude.ai artifact downloads. You must manually move the file to disk before CC can access it." Don't assume the download is end-to-end.
-
-> **Pre-check `git status` before every repo operation.** A "clean tree" assumption is a documented failure mode. Every prompt that touches `git add/commit/push` starts with `git fetch && git status` and a stop-if-dirty gate.
-
-> **Push-block hook awareness.** Before generating any CC prompt that ends with `git push`, flag that the push will hit the hook and must be run by Logan via `!` prefix. Never assume CC can push — it cannot, and the hook will block it correctly.
-
-## Environment state
+## Environment
 
 - Canonical Mac clone: `~/Documents/GitHub/asf-graphics-app`
-- Claudious clone: `~/Documents/GitHub/Claudious`
-- Python 3.9 local (with `__future__` shim); Python 3.11+ on Railway
-- Pydantic 2.12.5
-- Supabase MCP available for `apply_migration`
-- Push to main is hook/permission-blocked — use `!` prefix for user-run push
-- `.claude/settings.json` untracked through 2026-04-29 per mastery Day-7 trial
+- HEAD after push: will be `88458cc`
+- Current origin/main before push: `3195451` (Prompt 5 docs close)
+- Python 3.9 local, 3.11+ Railway
+- Supabase project `spvtwxqbnjdmipbvoyjk`
+- 11 `[TEST]`-prefixed jobs live in production DB (no `is_test_data` schema flag yet)
+- Push-block hook on main active; Logan pushes manually
+
+## Frustration signals (for next chat)
+
+- Stale-source revolving door: next chat must NOT cite userMemories for roadmap state. Hit `project_knowledge_search` first. This chat surfaced shipped RM-010 and RM-011 as "open" — user flagged it hard.
+- Cross-chat paste confusion occurred twice: next chat should self-identify if a paste looks like it belongs to a different project/session and halt before acting.
+- CC prompt format directive locked: single fenced block, no surrounding scaffolding. Paste-and-go.
+
+## Known capability gaps flagged (unanswered)
+
+- "Design is live" specifics — ChatGPT Canvas? Figma MCP? Canva MCP? Sora 2?
+- GPT-5.5 routing intent — adversarial review? Alt planning? Specific domain?
+- Concrete recent example of mis-routing.
+
+Answers pending. Routing matrix incomplete until resolved.
 
 ## Next chat first actions
 
 1. Read this handoff.
-2. `project_knowledge_search` on `"rm-022 spec"` to confirm `docs/specs/rm-022-universal-feedback-system.md` is visible in project knowledge (may lag a few hours after commit — OK to proceed with repo path if not).
-3. Verify Mac clone state before anything else:
-   - `cd ~/Documents/GitHub/asf-graphics-app && git fetch && git status`
-   - Expect: on main, clean working tree, up to date with `a15b8b2` or newer
-   - If dirty: stop and diagnose before continuing
-4. Open a fresh CC session (do NOT reuse a session running pricing engine work).
-5. Paste `cc-prompt-1a-rm022-schema-backend.md` contents into CC.
-6. After CC creates the migration files + backend code, STOP. Do not let CC apply migrations.
-7. Apply migrations 058–062 via Supabase MCP from this Claude.ai chat (`apply_migration`), one at a time, verify `rowsecurity=true` after each via `execute_sql`.
-8. Once migrations applied, let CC commit the code. Push blocked by hook — Logan runs push via `!` prefix.
-9. Smoke test backend: curl `/api/feedback/health` with admin token, verify 200.
-10. Queue Prompt 1b for next session.
-
-## Context carryover for memory retrieval
-
-Full spec rationale lives in `docs/specs/rm-022-universal-feedback-system.md` (941 lines). Search queries that surface design context:
-- `"universal feedback system gaps library bulk upload"` → rounds 1–4 architectural reasoning
-- `"40 gaps RLS rollback abuse lifecycle feedback"` → Class B/C/D/E sweep
-- `"peer privacy RLS hard rule workflow gates visibility"` → the one hard-block exception
-- `"client_uuid dedup offline queue feedback"` → offline-safe submission pattern
-- `"feedback health dashboard three-bucket resolution M&A"` → admin dashboard + export format
-
-Commit SHA for specs: `a15b8b2` (both files in single commit).
-
----
-
-**End of handoff.**
-
-<!-- PROMOTE TO CLAUDIOUS:
-- Handoff-artifact surface discipline: label destination surface (Claude.ai-web, Claude.ai-desktop, Claude Code CLI, Claude in Chrome). "New chat" is ambiguous.
-- File-delivery discipline between Claude.ai and CC: Claude.ai artifact downloads are not visible to CC until manually moved to disk.
-- Pre-check `git status` before every repo operation — "clean tree" assumption is a documented failure mode.
-- Push-block hook awareness: before any CC prompt ending in git push, flag that user must run push via `!` prefix.
-- Scoped `git add <path>` over stash-pop when committing into a dirty tree — honors single-invariant commit without touching unrelated state.
-- Async spec delivery via download in Claude.ai chat: confirm user has file in downloads BEFORE writing the CC archive prompt; don't assume end-to-end file flow.
-- DesignStudio.jsx pattern: when a deletion surfaces with no commit graph evidence, restore via `git checkout HEAD -- <path>` without committing — it's a revert, not a change.
--->
+2. Confirm asf-graphics-app origin/main at `88458cc` via `git ls-remote` or Logan's paste.
+3. Confirm smoke checklist pass/fail — if fail, triage before 6b.
+4. Load asf-ux-design skill explicitly at session start.
+5. Draft Prompt 6b CC prompt against locked ComponentCard props contract. Single fenced block. Paste-and-go format.
+6. Do NOT cite userMemories for state. `docs/roadmap.md` + `docs/codebase-state.md` + `docs/learnings.md` + this handoff are authority.

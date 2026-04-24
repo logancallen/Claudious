@@ -1,10 +1,10 @@
 # Active Handoffs — Index
 
-Last updated: 2026-04-24
+Last updated: 2026-04-24 (PM — ASF Prompt 6a shipped)
 
 | Project | File | Last Written |
 |---------|------|--------------|
-| ASF Graphics | handoff-active-asf.md | 2026-04-22 PM |
+| ASF Graphics | handoff-active-asf.md | 2026-04-24 PM (Prompt 6a shipped, 6b ready) |
 | Claude Mastery Lab | handoff-active-mastery.md | 2026-04-24 PM (audit+prep) |
 | PC Optimization (Arc Raiders) | handoff-active.md | 2026-04-22 PM |
 
