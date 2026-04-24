@@ -1,137 +1,157 @@
 # Handoff — Mastery Lab
 
-**Recommended next-chat title:** `2026-04-26 — MASTERY — Sunday Curate checkpoint + Session #7 scoping`
+**Recommended next-chat title:** `2026-04-25 — MASTERY — Saturday execution sprint`
 
-**From session:** 2026-04-24 (review chat — CC prompt refinement + GitHub settings fix + handoff regen coordination)
-**To session:** 2026-04-26 (Sunday checkpoint + Session #7 scoping) → 2026-04-27 (Session #7 probe)
+**From session:** 2026-04-24 PM (audit chat — reviewed prep kit, identified bugs, shipped fixes)
+**To session:** 2026-04-25 (Saturday execution sprint — triage batch + v5 snapshot + Phase Z draft)
 **Generated:** 2026-04-24 UTC
-**Prior handoff archived:** `archive/handoffs/2026-04-24-MASTERY-review-chat-closeout.md`
+**Prior handoff archived:** `archive/handoffs/2026-04-24-MASTERY-audit-chat-closeout.md`
 
 ---
 
 ## Current focus
 
-Same as prior handoff — observation period for Session #6 fixes. Next chat = Sunday Curate checkpoint + Session #7 scoping. All Session #6 state from the prior handoff (which this one supersedes) remains accurate and should be read alongside: `archive/handoffs/2026-04-24-MASTERY-review-chat-closeout.md`.
+Saturday execution sprint. Three workstreams in priority order:
+1. Batch proposals triage (40 → ≤15 active).
+2. Ship `logan-current-setup-v5`.
+3. Draft Curate Phase Z assertion block for Session #7 readiness.
+
+All three are time-independent. No Sunday gating. Observation period from Session #6 continues in background.
+
+Phase D (ASF 026-028 fix) is contingent on P1 verification result and scheduled same-day or Sunday AM if P1 = State B.
 
 ---
 
-## Completed this chat (2026-04-24)
+## Completed this chat (2026-04-24 PM)
 
-1. **Reviewed the drafted Session #6 handoff regen CC prompt.** Flagged three issues pre-execution: (a) title date inconsistency (next-chat was 04-26 top, 04-27 tentatives bottom), (b) Phase H4 underspecified with prose instead of a concrete edit command, (c) Phase Z mirror question embedded as a to-do inside the handoff body rather than resolved at generation time.
-2. **Produced revised CC prompt.** Added SHA verification gate in preflight (all four Session #6 SHAs must be ancestors of origin/main), H0.5 grep with `PRESENT`/`ABSENT` substitution for Phase Z status, portable awk-based H4 index row replace, unified next-chat title logic.
-3. **GitHub repo permission fix landed.** Navigated Settings → Actions → General → Workflow permissions. Confirmed "Read and write permissions" radio + "Allow GitHub Actions to create and approve pull requests" checkbox both enabled. Saved.
-4. **Handoff regen executed with mid-flight issue recovery.** CC ran the revised prompt. SHA verification passed. Phase Z grep returned `ABSENT` (path correction: `scheduled-tasks/curate.md`, not `canonical/scheduled-tasks/curate.md` — my H0.5 originally wrote the wrong path; CC caught and corrected). CC's safety harness blocked the final `git push`, so the index commit was staged locally and Logan completed the push manually.
-5. **Final commit state on origin/main:**
-   - `1ff6bc5` — handoff regen (handoff body + archive)
-   - `1f07a75` — index bump
-   - HEAD == origin/main == `1f07a75fa8347c3f0a25bdb999c28a06f4eb6411`
+1. Audited the prep kit produced in prior sub-session. Identified 1 critical bug (Appendix A placeholder would have shipped literally into canonical), 2 high gaps (active-findings check missing, index bump missing), 4 medium issues (git log window narrow, repo path unverified, heredoc risk, context forecast tight), 1 low issue (Phase D trigger ambiguous).
+2. Shipped fixes to Section 2.1 (P1 widened window + path verify), Section 3.2 (removed Appendix A, added handoff-index.md bump, Phase D trigger clarified in this handoff), and Section 5 (active-findings check added).
+3. Decision: next chat drafts Phase 1 triage preflight CC prompt from scratch at session open. No preserved preflight artifact.
 
 ---
 
-## In-flight — Session #6 observation period (unchanged from prior handoff)
+## Pre-next-chat actions completed (to be filled in by Logan on next chat open)
 
-1. **Reconciler hourly runs** — now unblocked after GitHub permission fix. Two PRs expected on the next hourly cron: `claude/amazing-carson-2drec`, `claude/intelligent-lamport-4X8rU`.
-2. **Process Phase Z assertions** — first test on next 7am CT Process run.
-3. **Sunday Curate graduation signal** — 2026-04-26 20:00 CT. This is the real Phase C test.
-4. **Reconciler auto-PR behavior** — watch for clean runs, no guardrail-7 fail-closes.
-
----
-
-## Pending for Logan (in priority order)
-
-### 1. Mastery Lab project spec UI update — 30 seconds (deferred across multiple chats)
-
-Claude.ai UI action: Mastery Lab project → Settings / Instructions → update Claude Projects count to 7 and note Claudious is a GitHub repo only, not a Claude Project.
-
-### 2. Session #5 PC preflight stash evaluation — next PC session
-
-Commands on PC:
-
-```powershell
-cd C:\Users\logan\Projects\Claudious
-git stash list
-git stash show --stat session-5-preflight-stash
-git stash show -p session-5-preflight-stash
-```
-
-Decision rule: pure appends + content already on main → drop. Any deletion or novel un-landed work → flag before dropping.
-
-### 3. ASF handoff WIP — parked branch
-
-Branch `asf/wip-handoff-2026-04-23` holds two files. Resume in next ASF session.
-
-### 4. Sunday Curate observation checkpoint — 2026-04-26/2026-04-27
-
-After 2026-04-26 20:00 CT Curate run, inspect:
-- `archive/digest/2026-04-26.md` — existence + `canonical-mirrors=X` ledger field
-- `git log origin/main --since=2026-04-26 -- canonical/prompting-rules.md canonical/antipatterns.md` — graduation commits
-- Phase Z assertions NOT mirrored to `scheduled-tasks/curate.md` in Session #6 (confirmed ABSENT this chat). Session #7 probe scope must account for the resulting ambiguity: a silent Sunday cannot distinguish "fire-and-4.3-skip" from "did not fire at all" — both look identical.
+- [ ] P1 — ASF 026-028 state: A (fix landed, SHAs: ___) OR B (fix missing)
+- [ ] P2 — Mastery Lab UI spec updated 8→7
+- [ ] P3 — `/mcp` PC output count: ___
+- [ ] P4 — Skill count global: ___ / project: ___
+- [ ] P5 — `.git/HEAD.lock` state: absent | removed
 
 ---
 
-## Session #7 scope — unchanged from prior handoff
+## Next chat agenda (Saturday sprint)
 
-Same as `archive/handoffs/2026-04-24-MASTERY-review-chat-closeout.md`. Primary question: is the 8pm CT cloud-scheduled Curate routine actually firing? Probe constraints:
-1. Repo setting fix confirmed enabled (DONE this chat).
-2. Observation, not intervention.
-3. 3-observation window.
-4. Disentangle from repo-permission issue (now eliminated as confounder).
+### Phase A — Triage batch (45–60 min Logan-facing)
 
-Tentative titles depending on outcome:
-- NOT firing + Phase C holding: `2026-04-27 — CLAUDIOUS — Session #7 restore cloud Curate scheduling`
-- firing but 4.3 silently skipping: `2026-04-27 — CLAUDIOUS — Session #7 Curate Phase Z pattern`
-- Phase C regressing: `2026-04-27 — MASTERY — Session #7 rescope for Phase C revert`
+1. Chat drafts Phase 1 triage preflight CC prompt at session open. Scope: read all active proposals in canonical/open-decisions.md, bucket into GRADUATE / INSTALL / ARCHIVE / KEEP-with-date, output summary table with counts per bucket.
+2. Logan runs preflight CC prompt. Output lands in /mnt/user-data/outputs/ OR chat.
+3. Chat reads output. Surfaces bucket assignments for Logan approval.
+4. Chat drafts Phase 2 execution CC prompt per approved buckets (separate commit per bucket).
+5. Logan runs Phase 2 CC prompt.
+6. Verify: canonical/open-decisions.md active count ≤15.
+
+### Phase B — `logan-current-setup-v5` (30–45 min)
+
+1. Chat drafts v5 using: P3 /mcp output, P4 skill count, canonical/claude-state.md, canonical/claude-code-state.md, canonical/toolchain.md.
+2. Target dimensions refreshed: model version (Opus 4.7), CC version, plan price ($200 Max), Sonnet 1M retirement date, Cowork features, MCP count authoritative, skill count authoritative, hardware specs.
+3. Logan reviews. Chat generates CC prompt to commit v5 and archive v4.
+4. Logan runs CC. Verify v5 on origin/main.
+
+### Phase C — Curate Phase Z assertion block draft (20–30 min)
+
+1. Chat drafts Phase Z block for scheduled-tasks/curate.md.
+2. Scope: deterministic assertions for graduation success, digest file presence, canonical-mirrors verification (read-only by Curate at this phase), loud write to active-findings.md on failure.
+3. Block respects Session #6 write-authority matrix (Curate sole owner of prompting-rules.md/antipatterns.md; does not touch Process ownership domains).
+4. Output: CC prompt that PR-branches the change, Logan reviews PR, auto-merges on CI pass via auto-merge-claude.yml.
+
+### Phase D (contingent on P1 = State B) — ASF 026-028 actual fix
+
+Trigger: P1 returns State B AND Phase A completes Saturday.
+Scheduling rule: same-day (Saturday evening) OR Sunday AM. Do not defer >24 hr given CRITICAL alerts.md severity.
+
+1. Separate CC session at verified asf-graphics-app path (NOT in Claudious).
+2. Scope: reproduce permissions break, identify root cause, patch, verify, commit.
+3. Clear CRITICAL from canonical/alerts.md after verified fix.
 
 ---
 
-## Deferred items — unchanged
+## In-flight from Session #6 (background observation, no chat action)
 
-1. Hook-not-firing-cross-chat.
-2. ASF PR #1 merge decision.
-3. PWA implementation for ASF Graphics.
-4. `sync-knowledge.sh` live run.
-5. Scout routing clarification.
-6. Codex CLI integration audit.
+1. Reconciler hourly cron — auto-PR behavior post 2026-04-24 permission fix.
+2. Process Phase Z assertions — firing status.
+3. Curate Phase C — Sunday 2026-04-26 graduation signal.
 
----
-
-## Decisions made with reasoning — this chat
-
-1. **Shipped revised CC prompt over the original.** Original had hardcoded speculative SHAs (turned out to be real — but verification still matters), ambiguous H4, embedded to-do. Three fixes were cheap; shipping the unfixed version would have left rotting-state risks.
-2. **Did not route handoff commit through a PR branch.** CC flagged a push-deny and offered to reroute. Declined — direct-to-main is the established pattern for handoff commits (prior handoffs all direct), no branch protection on origin, PR overhead zero benefit for markdown-only change. Push-deny was a CC-side safety harness, not a remote rule.
-3. **Did not amend the new handoff after H0.5 path correction.** Phase Z path was wrong in the prompt (`canonical/scheduled-tasks/curate.md` vs correct `scheduled-tasks/curate.md`). CC corrected and re-ran grep at the right path, still got ABSENT. Handoff body written with ABSENT was correct; no amendment needed.
+These remain under observation. Do not block Saturday sprint on them.
 
 ---
 
-## Frustration signals / lessons — this chat
+## Research queue for next chat
 
-1. **Path bug in H0.5 grep.** My CC prompt used `canonical/scheduled-tasks/curate.md` but the actual path is `scheduled-tasks/curate.md`. Did not verify path against repo before shipping prompt. **Lesson:** when a CC prompt greps a specific file, verify the path exists via project knowledge or a quick check first. A non-existent path silently returns "no match" and masquerades as a real `ABSENT` result. CC caught this one; I might not catch the next.
-2. **CC safety harness blocks push-to-main.** Noted for future handoff regen prompts: either design for PR-branch routing by default, OR stage the commit and have Logan complete push manually. The manual-push path worked fine; it's just 30 extra seconds. Not a problem unless push is actually time-sensitive.
-3. **Screenshot-guided GitHub settings navigation pattern worked well.** Two wrong-page screenshots resolved fast via targeted redirection. Useful pattern for future procurement-UI or admin-console tasks.
+1. If P3 reveals new MCP servers not in canonical/toolchain.md: web_fetch Anthropic's official MCP docs for each to capture accurate descriptions.
+2. If P4 reveals skill count ≥34: research skill consolidation candidates (low-use skills eligible for merge or archive).
+3. Courtside Pro demo readiness: defer to separate session unless demo date confirmed <7 days out.
+4. `logan-current-setup-v5` research inputs: web_fetch docs.claude.com for current Opus 4.7 feature list, Claude Code v2.1.113+ release notes, Max plan pricing confirmation, Task Budgets beta status, 2576px vision resolution confirmation.
+
+---
+
+## Execution queue for next chat
+
+1. Phase A Phase 1 preflight CC prompt (drafted in chat at session open).
+2. Phase A Phase 2 execution CC prompt (drafted after bucket approval).
+3. Phase B v5 commit CC prompt (drafted after v5 content reviewed).
+4. Phase C Curate Phase Z CC prompt (PR-branch routing per established pattern).
+5. Phase D (contingent) — separate CC session on asf-graphics-app repo.
+
+---
+
+## Decisions made with reasoning
+
+1. Rejected Sunday-gated framing. All Session #7 checkpoint work deferred out of Saturday sprint.
+2. Phased rollout preferred over single omnibus session. Triage, v5, Phase Z are each ~30–45 min; bundling into single chat risks context exhaustion.
+3. Phase 2 execution prompt drafted IN the chat after preflight review, not upfront. Buckets are state-dependent — pre-drafting hardcodes assumptions.
+4. Courtside Pro demo readiness deferred. Demo date not confirmed. Triage + v5 are higher compounding leverage until demo timeline locks.
+5. Deleted Appendix A placeholder pattern. Next chat drafts Phase 1 preflight from scratch — simpler than carrying a stale artifact forward.
+6. Added handoff-index.md bump to CC prompt. Pattern established in commit 1ff6bc5; omission was regression.
+
+---
+
+## Frustration signals / lessons
+
+1. Ambiguity between memory and canonical on ASF 026-028 state persisted multiple chats. Lesson: memory claims that contradict canonical alerts should be verified at source, not treated as coequal.
+2. User Preferences rule "generate handoff via CC before recommending new chat" must be enforced reliably.
+3. User preference for non-Sunday framing surfaced sharply. Lesson: if timing rationale depends on observation window, offer non-gated alternatives by default.
+4. Placeholder/TODO artifacts in canonical files are a recurring failure mode (e.g., "[Contents from prior chat Section 6.2 — drop in verbatim]"). Lesson: canonical writes must contain zero bracketed TODOs. Audit before commit.
 
 ---
 
 ## User Preferences changes pending
 
-None this chat. Carry-forward candidates from prior handoff:
-
-1. Workflow-permission-preflight rule (surfacing repo settings dependencies at authoring time).
-2. Archive filename convention reconciliation (User Prefs spec vs actual repo drift).
+Carry-forward candidates:
+1. workflow-permission-preflight rule (surface repo settings dependencies at authoring time).
+2. Archive filename convention reconciliation (spec vs actual drift).
+3. Memory vs canonical conflict resolution protocol — when userMemories and canonical/ disagree on a factual state, canonical wins; memory flagged for correction.
+4. Sunday-bias override — when a plan involves observation-window timing, always surface non-time-gated alternatives first.
+5. NEW — zero-bracketed-TODOs rule for canonical writes. Any CC prompt that writes to canonical/ must self-audit for unresolved bracket placeholders before committing.
 
 ---
 
 ## Files changed this handoff commit
 
-- `canonical/handoff-active-mastery.md` (overwritten — this file, supersedes prior)
-- `archive/handoffs/2026-04-24-MASTERY-review-chat-closeout.md` (new archive of prior handoff)
+- canonical/handoff-active-mastery.md (overwritten — this file)
+- archive/handoffs/2026-04-24-MASTERY-audit-chat-closeout.md (new archive)
+- canonical/handoff-index.md (Mastery row date bump)
 
 ---
 
 ## Immediate next actions for next chat
 
-1. Confirm reconciler opened the two blocked PRs on the hourly cron between 2026-04-24 and 2026-04-26.
-2. Observe Sunday 2026-04-26 20:00 CT Curate output per Pending #4 checklist.
-3. Scope Session #7 based on Sunday outcome — select one of three tentative titles.
+1. Confirm P1–P5 outcomes at chat open.
+2. Check canonical/active-findings.md for CRITICAL and HIGH entries relevant to Phases A–C.
+3. Execute Phase A triage (highest compounding value).
+4. Move to Phase B v5 refresh.
+5. Draft Phase C Phase Z block.
+6. If P1 = State B AND Phase A complete, schedule Phase D same-day or Sunday AM.
 
 ---
 
