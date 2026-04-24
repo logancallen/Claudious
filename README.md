@@ -13,6 +13,7 @@ Claudious is the global brain for Logan's Claude ecosystem. Every Claude Project
 
 | Path | Purpose | Attached to Projects? |
 |---|---|---|
+| `.claudious-heartbeat/` | Per-machine state (SHA, dirty, ahead/behind) for cross-machine drift detection | No |
 | `canonical/` | Current-state truth (9 signal-dense files) | **Yes** |
 | `archive/` | Dated history (intake, runs, digests, proposals, queue, scout, retrospectives, snapshots, evaluations, project-learnings, research) | No — reference only |
 | `scheduled-tasks/` | Cloud routine prompts (intake, process, curate, scout-additions) | No |

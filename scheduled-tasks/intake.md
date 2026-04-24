@@ -56,13 +56,67 @@ echo "- start: $(date +%FT%T)" >> "$LEDGER"
 
 ## 1. Scope
 
-- **MAY write:** `archive/intake/${TODAY}.md`, `archive/runs/${TODAY}.md`, `canonical/active-findings.md` (append only), `canonical/claude-state.md` (OFFICIAL updates only), `canonical/claude-code-state.md` (OFFICIAL updates only)
-- **MAY NEVER:** modify `learnings/`, `archive/queue/`, `archive/proposals/`, `skills/`, `canonical/prompting-rules.md`, `canonical/antipatterns.md`, `canonical/open-decisions.md`, `canonical/briefing-today.md`, any code repo, any migration, User Preferences
+- **MAY write:** `archive/intake/${TODAY}.md`, `archive/runs/${TODAY}.md`, `canonical/active-findings.md` (append only), `canonical/claude-state.md` (OFFICIAL updates only), `canonical/claude-code-state.md` (OFFICIAL updates only), `.claudious-heartbeat/retired.txt` (create-if-missing placeholder only; heartbeats themselves are READ-ONLY from Intake)
+- **MAY NEVER:** modify `learnings/`, `archive/queue/`, `archive/proposals/`, `skills/`, `canonical/prompting-rules.md`, `canonical/antipatterns.md`, `canonical/open-decisions.md`, `canonical/briefing-today.md`, `.claudious-heartbeat/*.json` (machines own their own heartbeats), any code repo, any migration, User Preferences
 - **MAY NEVER DELETE from canonical/** — deletion is curate's job only.
 
 ## 2. Dependencies
 
 None. Intake is first daily task.
+
+## 2a. Heartbeat Absorption (Phase 0.5)
+
+Read all files in `.claudious-heartbeat/*.json`. For each machine:
+
+- Parse `last_seen` (UTC ISO-8601).
+- Compute age: `now - last_seen` in hours.
+- For each tracked repo in `tracked_repos`: note `behind`, `dirty_files`, `branch`.
+
+Emit findings to `archive/intake/${TODAY}.md` Section A (Scout) and mirror to `canonical/active-findings.md` when ANY of the following fire:
+
+**STALE_MACHINE** — `last_seen > 48h`
+```
+kebab-id: machine-stale-<machine-id>-<YYYYMMDD>
+**Source:** heartbeat
+**Credibility:** OFFICIAL (filesystem)
+**Impact:** MEDIUM
+**Action:** queued
+**Summary:** Machine <machine-id> last heartbeat <N>h ago. Either offline for extended period or heartbeat script not running on session start. Verify machine is active or remove heartbeat file if retired.
+```
+
+**REPO_BEHIND** — any tracked repo with `behind > 0` AND machine `last_seen < 4h` (machine is active and still hasn't pulled)
+```
+kebab-id: repo-behind-<machine>-<repo>-<YYYYMMDD>
+**Source:** heartbeat
+**Credibility:** OFFICIAL (filesystem)
+**Impact:** HIGH
+**Action:** queued
+**Summary:** Machine <machine-id> is <N> commits behind origin/main on <repo>. Next session on that machine must `git pull` before any edits. This is the pre-session-doctor's job when Layer 2 ships.
+```
+
+**STALE_WIP** — any tracked repo with `dirty_files > 0` AND last_seen was `> 24h` ago
+```
+kebab-id: stale-wip-<machine>-<repo>-<YYYYMMDD>
+**Source:** heartbeat
+**Credibility:** OFFICIAL (filesystem)
+**Impact:** MEDIUM
+**Action:** queued
+**Summary:** Machine <machine-id> has <N> uncommitted files on <repo>, last seen <H>h ago. Either resume work on that machine or stash/commit before switching.
+```
+
+**MISSING_HEARTBEAT** — if fewer than 2 distinct machines have committed heartbeats in the last 14 days (post-rollout grace period)
+```
+kebab-id: heartbeat-coverage-gap-<YYYYMMDD>
+**Source:** heartbeat
+**Credibility:** OFFICIAL
+**Impact:** LOW
+**Action:** queued
+**Summary:** Heartbeat coverage is single-machine; cross-machine drift detection is blind. Install heartbeat on remaining machines.
+```
+
+Do NOT fire STALE_MACHINE for machines explicitly listed in `.claudious-heartbeat/retired.txt` (one machine-id per line). Create that file only if Logan retires a machine.
+
+All heartbeat findings count toward the intake's `Total for Process:` line.
 
 ## 3. Work
 

@@ -1,0 +1,38 @@
+{
+  "machine_id": "lama",
+  "hostname": "Lama",
+  "os": "Windows",
+  "last_seen": "2026-04-24T00:18:07Z",
+  "tracked_repos": {
+    "Claudious": {
+      "path": "/c/Users/logan/Projects/Claudious",
+      "head_sha": "2fcc376",
+      "head_subject": "routing: 2026-04-23 three-way synthesis refresh post-GPT-5.5 launch (#16)",
+      "branch": "claude/heartbeat-layer-01",
+      "dirty_files": 4,
+      "ahead": 0,
+      "behind": 0,
+      "last_fetch": "2026-04-24T00:18:07Z"
+    },
+    "asf-graphics-app": {
+      "path": "/c/Users/logan/Documents/GitHub/asf-graphics-app",
+      "head_sha": "4c7bed8",
+      "head_subject": "fix(RM-022): split migration 062 into 062a enum + 062b table per ALTER TYPE tran",
+      "branch": "main",
+      "dirty_files": 0,
+      "ahead": 0,
+      "behind": 0,
+      "last_fetch": "2026-04-24T00:18:07Z"
+    },
+    "courtside-pro": {
+      "path": "/c/Users/logan/Documents/GitHub/courtside-pro",
+      "head_sha": "a2516df",
+      "head_subject": "feat(ai): expand AI_KNOWLEDGE_BASE with research integration",
+      "branch": "main",
+      "dirty_files": 4,
+      "ahead": 0,
+      "behind": 15,
+      "last_fetch": "2026-04-24T00:18:07Z"
+    }
+  }
+}

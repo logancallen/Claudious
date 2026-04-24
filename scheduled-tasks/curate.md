@@ -160,6 +160,16 @@ Full digest — verbose, archival:
 - Aborted: X
 - Week status: <healthy|degraded|broken|bootstrapping>
 
+## Machines
+
+<For each heartbeat file in `.claudious-heartbeat/*.json`, print one line: machine-id, per-repo status (✅ if clean/synced, ⚠️ with reason if not), last seen human-readable.>
+
+Example:
+- logan-pc: Claudious ✅, asf ✅, courtside ⚠️ 3 behind (last seen 2h ago)
+- mac-studio: Claudious ✅, asf ✅, courtside ✅ (last seen 18h ago)
+
+If NO heartbeat files exist: print "- (none yet — run scripts/update-heartbeat.* on each machine)"
+
 ## Canonical state
 - active-findings entries: N (pruned M)
 - open-decisions entries: N (pruned M)
@@ -201,6 +211,9 @@ Template:
 
 🏥 Intake [✅/❌] Process [✅/❌] Curate [✅/❌]
 
+🖥️ MACHINES (<count>)
+• <machine-id>: <one-line per-repo status> (<last seen>)
+
 Archive: github.com/logancallen/Claudious/blob/main/archive/digest/${TODAY}.md
 ```
 
@@ -210,6 +223,8 @@ Rules for the brief:
 - No line over 100 chars (mobile wraps badly).
 - CRITICAL alerts from `alerts.md` bump the `📊 System:` line from HEALTHY to DEGRADED and add a line `🚨 <alert title>` above `🆕 NEW`.
 - Emojis in this file are intentional — the brief is the phone UI. Do not remove them when refactoring.
+- `🖥️ MACHINES` pulls from `.claudious-heartbeat/*.json`. One line per machine. ✅ when Claudious + tracked-repos are clean/synced; ⚠️ when any tracked repo is `behind > 0` or `dirty_files > 0` or `last_seen > 48h` ago. If no heartbeat files exist, render the section as `🖥️ MACHINES (0)` with bullet `• (none yet — run scripts/update-heartbeat.* on each machine)`.
+- HIGH-impact heartbeat findings (`REPO_BEHIND`) must also surface under `⚠️ NEEDS YOU` with the heartbeat kebab-id and a one-word action (usually `pull`).
 
 Commit:
 
