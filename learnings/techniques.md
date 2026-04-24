@@ -132,4 +132,20 @@
 
 <!-- PROMOTE TO CLAUDIOUS: N/A — this IS Claudious. Pattern is cross-project relevant: any multi-machine dev environment benefits from committed heartbeat files. -->
 
+## Pre-Session Doctor (Layer 2) — 2026-04-23
+
+**Pattern:** SessionStart hook in `.claude/settings.json` calls a thin wrapper that invokes a central preflight script (lives in Claudious `scripts/update-heartbeat.sh --preflight <repo>`). Hook runs before any Claude Code work starts: updates heartbeat, commits+pushes to Claudious main, fetches current repo, halts on drift conditions.
+
+**Halt conditions (exit codes 2-4):** current repo behind origin; stale WIP (≥5 dirty AND oldest >24h); sibling machine pushed within 4h and this machine is behind.
+
+**Fail-open philosophy:** infrastructure failures (network, Claudious missing, git errors, unknown repo name) print a `[WARN] preflight-degraded` line and exit 0. Only real drift data causes halts. CC remains usable even when Claudious is unavailable.
+
+**Cross-platform:** `.claude/settings.json` is committed to each tracked repo; both machines inherit the hook on `git pull`. The hook wrapper is `.sh` (bash available on Mac natively and via Git Bash on Windows — same bash CC uses to run asf's existing hooks). A sibling `.ps1` exists for manual admin use. JSON parsing uses `node -e` (universal on Logan's dev boxes; python3 on Windows is a Microsoft Store alias stub, not a real interpreter).
+
+**Heartbeat auto-commit** means zero manual cross-machine sync steps — next CC session on either machine picks up the latest state automatically. Commit-push is gated on `branch == main` so feature-branch CC sessions don't accidentally push on behalf of the user.
+
+**Scope control:** hook only lives in 3 tracked repos (Claudious, asf-graphics-app, courtside-pro). No overhead in CC sessions outside those repos.
+
+<!-- PROMOTE TO CLAUDIOUS: N/A — this IS Claudious. Cross-project pattern: commit hook config + centralize logic. -->
+
 ## Archive
