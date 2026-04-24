@@ -141,25 +141,20 @@ jobs:
               candidates.push({ branch, ahead: Number(ahead.out), behind: Number(behind.out || '0') });
             }
 
-            // Guardrail 7: max orphans
-            if (candidates.length > MAX_ORPHANS) {
-              const msg = `Detected ${candidates.length} orphan candidates (max ${MAX_ORPHANS}). Refusing to proceed.`;
-              await writeTripwire('FAILED', `**Failure:** ${msg}\n\nCandidates:\n${candidates.map(c => `- ${c.branch} (+${c.ahead}/-${c.behind})`).join('\n')}`);
-              await commitLogAndSummary('reconciler: FAILED (max-orphans guardrail)', [logPath]);
-              core.setFailed(msg);
-              return;
-            }
-
-            // Check existing open PRs per branch
+            // Check existing open PRs per branch (needed for both passes)
             const existingPrs = new Map();
             const prList = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', per_page: 100 });
             for (const pr of prList) existingPrs.set(pr.head.ref, pr.number);
 
+            // PASS 1 — classify each candidate by running all pre-PR filters.
+            // Branches that will be skipped are decided here and do NOT count toward MAX_ORPHANS.
+            // Branches that would open a PR are held in `eligible` pending the MAX_ORPHANS check.
+            const eligible = [];
             for (const cand of candidates) {
               const { branch } = cand;
               const entry = { branch, ahead: cand.ahead, behind: cand.behind, decision: null, skipReason: null, prNumber: null, mergeBase: null, filesTouched: [] };
 
-              // Guardrail 3 pre-check — hand-named exclusion
+              // Hand-named exclusion
               if (HAND_NAMED_PREFIXES.some(p => branch.startsWith(p))) {
                 entry.decision = 'SKIPPED_HAND_NAMED';
                 entry.skipReason = 'Branch name matches hand-named exclusion prefix';
@@ -176,7 +171,7 @@ jobs:
                 continue;
               }
 
-              // Compute merge-base
+              // Merge-base
               const mbRes = shSafe(`git merge-base origin/main origin/${branch}`);
               if (!mbRes.ok) {
                 entry.decision = 'SKIPPED_NO_MERGE_BASE';
@@ -196,6 +191,7 @@ jobs:
                 entries.push(entry);
                 continue;
               }
+              entry.ageDays = ageDays;
 
               // Guardrail 3: routine eligibility — [routine] marker OR cloud-slug pattern
               const headMsg = shSafe(`git log -1 --format=%B origin/${branch}`).out || '';
@@ -207,6 +203,7 @@ jobs:
                 entries.push(entry);
                 continue;
               }
+              entry.hasRoutineTag = hasRoutineTag;
 
               // Files touched by branch relative to merge-base
               const filesRes = shSafe(`git diff --name-only ${mergeBase}..origin/${branch}`);
@@ -237,7 +234,22 @@ jobs:
                 continue;
               }
 
-              // All guardrails passed — open PR via API (guardrail 5: PR description template)
+              // Survived all pre-PR filters — eligible to open a PR (pending MAX_ORPHANS cap)
+              eligible.push(entry);
+            }
+
+            // Guardrail 7: max orphans — applied AFTER filtering, only counts eligible branches
+            if (eligible.length > MAX_ORPHANS) {
+              const msg = `Detected ${eligible.length} eligible orphan candidates after filtering (max ${MAX_ORPHANS}). Refusing to proceed.`;
+              await writeTripwire('FAILED', `**Failure:** ${msg}\n\nEligible candidates:\n${eligible.map(c => `- ${c.branch} (+${c.ahead}/-${c.behind})`).join('\n')}\n\nAlso evaluated (filtered out):\n${entries.map(e => `- ${e.branch} → ${e.decision}`).join('\n')}`);
+              await commitLogAndSummary('reconciler: FAILED (max-orphans guardrail, post-filter)', [logPath]);
+              core.setFailed(msg);
+              return;
+            }
+
+            // PASS 2 — open PRs for eligible branches
+            for (const entry of eligible) {
+              const { branch, mergeBase, ageDays, hasRoutineTag } = entry;
               const branchSha = shSafe(`git rev-parse origin/${branch}`).out;
               const title = `reconciler: merge orphan ${branch}`;
               const body = [
@@ -254,7 +266,7 @@ jobs:
                 `- Guardrail 1 (merge-base age ≤ ${MERGE_BASE_MAX_AGE_DAYS}d): PASS (${ageDays.toFixed(2)}d)`,
                 `- Guardrail 2 (no regression against main): PASS`,
                 `- Guardrail 3 (routine-eligibility): PASS (${hasRoutineTag ? '[routine] tag' : 'cloud-slug pattern'})`,
-                `- Guardrail 7 (orphan count ≤ ${MAX_ORPHANS}): PASS`,
+                `- Guardrail 7 (eligible orphan count ≤ ${MAX_ORPHANS}): PASS`,
                 ``,
                 `Downstream: \`.github/workflows/auto-merge-claude.yml\` will squash-merge on PR-open event.`,
                 ``,
