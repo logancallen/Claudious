@@ -48,7 +48,7 @@ if [ -d "learnings" ]; then
 fi
 
 # Commit and push if changes exist
-DIRS="learnings/ research/ docs/ scout/ evaluations/ queue/ proposals/ retrospectives/ cross-platform/ skills/ digest/ alerts.md"
+DIRS="learnings/ research/ docs/ archive/scout/ archive/evaluations/ archive/queue/ proposals/ archive/proposals/ retrospectives/ archive/retrospectives/ skills/ archive/digest/ alerts.md"
 if ! git diff --quiet $DIRS 2>/dev/null || git ls-files --others --exclude-standard $DIRS 2>/dev/null | grep -q .; then
     if [ "$DRY_RUN" -eq 1 ]; then
         echo "[dry-run] Changes detected in knowledge dirs."
