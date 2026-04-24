@@ -1,7 +1,7 @@
 # Open Decisions — Proposals Awaiting Logan
 
-**Last updated:** 2026-04-23
-**Total open:** 40
+**Last updated:** 2026-04-24
+**Total open:** 41
 
 Proposals are improvements that cannot auto-deploy (TEST-FIRST, REVIEW-REQUIRED, CONFLICT, or larger than TRIVIAL). Each entry points to the full proposal file in archive/proposals/.
 
@@ -179,6 +179,12 @@ Proposals are improvements that cannot auto-deploy (TEST-FIRST, REVIEW-REQUIRED,
 **File:** archive/proposals/process-claudeignore-antipatterns.md
 **Summary:** (see file)
 **Why proposal:** Routing reason:** IMPACT=L; requires manual action (scope exclusion in queue processor)
+**Logan action:** review + approve/reject
+
+### process-open-decisions-regen-not-landing-on-main
+**File:** archive/proposals/process-open-decisions-regen-not-landing-on-main.md
+**Summary:** (see file)
+**Why proposal:** Routing reason:** Changes routine behavior around branch/PR handling; not a SAFE+HIGH+TRIVIAL md-only change → PROPOSAL
 **Logan action:** review + approve/reject
 
 ### reconcile-mcp-count-inconsistency
