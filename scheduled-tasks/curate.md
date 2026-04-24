@@ -272,16 +272,32 @@ Then re-trigger `canonical/open-decisions.md` regeneration (same logic as proces
 
 ### 4.3 Graduate learnings (3+ citations) — now writes to canonical
 
-Scan `learnings/*.md` for patterns referenced 3+ times. For each:
+**Authority.** Curate is the SOLE owner of writes to `canonical/prompting-rules.md` and `canonical/antipatterns.md` (see `CLAUDE.md` Write-Authority Matrix). Process no longer mirrors on deploy — items land in `learnings/` first and only graduate to canonical once this step confirms citation threshold.
 
-1. Determine target canonical file:
+**Citation definition (deterministic — no LLM judgment).**
+
+A "citation" is an entry in `learnings/*.md` (techniques, patterns, antipatterns, gotchas) that references the candidate concept by a stable identifier — either:
+- An exact name string (e.g. the concept's primary name as it first appears), or
+- A stable synonym explicitly linked to the concept via an `alias:` tag or a prior graduation record.
+
+Three distinct entries across any combination of `learnings/*.md` files constitute graduation eligibility. Two rules:
+
+1. **Repeat entries in the same file count as ONE citation**, not N. If `learnings/techniques.md` has three separate blocks all referencing `/loop`, that's one citation, not three.
+2. **Process re-deploys of the same concept count as ONE citation** once collapsed. If the queue re-deployed the same `Type:TECHNIQUE` entry three times in three weeks (e.g. because it was re-proposed), the concept has one citation, not three.
+
+This makes graduation deterministic: the LLM computes citation count from disk via `grep` + dedup, not by judgment. Zero candidates meeting the threshold is a valid outcome and must be logged explicitly (see step 6 below), not defaulted to.
+
+**Procedure.**
+
+1. Determine target canonical file from the `Type:` field carried on the learnings entry (written there by Process Phase 2):
    - TECHNIQUE or PATTERN → `canonical/prompting-rules.md`
    - ANTIPATTERN or GOTCHA → `canonical/antipatterns.md`
 2. Append consolidated content to the target canonical file under the matching section.
 3. Verify: `grep -c "<key phrase>" <canonical target>` → must ≥1. If 0, revert append and log failure.
 4. Remove source entries from `learnings/*.md`.
-5. Verify: `grep -c "<key phrase>" learnings/*.md` → must = 0 (or only inside `archive/` — not applicable since learnings stays at root). If >0, revert, log failure.
-6. Append to `archive/queue/deployed.log`: `YYYY-MM-DD GRADUATED <name> → <canonical target>. WORKING. [evidence: grep-confirmed]`.
+5. Verify: `grep -c "<key phrase>" learnings/*.md` → must = 0. If >0, revert, log failure.
+6. Append to `archive/queue/deployed.log`: `YYYY-MM-DD GRADUATED <name> → <canonical target>. WORKING. [evidence: grep-confirmed, citations=<N>]`.
+7. If this step produces zero graduations, log an explicit no-op line: `YYYY-MM-DD GRADUATED_NOOP — 0 candidates met 3-citation threshold (scanned=<count>)`. Do not omit the log line; silence is the failure mode this section is designed to eliminate.
 
 Graduations no longer write to `skills/graduated/` — canonical is the surface. `skills/` remains for Claude Code skill files only.
 

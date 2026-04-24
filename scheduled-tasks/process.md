@@ -154,22 +154,9 @@ For each queue item:
 1. Append "Change" block to target file in `learnings/`
 2. `grep -c "<unique string>" <target>` → must ≥1
 3. If fails → revert append, item stays in queue, log `DEPLOY_FAILED`
-4. If passes → proceed to canonical mirror step
+4. If passes → proceed to active-findings graduation step
 
-**Mirror to canonical:**
-
-Based on `Type` field in the queue header:
-- `TECHNIQUE` or `PATTERN` → append the same change block under the matching section of `canonical/prompting-rules.md`
-- `ANTIPATTERN` or `GOTCHA` → append under the matching section of `canonical/antipatterns.md`
-- Other types (TOOL, MODEL-STATE, CC-STATE, NEWS) → no canonical mirror from this step; those surface via `canonical/active-findings.md` and get deleted by curate on graduation/expiry
-
-After the mirror append:
-
-```bash
-grep -c "<unique string>" "<canonical mirror>" || { echo "MIRROR_FAILED"; revert_both; }
-```
-
-If mirror fails → revert BOTH the learnings append and the canonical append; leave queue item in place; log `DEPLOY_FAILED — canonical mirror`.
+**Mirror to canonical:** OWNED BY CURATE (step 4.3, Sunday graduations). Process does not write to `canonical/prompting-rules.md` or `canonical/antipatterns.md` — those files land items once Curate confirms 3+ citations. See `CLAUDE.md` Write-Authority Matrix. Process's deploy responsibility ends at `learnings/`; the queue item's `Type` field survives with the learnings entry and Curate reads it there at graduation time.
 
 **Mark finding graduated in active-findings:**
 
@@ -184,23 +171,16 @@ git rm "archive/queue/<file>.md"
 **Log to deployed.log:**
 
 ```
-YYYY-MM-DD DEPLOYED <name> — <summary>. WORKING. [evidence: grep-confirmed in <target> + <canonical mirror>]
+YYYY-MM-DD DEPLOYED <name> — <summary>. Type: <TYPE>. WORKING. [evidence: grep-confirmed in <learnings target>]
 ```
+
+The `Type:` field is load-bearing — Curate reads it at graduation time to route the item into the correct canonical file (`prompting-rules.md` vs `antipatterns.md`).
 
 Commit after deploy:
 
 ```bash
 git add -A
 git commit -m "process: deployed $DEPLOY_COUNT items" || echo "no deploys"
-```
-
-**Phase 2 ledger emission — runs unconditionally at end of phase 2.**
-
-```bash
-# Count canonical mirror files that actually changed in this run.
-# Uses HEAD commit diff since Phase 2 just committed; if no-op, value = 0.
-CANONICAL_MIRRORS=$(git show --name-only --format= HEAD 2>/dev/null | grep -cE '^canonical/(prompting-rules|antipatterns)\.md$' || echo 0)
-echo "LEDGER: canonical-mirrors=$CANONICAL_MIRRORS"
 ```
 
 ### Phase 3 — Regenerate `canonical/open-decisions.md`
@@ -291,28 +271,12 @@ else
 fi
 ```
 
-**Z.2 — Mirror ran if Phase 2 deployed a TECHNIQUE/PATTERN/ANTIPATTERN/GOTCHA.**
+**Z.2 — Assertion summary + active-findings emission.**
+
+Note: a prior Z.2 check ("mirror ran if mirror-triggering type deployed") was removed in Session #6 Phase C — canonical mirror is now owned by Curate's Sunday graduation step, not Process's per-deploy mirror. Process's deploy responsibility ends at `learnings/`.
 
 ```bash
-# If Phase 2's deploy commit's message (or any staged/committed deployed.log lines) indicate
-# a mirror-triggering type was deployed today, the canonical-mirrors ledger count must be > 0.
-MIRROR_TRIGGERING_DEPLOYS=$(grep "^${TODAY} DEPLOYED" archive/queue/deployed.log 2>/dev/null | grep -cE '\b(TECHNIQUE|PATTERN|ANTIPATTERN|GOTCHA)\b' || echo 0)
-
-if [ "${CANONICAL_MIRRORS:-unset}" = "unset" ]; then
-  echo "ASSERT FAIL Z.2: CANONICAL_MIRRORS ledger field missing (Phase 2 mirror sub-step did not run)"
-  ASSERT_Z2="FAIL"
-elif [ "$MIRROR_TRIGGERING_DEPLOYS" -gt 0 ] && [ "$CANONICAL_MIRRORS" -eq 0 ]; then
-  echo "ASSERT FAIL Z.2: Mirror-triggering type deployed ($MIRROR_TRIGGERING_DEPLOYS item(s)) but zero canonical mirrors written"
-  ASSERT_Z2="FAIL"
-else
-  ASSERT_Z2="PASS"
-fi
-```
-
-**Z.3 — Assertion summary + active-findings emission.**
-
-```bash
-if [ "$ASSERT_Z1" = "FAIL" ] || [ "$ASSERT_Z2" = "FAIL" ]; then
+if [ "$ASSERT_Z1" = "FAIL" ]; then
   # Append loud entry to active-findings so the next daily briefing surfaces it
   cat >> canonical/active-findings.md <<EOF
 
@@ -321,7 +285,6 @@ if [ "$ASSERT_Z1" = "FAIL" ] || [ "$ASSERT_Z2" = "FAIL" ]; then
 **Source:** scheduled-tasks/process.md Phase Z
 **What:** Process run $(date -u +%Y-%m-%d_%H:%M) failed post-run assertions.
 - Z.1 (Phase 3 ran if deployables): $ASSERT_Z1
-- Z.2 (mirror ran if mirror-triggering type): $ASSERT_Z2
 **Action:** Manually regenerate missing outputs, commit with \`[process-assert-fix]\` marker, investigate root cause.
 EOF
 
@@ -351,7 +314,6 @@ if [ "${LEDGER_STATUS:-}" = "FAILED" ]; then
     echo "### ${NOW} process [FAILED]"
     echo "- Phase Z assertion failure"
     echo "- Z.1 open-decisions-regenerated: ${ASSERT_Z1}"
-    echo "- Z.2 canonical-mirrors-written: ${ASSERT_Z2}"
     echo "- See canonical/active-findings.md (process-routine-assertion-fail block)"
   } >> "$RUNS_LOG"
   git add "$RUNS_LOG"
@@ -380,8 +342,8 @@ DUR=$((END - START))
 ### ${NOW} process [${STATUS}]
 - commit: $(git rev-parse HEAD)
 - inputs: archive/intake/${TODAY}.md, archive/queue/, archive/queue/deployed.log, archive/proposals/
-- outputs: queue=+X, proposals=+X, deployed=X, verified=X, canonical-mirrors=${CANONICAL_MIRRORS}, open-decisions-regenerated=${OPEN_DECISIONS_REGENERATED}
-- assertions: Z.1=${ASSERT_Z1}, Z.2=${ASSERT_Z2}
+- outputs: queue=+X, proposals=+X, deployed=X, verified=X, open-decisions-regenerated=${OPEN_DECISIONS_REGENERATED}
+- assertions: Z.1=${ASSERT_Z1}
 - summary: Triage X, Deploy X W/X F, Verify X W/X B/X R
 - duration: ${DUR}s
 ```
