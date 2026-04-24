@@ -27,3 +27,6 @@
 - **Sonnet 4.5 / 4 1M context retires 2026-04-30** — 10 days out; audit any workflow still pinned to legacy Sonnet 1M beta.
 - **MCP 500K result storage** (Week 15-16) — raises payload ceiling; can change what's worth sending through MCP vs inline.
 - **/doctor now warns on MCP scope drift** — use before triaging MCP-break bugs.
+
+## Orphan reconciliation
+- 2026-04-24T16:46:29.695Z — Reconciled 2 orphan branch(es): PR(s) #28, #29 — run https://github.com/logancallen/Claudious/actions/runs/24901090611
