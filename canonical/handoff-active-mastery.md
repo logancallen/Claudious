@@ -1,163 +1,107 @@
 # Handoff — Mastery Lab
 
-**Recommended next-chat title:** `2026-04-24 — MASTERY — Process Fix Session 5`
+**Recommended next-chat title:** `2026-04-25 — MASTERY — Post-fix observation + Session #6 scope`
 
-**From session:** 2026-04-23 PM (Session #4, Process regen investigation)
-**To session:** 2026-04-24 (Session #5, fix implementation)
+**From session:** 2026-04-24 (Session #5, Option 3b reconciler fix shipped)
+**To session:** 2026-04-25 (Session #6, F1/F3 + Curate review or guardrail-7 retune)
 **Generated:** 2026-04-24 UTC
-**Prior handoff archived:** archive/handoffs/2026-04-24-0611-mastery-pre-session-4.md
+**Prior handoff archived:** `archive/handoffs/2026-04-24-session-5-closeout.md`
 
 ---
 
 ## Current focus
 
-Closing the Process regen silent-failure loop identified in Session #4. Investigation (PR #19, commit 7fdad89 on main) documented the hypothesis, confirmed it, and expanded scope to 4 canonical files + Intake. A runtime probe (routine `gh-availability-test`, trigger `trig_013rpTZodtU27KemLFsUCXut`) was fired just before this handoff generated to decide Session #5's fix path: Option 2 (routine self-PRs in Section 5) vs Option 3b (orphan-branch reconciler workflow).
-
-**Session #5's job:** read probe verdict + paste F1–F5 taxonomy and Step (g)/(h) details from the investigation doc, then draft the fix prompt matching the verdict.
+Observation period for the Option 3b reconciler workflow (merged in PR #20). Decide Session #6 scope after 1 week of reconciler data: F1 (Phase 3 silently skipped), F3 (auto-deploy mirror never fires), Curate orphan risk, and the guardrail-7 retune flagged below. An overnight queue (2026-04-24) runs Phases A–D autonomously and may pre-stage Session #6 investigation docs.
 
 ---
 
-## Completed items
+## Completed items (Session #5)
 
-1. **Session #4 investigation PR #19 merged.** Branch `claude/process-regen-investigation`, squash commit `7fdad89`. Doc at `docs/investigations/2026-04-24-process-regen-investigation.md`, 495 lines.
-2. **Hypothesis confirmed and expanded.** Five distinct failure modes (F1–F5) cataloged. Blast radius is 4 canonical files (`open-decisions.md`, `active-findings.md`, `claude-state.md`, `claude-code-state.md`), not 1. Intake shares the failure mode — fix cannot be Process-specific.
-3. **Option 2 rejected in investigation doc based on 2026-04-20 "gh blocked" evidence.** Pre-mortem in Session #4 chat flagged this rejection as 4-day-old data and needed retest.
-4. **Probe routine created (gh-availability-test, trig_013rpTZodtU27KemLFsUCXut).** Fires 2026-04-24T06:13:00Z, Opus 4.7, Default env matching Intake/Process/Curate, no connectors, `allow_unrestricted_git_push: true` matched to production routines. Link: https://claude.ai/code/routines/trig_013rpTZodtU27KemLFsUCXut
-5. **Backfill CC prompt drafted** at `/mnt/user-data/outputs/cc-prompt-05b-manual-phase3-regen-backfill.md` (unsent). Fix-independent. Not executed. Delta pre-run expected: 1 missing entry (`process-open-decisions-regen-not-landing-on-main`). Delta gate: abort if >3 missing entries found at runtime.
-6. **Drift already partially healed by PR #18 (2026-04-23).** Current delta reduced from 12 → 1 entry.
+1. **Phase 1 — probe diagnosis.** Verdict: `gh-blocked`. Evidence: probe branch `origin/claude/gh-availability-probe-1777012492` commit `50114da` shows `gh: command not found` on every gh invocation; `git push` works, but gh CLI is entirely absent from the routine runtime. Diagnosis file: `archive/tests/gh-availability-2026-04-24-diagnosis.md` (commit `d150540` on branch `claude/session-5-fix-diagnosis`).
+2. **Phase 3 — Option 3b reconciler workflow merged.** PR #20, squash commit `7b03b3c`. File: `.github/workflows/orphan-claude-branch-reconciler.yml`. Seven guardrails implemented per prompt; cadence hourly (`0 * * * *`) per investigation doc Step (g) — prompt's 6h proposal overridden by "doc wins" rule.
+3. **Phase 3 — manual verification fire.** Run `24876235029` completed with guardrail 7 firing: detected 18 orphan candidates > max 10. Tripwire logged FAILED to `archive/reconciler-log/2026-04-24.md` (commit `1cae5f1`). See "Open issue" section below.
+4. **Phase 4 — surgical backfill merged.** PR #21, squash commit `813905a`. Added `process-open-decisions-regen-not-landing-on-main` entry (41st) to `canonical/open-decisions.md`. Header bumped 40→41, last-updated 2026-04-23→2026-04-24. Delta matched pre-run expectation of 1.
+5. **Phase 5 — memory-reconciliation canonical note.** `canonical/logan-machine-state.md` committed directly to main as `b8f64c9`. Documents PC canonical path as `C:\Users\logan\Projects\Claudious` (contradicts stale user-memory entry claiming that path is deprecated). Next Mastery Lab chat needs to edit `userMemories.recent_updates` to match.
+6. **Phase 6 — this handoff.** Commit pending.
+
+**Pre-flight side note:** Stash `session-5-preflight-stash` (stash@{0}) preserves three files that were dirty on session start (`alerts.md`, `archive/queue/deployed.log`, `learnings/techniques.md`) — benign routine-output that was never committed. Investigate whether these belong on main and commit them, or drop the stash as superseded.
+
+---
+
+## Open issue — guardrail-7 retune (Session #6 or earlier)
+
+The reconciler's first manual run hit guardrail 7 (`max 10 orphans per run`) because 18 `claude/*` branches are ahead of main. **The count is inflated by branches that would have been filtered later in the pipeline:**
+
+- Hand-named branches (`canonical-restructure`, `gh-availability-probe-*`, `handoff-*`, `process-regen-investigation`, `session-5-fix-diagnosis`) — 5 of 18. Would skip via HAND_NAMED_PREFIXES check.
+- Cloud-slug branches with merge-base > 2 days old — would skip via guardrail 1.
+- Cloud-slug branches without `[routine]` marker (most current ones) — would skip via guardrail 3 if the slug pattern didn't match, but the slug pattern is broad so these would pass.
+
+**Design fix (for Session #6 decision):** apply hand-named exclusion, guardrail 1 (age), and guardrail 3 (routine-eligibility) BEFORE counting toward MAX_ORPHANS. Count only the candidates that could actually become PRs.
+
+**Why this wasn't fixed this session:** Per the Session #5 prompt, "if the first manual run fails any guardrail, STOP and report. Don't fix-and-retry silently — the failure is the signal." So the fix is surfaced for Logan's review rather than patched silently.
+
+**Risk of leaving as-is:** while 18 candidates exist on origin, the workflow will fail-closed every hour. That's safe (no runaway merges) but noisy. Recommended action: prune merged-but-undeleted `claude/*` branches on origin to bring the raw count under 10, which unblocks the reconciler until the pre-filter redesign ships.
 
 ---
 
 ## In-flight items
 
-1. **Probe execution.** Fires ~06:13Z 2026-04-24. Results will populate `archive/tests/gh-availability-2026-04-24.md` and a PR. Verdict block is the primary artifact — `verdict=option-2-viable` or `verdict=option-3b-required`.
-2. **Handoff generation.** This file.
+1. **Session #5 reconciler observation period.** 1 week of data needed before Session #6 decision on guardrail-7 retune + Curate extension. Watch `archive/reconciler-log/` for daily entries and `canonical/briefing-today.md` for "Orphan reconciliation" appends. Monitor: does the hourly schedule fire? does it consistently fail-closed on the same 18 orphans, or do new orphans accumulate?
+2. **Overnight queue 2026-04-24 (Phases A–D).** Runs after Session #5 close. Gates Session #5 completion, fixes sync-knowledge.sh DIRS if bugged, investigates F1/F3/Curate read-only. Expected output: 3 investigation docs + updated handoff.
 
 ---
 
-## Pending items (for Session #5, in order)
+## Pending for Session #6 (in priority order)
 
-### Immediate next actions for Session #5
-
-1. **Read probe verdict.** Fetch `archive/tests/gh-availability-2026-04-24.md` from main. Parse the verdict block. Branch from there.
-2. **Ask Logan for three investigation-doc excerpts** (still not in project knowledge via RAG as of Session #4 close):
-   - F1–F5 taxonomy with full definitions
-   - Step (g) Option 3b detail (cron interval, PR creation mechanism, labels/checks, handling of branches older than N days)
-   - Step (h) revised surgical backfill plan (exact missing-entry identity and regen approach)
-3. **Memory path decision.** `userMemories` says canonical Windows path is `Documents\GitHub\Claudious`. Session #4 CC confirmed actual path is `Projects\Claudious`. Either update memory or commit to a migration session. Don't silently keep both.
-4. **Draft Session #5 fix CC prompt** matching probe verdict (see "Skeletons" below).
-5. **Decide on 5B backfill prompt timing.** Safe to run now (fix-independent) or hold until fix lands. Recommend run after fix ships — cleaner audit trail.
-
-### Session #5 prompt skeletons (draft mode only — fill in at session time)
-
-**If `verdict=option-2-viable`:**
-- ~150-line CC prompt
-- Edits `scheduled-tasks/process.md` Section 5 to add `gh pr create` + `gh pr merge --auto --squash` after the current `git push origin main` flow
-- Mirrors same edit to `scheduled-tasks/intake.md`
-- Adds ledger field `open-decisions-regenerated=<yes|no>` enforcement note
-- Tests with one manual routine fire per routine
-- Branch: `claude/process-and-intake-self-pr`
-- Risk: Curate may need the same treatment — investigate whether Curate also silently orphans
-
-**If `verdict=option-3b-required`:**
-- ~300-line CC prompt
-- Creates `.github/workflows/orphan-claude-branch-reconciler.yml`
-- Cron: every 6 hours (not the earlier 4-hour guess — no basis)
-- Seven guardrails from Session #4 pre-mortem:
-  1. Merge-base age bound (skip branches where merge-base with origin/main > 2 days old)
-  2. Diff regression check (skip branches that would revert any file touched since branch was cut)
-  3. Routine-eligibility tag (only PR branches with `[routine]` commit-message marker)
-  4. Tripwire status marker (writes WORKING / FAILED to `archive/reconciler-log/YYYY-MM-DD.md`)
-  5. PR description template with audit trail
-  6. Daily summary to `canonical/briefing-today.md` if any orphans processed
-  7. Cap at max 10 orphans per run (prevents runaway merges if detection logic misfires)
-- Branch: `claude/orphan-reconciler-workflow`
-- Risk: workflow itself becomes an automation that can fail silently — tripwire is the counter
-
-### Session #6 (deferred — do not draft in Session #5)
-
-**Scope:** Failure mode #2 from Session #4 investigation — Process's merged runs silently skipping Phase 3 entirely (PR #4 merged but skipped regen; orphan 761e1ff did the work).
-
-Neither Option 2 nor Option 3b addresses this. Needs a post-condition check or execution-verification step inside Process's spec. Schedule after Session #5 fix lands + 1 week of reconciler/self-PR observation data.
+1. **F1 fix — Phase 3 silently skipped inside routine.** Per Session #4 investigation Step (g): ledger field `open-decisions-regenerated=<yes|no>` must be emitted deterministically; absent field on a COMPLETE run with `deployed>0 OR proposals>0` should be an ERROR. Requires editing `scheduled-tasks/process.md` Section 3/6. **Session #5 did not touch this.** Overnight queue Phase C1 will pre-stage an investigation doc.
+2. **F3 fix — auto-deploy mirror to `prompting-rules.md` / `antipatterns.md` never runs.** Zero commits to these files on any branch since seed despite deploy work. Fix: similar ledger field (`canonical-mirrors-written=<list>`) + post-Phase-2 assert, and figure out why the mirror step isn't executing. Overnight queue Phase C2 will pre-stage an investigation doc.
+3. **Curate coverage decision.** Session #5 explicitly did not touch `scheduled-tasks/curate.md`. The reconciler handles Curate orphans forward-looking, but Curate may need the same ledger-field hygiene as Process/Intake. Overnight queue Phase C3 checks Curate's orphan rate empirically.
+4. **Guardrail-7 retune** (see "Open issue" above). Small surgical edit to the workflow's candidate-counting logic.
+5. **F5 — routines not running at all on some days.** Ledger absence detection via a second Actions cron workflow. Out of scope for #6 unless Logan bundles.
 
 ---
 
-## Deferred items
+## Deferred items (carried from prior handoff)
 
-1. **Hook-not-firing-cross-chat (Session #4 Question 0).** No `🫀 lama` or `[HB] lama` preflight line observed at Session #4 start. Separate investigation slot — not folded into Process regen work. Owner: TBD.
+1. **Hook-not-firing-cross-chat (Session #4 Question 0).** No `🫀 lama` or `[HB] lama` preflight line observed at Session #4 start. Separate investigation slot — not folded into Process regen work.
 2. **ASF PR #1 merge decision.** Mentioned in Session #4 kickoff, unresolved. Routes through ASF handoff, not Mastery.
 3. **Mastery Lab project spec update (7 Projects).** 30-second UI action still pending from prior sessions.
 4. **Scout routing clarification** (standalone vs folded into Intake/Process).
-5. **PWA implementation for ASF Graphics** (`2026-04-20 — ASF — PWA Implementation` staged chat).
+5. **PWA implementation for ASF Graphics** (staged chat `2026-04-20 — ASF — PWA Implementation`).
 
 ---
 
-## Unresolved questions
+## Frustration signals / lessons
 
-1. Does probe step 3 (MCP github tools introspection) return a real count or `unknown`? If `unknown`, don't treat as failure — verdict depends on gh + git lines only.
-2. Does the probe's `git push origin HEAD` succeed to a non-claude-prefixed branch because of `allow_unrestricted_git_push: true`? If yes, the auto-merge-claude.yml prefix assumption needs revisiting.
-3. Does `/schedule` in CC CLI accept a clean one-off-in-future timestamp, or does it require recurring cadence + manual delete after? Low-value question; answered for this probe regardless.
-
----
-
-## Decisions made this session
-
-1. **Retest Option 2 before committing to 3b.** Pre-mortem caught a 4-day-old rejection being accepted without retest. Confidence HIGH. Probe fires 06:13Z.
-2. **Two-prompt Session #5 structure (5A probe, 5B backfill) rather than one monolithic fix prompt.** Probe and backfill are independent and parallel-safe. Confidence HIGH.
-3. **Session #6 explicitly carved out for Phase-3-silently-skipped failure mode.** Neither Session #5 fix option addresses it. Don't merge into #5 scope. Confidence HIGH.
-4. **Model: Opus 4.7 for probe** (not Sonnet 4.6). Probe's verdict block needs literalism Sonnet may paraphrase. Confidence MED-HIGH (educated guess; Sonnet would likely have worked).
-5. **Env: Default** matching production routines. Confirmed by CC before firing. Confidence HIGH.
-6. **Cron interval for hypothetical 3b workflow: every 6 hours** (not 4 as earlier sketch). Aligns with routine cadence — Process runs daily, orphans can't accumulate faster than that. Confidence MED.
-
----
-
-## Files recently changed this session
-
-Session #4 investigation branch (merged to main):
-- `7fdad89` — investigation: process regen silent-failure diagnosis (squash merge of PR #19 / `claude/process-regen-investigation` / investigation doc SHA `ba0c5a2` on branch)
-
-Session #4 drafted but unsent (live at `/mnt/user-data/outputs/` on the chat):
-- `routine-05a-gh-availability-probe.md` — probe body, superseded by inline paste into `/schedule` creation flow
-- `cc-prompt-05b-manual-phase3-regen-backfill.md` — surgical backfill prompt, unsent
-
-Routine created (external to repo):
-- `gh-availability-test` / `trig_013rpTZodtU27KemLFsUCXut` — one-shot, fires 06:13Z 2026-04-24
-
-Expected commits in next ~30 min (probe-driven):
-- `archive/tests/gh-availability-2026-04-24.md` — probe output
-- Probe PR (auto-merge if gh works, left as evidence if gh blocked)
-
----
-
-## Frustration signals (do not repeat)
-
-1. **Pattern-matched on CC's recommendation without retest.** Session #4 chat accepted the "Option 2 rejected" finding based on 4-day-old handoff evidence. Should have flagged for retest immediately, not caught in pre-mortem. Rule for Session #5: when CC rejects an option, check the age of the rejection evidence before propagating.
-2. **Answered "no, CC can't create routines" based on pattern-matching.** Reality: `/schedule` in CC CLI creates routines conversationally. Same class of error as #1. Rule: before answering a CC-capability question confidently, verify against current docs (Claude Code docs, routines page).
-3. **Referenced file "05A probe body" by name instead of pasting contents.** CC correctly refused to guess. Rule: when handing CC a prompt body, paste literal text, never a filename reference.
-4. **Probe prompt initially called for routine name setup via web UI, updated mid-session to /schedule.** Version discipline — don't leave stale instructions in context when revised.
+1. **"One-shot routine reliability is now in question."** The 2026-04-24T06:13Z gh-availability probe routine DID fire (branch pushed at 06:35Z) — but produced an orphan branch rather than a PR, because the probe script ran inside the same cloud-routine runtime that lacks gh CLI. This is useful data (the probe ran), but it proves that one-shot routines can silently reproduce the exact F2 failure mode they're testing for. Future probes that need a PR/merge signal should use `workflow_dispatch` of a GitHub Actions workflow, not a `/schedule` cloud routine.
+2. **Probe evidence was 4 days old in Session #4.** Lesson absorbed: before propagating a blocker, check evidence age.
+3. **Guardrail 7 design collided with real repo state on first run.** Count-before-filter is the wrong shape when branches are long-lived. Design lesson: for safety caps on filterable sets, count after filters, not before.
 
 ---
 
 ## User Preferences changes pending
 
-None from this session. Noted earlier (not added): possible new rule about "re-test rejections older than N days before propagating" — but this is adequately covered by "State the strongest counterargument before any recommendation." No preference edit needed.
+- **`userMemories.recent_updates` line is wrong about PC paths.** See `canonical/logan-machine-state.md`. Needs Logan to edit in a Mastery Lab chat — CC cannot edit user memory directly. Current text claims `C:\Users\logan\Projects\` is deprecated; reality is Claudious canonical still lives there.
 
 ---
 
 ## Context snapshot
 
-- Mastery Lab chat context at Session #4 close: ~68% used.
-- Claudious main branch tip: 7fdad89 at Session #4 investigation merge; may have advanced by probe run time.
-- Open-decisions.md total-open header: still shows pre-backfill count (1-entry delta unresolved; backfill prompt unsent).
-- Routines active: intake (6am CT), process (7am CT), curate (8pm CT), weekly health check (Sunday 8am CT), gh-availability-test (one-shot 06:13Z 2026-04-24).
+- Mastery Lab context at Session #5 close: ~70% used (rough).
+- Claudious main branch tip at handoff time: `b8f64c9` (post-Phase 5 memory note).
+- Open-decisions.md entry count: **41** (matches header).
+- `canonical/logan-machine-state.md`: present.
+- `.github/workflows/orphan-claude-branch-reconciler.yml`: present, active, hourly schedule engaged.
+- Existing stash: `stash@{0}: On main: session-5-preflight-stash` (3 files, routine-output residue).
+- Routines active: intake (6am CT), process (7am CT), curate (8pm CT), weekly health check (Sunday 8am CT). One-shot gh-availability-test probe has completed.
+- New workflow active: orphan-claude-branch-reconciler (hourly).
 
 ---
 
-## Session #5 opening move
+## Session #6 opening move
 
 1. Read this handoff.
-2. Fetch `archive/tests/gh-availability-2026-04-24.md` from main. If not present, the probe hasn't fired or failed — diagnose before drafting fix.
-3. Ask Logan for F1–F5 taxonomy + Step (g)/(h) excerpts from investigation doc.
-4. Ask Logan for memory-path decision.
-5. Draft fix prompt per verdict branch (skeletons above).
-6. Draft 5B backfill prompt for parallel execution (already ~90% drafted at `/mnt/user-data/outputs/cc-prompt-05b-manual-phase3-regen-backfill.md`).
+2. Read the three overnight-queue investigation docs (if Phase C completed): `docs/investigations/2026-04-25-session-6-f1-phase-3-silent-skip.md`, `docs/investigations/2026-04-25-session-6-f3-auto-deploy-mirror.md`, `docs/investigations/2026-04-25-session-6-curate-orphan-check.md`.
+3. Check `archive/reconciler-log/` for 7 days of tripwire entries. Is guardrail 7 still firing? Did orphan counts change?
+4. Decide fix scope: F1 alone, F1+F3, or bundle with guardrail-7 retune + Curate extension.
+5. Draft Session #6 fix prompt.
