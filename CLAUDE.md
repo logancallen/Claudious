@@ -37,7 +37,7 @@ Skills loaded by Claude Code, mastery-lab is the prompting research vault, scrip
 
 ## Daily Operation
 1. **Intake** (6am) — scans web + repo state → writes to `archive/intake/` + appends new findings to `canonical/active-findings.md` + conditionally updates `canonical/claude-state.md` / `canonical/claude-code-state.md` on OFFICIAL findings.
-2. **Process** (7am) — triages findings → `archive/queue/` (auto-deploy candidates) or `archive/proposals/` (judgment calls) → auto-deploys `SAFE+HIGH+TRIVIAL` items to `learnings/*.md` AND mirrors them to `canonical/prompting-rules.md` or `canonical/antipatterns.md`. Regenerates `canonical/open-decisions.md`.
+2. **Process** (7am) — triages findings → `archive/queue/` (auto-deploy candidates) or `archive/proposals/` (judgment calls) → auto-deploys `SAFE+HIGH+TRIVIAL` items to `learnings/*.md`. Does NOT write to `canonical/prompting-rules.md` or `canonical/antipatterns.md` — graduation to canonical is Curate's authority (Sunday, 3+ citations; see Write-Authority Matrix). Regenerates `canonical/open-decisions.md`.
 3. **Curate** (8pm) — writes daily digest to `archive/digest/` + OVERWRITES `canonical/briefing-today.md` with a phone-readable brief → commit on main triggers `.github/workflows/daily-briefing.yml` → email lands in Logan's inbox minutes later.
 
 ## Observability
@@ -53,8 +53,8 @@ Routines update canonical files in place. Since project knowledge is attached di
 | `canonical/00-README.md` | — | — | — | ✅ |
 | `canonical/claude-state.md` | ✅ (OFFICIAL MODEL-STATE only) | — | — | ✅ |
 | `canonical/claude-code-state.md` | ✅ (OFFICIAL CC-STATE only) | — | — | ✅ |
-| `canonical/prompting-rules.md` | — | ✅ (auto-deploy mirror) | ✅ (Sunday graduations) | ✅ |
-| `canonical/antipatterns.md` | — | ✅ (auto-deploy mirror) | ✅ (Sunday graduations) | ✅ |
+| `canonical/prompting-rules.md` | — | ❌ | ✅ (Sunday graduations, 3+ citations) | ✅ |
+| `canonical/antipatterns.md` | — | ❌ | ✅ (Sunday graduations, 3+ citations) | ✅ |
 | `canonical/toolchain.md` | — | — | — | ✅ |
 | `canonical/active-findings.md` | ✅ (append) | ✅ (Action field) | ✅ (prune) | — |
 | `canonical/open-decisions.md` | — | ✅ (full regen) | ✅ (prune >30d) | — |
