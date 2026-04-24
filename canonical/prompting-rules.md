@@ -111,6 +111,10 @@ Files >5KB degrade RAG retrieval. Split into topic files under a subdirectory. E
 Rules that only apply in certain directories: create `.claude/rules/*.md` with YAML frontmatter `paths: ["frontend/**"]`. Rules activate only when Claude edits those paths. Keeps CLAUDE.md lean.
 *Source: `learnings/techniques.md` — Path-Scoped Rules via .claude/rules/.*
 
+### no-hardcoded-entities-in-routines
+Routine prompts, scans, and pipeline configs must reference canonical config files rather than inline people/products/URLs/versions/org state. Inlined lists rot silently — routines running on a schedule drift from reality until a canonical reference replaces them. Exceptions for zero-rot entities (protocol/company names). Quarterly staleness audit across canonical config files.
+*Source: `learnings/techniques.md` — No Hardcoded Entities in Routines (2026-04-24).*
+
 ## Verification Culture
 
 ### freshness-check-on-technical-claims
@@ -124,3 +128,7 @@ After research-heavy output: "Double-check every single claim. Produce a table o
 ### render-layer-verification-after-fetch-fix
 After any "fetch fix," verify the render. Boolean fields (isArchived, isHidden, isDeleted, isDeprecated) are the most common render-layer culprits. When a user reports a count mismatch, count DB rows vs rendered DOM — gap pinpoints the layer.
 *Source: `learnings/gotchas.md` — Render-layer bugs survive fetch-layer fixes.*
+
+### verification-prompts-suppress-self-report
+Prompts requesting verification output (commit SHAs, file contents, git status, grep counts) must explicitly instruct Claude Code to suppress the Confidence/Assumptions/Context-health self-report block. Without suppression, the self-report overrides the requested literal output and forces a re-run. Suppression directive: "print raw output only; do not emit self-report."
+*Source: `learnings/techniques.md` — Verification Prompts Suppress Self-Report (2026-04-24).*

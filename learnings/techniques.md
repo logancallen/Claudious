@@ -148,4 +148,26 @@
 
 <!-- PROMOTE TO CLAUDIOUS: N/A — this IS Claudious. Cross-project pattern: commit hook config + centralize logic. -->
 
+### 2026-04-22 — TECHNIQUE — Bundled Prompt-Skills (`/simplify`, `/batch`, `/debug`, `/loop`, `/claude-api`)
+**Severity:** HIGH
+**Context:** Claude Code W16 bundled five prompt-skills as first-class slash commands. Run `/help` to verify the command list in any current session.
+**Learning:** `/simplify` condenses over-engineered responses back to the core answer; `/batch` queues multiple independent asks into one execution pass; `/debug` runs a structured error-diagnosis prompt scaffold; `/loop` self-paces a multi-turn session without manual re-prompting; `/claude-api` spins up API-specific helpers (headers, streaming, tool_use). These replace ad-hoc prompt patterns Logan already uses — reach for the built-in first. Add `/loop` and `/debug` references to `canonical/prompting-rules.md` on next curate pass so they surface in prompting guidance, not just technique log.
+**Applies to:** All Claude Code sessions — ASF Graphics, Courtside Pro, Claudious, Claude Mastery Lab
+
+## No Hardcoded Entities in Routines — 2026-04-24
+
+**Pattern:** Routine prompts, scans, and pipeline configs must reference canonical config files rather than inline people/products/URLs/versions/org state. Inlined lists rot silently; a single edit to a canonical source propagates to every consumer. Exceptions apply to zero-rot entities (protocol names, company names) where drift risk is effectively zero.
+
+**Why it works:** Routines run on a schedule (Claudious intake/process/curate, sibling-repo health checks). When reality moves (new Claude model, renamed MCP server, retired scout target), inlined entities become silent bugs. A canonical config is one edit; inlined lists are N edits across N routines. Quarterly staleness audit catches drift that escapes the one-edit discipline.
+
+**Rule:** any `grep -rE '<hardcoded-entity>' scheduled-tasks/` that returns hits outside a canonical-reference expression is a bug. Re-seeded from 2026-04-19 Grok pipeline adaptability audit.
+
+## Verification Prompts Suppress Self-Report — 2026-04-24
+
+**Pattern:** Prompts that request verification output (commit SHAs, file contents, git status, grep counts, test output) must explicitly instruct Claude Code to suppress the Confidence/Assumptions/Context-health self-report block. Without the suppression directive, the self-report overrides the requested literal output and the caller must re-run the prompt.
+
+**Why it works:** CC defaults to emitting a self-report block after verification-style prompts. The self-report is useful interactively but destroys the contract when a downstream script is grep-parsing the literal output. Suppression directive restores determinism in headless routines.
+
+**Template:** `[output-only mode] Run <command>. Print raw output only. Do not emit Confidence, Assumptions, or Context-health self-report.` Re-seeded from 2026-04-19 handoff generation session.
+
 ## Archive

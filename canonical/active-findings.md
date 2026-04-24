@@ -335,14 +335,14 @@
 **Credibility:** OFFICIAL
 **Type:** TECHNIQUE
 **Summary:** Re-seed of constitutional-rule draft: routine prompts, scans, and pipelines must reference canonical config files rather than inlining people/products/URLs/versions/org state. Exceptions for zero-rot entities (protocol/company names). Quarterly staleness audit across canonical config files. Target `canonical/prompting-rules.md`. IMPACT: H | EFFORT: T | RISK: SAFE.
-**Action:** queued
+**Action:** graduated
 
 ### [2026-04-24] constitutional-rule-verification-prompts-suppress-self-report
 **Source:** archive/intake/2026-04-24.md § Section D (re-seeded from 2026-04-19 handoff session)
 **Credibility:** OFFICIAL
 **Type:** TECHNIQUE
 **Summary:** Re-seed of constitutional-rule draft: prompts that request verification outputs (commit SHAs, file contents, git status) must explicitly instruct CC to suppress the Confidence/Assumptions/Context-health self-report block, otherwise the self-report overrides the requested literal output. Target `canonical/prompting-rules.md`. IMPACT: H | EFFORT: T | RISK: SAFE.
-**Action:** queued
+**Action:** graduated
 
 ---
 
