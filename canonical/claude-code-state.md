@@ -1,10 +1,38 @@
 # Claude Code — Current State
 
-**Last updated:** 2026-04-24
-**Version:** 2.1.118 (released 2026-04-23)
+**Last updated:** 2026-04-25
+**Version:** 2.1.119 (released 2026-04-23)
 **Default model:** Opus 4.7
 
 ---
+
+## Features Shipped 2.1.119 (Logan-relevant)
+
+- **`/config` settings persist** to `~/.claude/settings.json` with project / local / policy override precedence — explicit precedence ordering matters when PowerShell `$PROFILE` env vars (e.g. `CLAUDE_CODE_SUBAGENT_MODEL`) conflict with project settings.
+- **`prUrlTemplate`** setting — custom code-review URLs (useful if Logan wires `/ultrareview` to internal review tooling).
+- **`CLAUDE_CODE_HIDE_CWD`** env var — hides working directory in startup logo (privacy when sharing screenshots).
+- **`--from-pr` accepts GitLab MR, Bitbucket PR, GitHub Enterprise PR URLs** — multi-host PR review.
+- **`--print` honors agent's `tools:` and `disallowedTools:` frontmatter** — agent permissions correctly enforced in headless mode.
+- **`--agent <name>` honors agent definition's `permissionMode`** for built-in agents.
+- **PowerShell tool commands** can be auto-approved in permission mode (closes a Windows-side gap).
+- **Hooks `PostToolUse` and `PostToolUseFailure` events include `duration_ms`** — enables per-tool perf telemetry from routine hooks.
+- **Subagent + SDK MCP server reconfiguration connects servers in parallel** (faster Claudious cold-start).
+- **Status-line stdin JSON adds `effort.level` and `thinking.enabled`** — surface current effort/thinking state in custom status lines.
+- **Plugins pinned by another plugin's version constraint auto-update to highest satisfying git tag**.
+- **`owner/repo#N` shorthand uses git remote's host** instead of always pointing to github.com.
+
+## Features Shipped 2.1.116 (Logan-relevant)
+
+- **`/resume`** up to 67% faster on 40MB+ sessions (intake/process/curate routines benefit on long ledger files).
+- **MCP startup faster** via deferred `resources/templates/list`.
+- **Smoother fullscreen scrolling** in VS Code, Cursor, Windsurf; `/terminal-setup` configures editor scroll sensitivity.
+- **Thinking spinner inline progress text** ("still thinking" → "thinking more" → "almost done thinking").
+- **`/doctor`** can be opened while Claude is responding.
+- **`/reload-plugins`** and background plugin auto-update auto-install missing dependencies.
+- **Bash tool hints when `gh` commands hit GitHub API rate limits** — Claudious GH-token aware.
+- **Agent frontmatter `hooks:` fire when running as main-thread agent via `--agent`** — agent hooks no longer subagent-only.
+- **Security: sandbox auto-allow no longer bypasses dangerous-path safety check**.
+- **Downloads moved off Google Cloud Storage** to `https://downloads.claude.ai/claude-code-releases` — corporate proxies whitelisting GCS need to update.
 
 ## Features Shipped 2.1.114 → 2.1.118 (Logan-relevant)
 
@@ -52,6 +80,8 @@
 | `MCP_SERVER_CONNECTION_BATCH_SIZE` | `6` | Parallel MCP server connection batch |
 | `MCP_CONNECTION_NONBLOCKING` | `1` | Don't block session start on slow MCP |
 | `ENABLE_PROMPT_CACHING_1H` | `1` | 1-hour prompt cache TTL (vs default 5m) |
+| `CLAUDE_CODE_HIDE_CWD` | (unset) | Available since 2.1.119; set to hide cwd in startup logo when screen-sharing |
+| `DISABLE_UPDATES` | (unset) | Opt out of background update checks (2.1.118) |
 
 Revisit `ENABLE_PROMPT_CACHING_1H` if burn rate increases — 1h cache writes cost 100% over base input tokens (vs 25% for 5m). Appropriate for Logan's typical long-form sessions.
 
