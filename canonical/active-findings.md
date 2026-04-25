@@ -1,6 +1,6 @@
 # Active Findings — Last 7 Days
 
-**Last updated:** 2026-04-23
+**Last updated:** 2026-04-25
 **Scope:** Intake findings captured in the last 7 days that have not yet graduated to `prompting-rules.md` / `antipatterns.md` or been archived.
 **Refresh:** Maintained by the `intake` routine — new findings appended, items graduated or >7 days old removed.
 
@@ -342,6 +342,124 @@
 **Credibility:** OFFICIAL
 **Type:** TECHNIQUE
 **Summary:** Re-seed of constitutional-rule draft: prompts that request verification outputs (commit SHAs, file contents, git status) must explicitly instruct CC to suppress the Confidence/Assumptions/Context-health self-report block, otherwise the self-report overrides the requested literal output. Target `canonical/prompting-rules.md`. IMPACT: H | EFFORT: T | RISK: SAFE.
+**Action:** queued
+
+---
+
+---
+
+## 2026-04-25 Intake (Scout + Config, novelty=high)
+
+### [2026-04-25] claude-code-2-1-119-release
+**Source:** https://code.claude.com/docs/en/changelog
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.119 (2026-04-23) — `/config` settings now persist to `~/.claude/settings.json` with project/local/policy override precedence; adds `prUrlTemplate` setting; `CLAUDE_CODE_HIDE_CWD` env var hides cwd in startup logo; `--from-pr` accepts GitLab MR, Bitbucket PR, GHE PR URLs; `--print` honors agent `tools:`/`disallowedTools:` frontmatter; `--agent` honors agent `permissionMode`; PowerShell tool commands auto-approvable; Hook `PostToolUse` and `PostToolUseFailure` events include `duration_ms`; subagent + SDK MCP server reconfiguration connects in parallel; status-line stdin JSON adds `effort.level` and `thinking.enabled`.
+**Action:** queued
+
+### [2026-04-25] claude-code-2-1-116-release
+**Source:** https://code.claude.com/docs/en/changelog
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.116 (2026-04-20) — `/resume` up to 67% faster on 40MB+ sessions; faster MCP startup via deferred `resources/templates/list`; smoother fullscreen scrolling in VS Code/Cursor/Windsurf with `/terminal-setup` editor scroll sensitivity; thinking-spinner inline progress text; `/doctor` opens while Claude is responding; `/reload-plugins` and background plugin auto-update auto-install missing dependencies; sandbox auto-allow no longer bypasses dangerous-path safety check; downloads moved off Google Cloud Storage to `https://downloads.claude.ai/claude-code-releases`.
+**Action:** queued
+
+### [2026-04-25] managed-agents-memory-public-beta
+**Source:** https://platform.claude.com/docs/en/release-notes/overview (April 23, 2026)
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Memory for Claude Managed Agents now in public beta under standard `managed-agents-2026-04-01` header. See "Using agent memory" docs for integration. Adds cross-session state to managed agent harness.
+**Action:** queued
+
+### [2026-04-25] rate-limits-api
+**Source:** https://platform.claude.com/docs/en/release-notes/overview (April 24, 2026)
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Rate Limits API released — admins can programmatically query rate limits configured for their organization and workspaces.
+**Action:** queued
+
+### [2026-04-25] advisor-tool-public-beta
+**Source:** https://platform.claude.com/docs/en/release-notes/overview (April 9, 2026)
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Advisor tool in public beta — pair faster executor model with higher-intelligence advisor that provides strategic guidance mid-generation. Long-horizon agentic workloads approach advisor-solo quality while bulk of token generation runs at executor rates. Beta header `advisor-tool-2026-03-01`. Late capture (2 weeks old) — credibility check on prior intake coverage.
+**Action:** queued
+
+### [2026-04-25] cowork-scheduled-tasks
+**Source:** https://winbuzzer.com/2026/04/04/anthropic-claude-desktop-control-windows-cowork-dispatch-xcxwbn/
+**Credibility:** OFFICIAL
+**Type:** TOOL
+**Summary:** Cowork can now create and schedule recurring + on-demand tasks. Direct overlap with CC Routines; opens an alternative execution path for Claudious daily routines if the 15/day Max-plan Routines cap becomes binding.
+**Action:** queued
+
+### [2026-04-25] custom-charts-diagrams-inline
+**Source:** Aggregated April 2026 release notes (multiple)
+**Credibility:** OFFICIAL
+**Type:** MODEL-STATE
+**Summary:** Claude can now render custom charts, diagrams, and visualizations inline in chat responses (no separate Artifacts step). Relevant for daily-briefing rendering if future Claudious brief evolves beyond plain markdown email.
+**Action:** queued
+
+### [2026-04-25] claude-design-launch
+**Source:** https://techcrunch.com/2026/04/17/anthropic-launches-claude-design-a-new-product-for-creating-quick-visuals/
+**Credibility:** VERIFIED
+**Type:** NEWS
+**Summary:** Anthropic launched Claude Design (2026-04-17) as a product for creating quick visuals (logos, mock-ups, decks). Previously labeled "research preview" in `canonical/claude-state.md` Claude.ai Features list — status-tag may need update.
+**Action:** queued
+
+### [2026-04-25] mcp-annotations-spec-pattern
+**Source:** https://devblogs.microsoft.com/devops/azure-devops-mcp-server-april-update/
+**Credibility:** VERIFIED
+**Type:** TECHNIQUE
+**Summary:** MCP Annotations gaining adoption — metadata tags (`readonly`, `destructive`, `openWorld`) help LLMs choose tools safely. Now in MCP spec + Microsoft impl. Relevant if Logan adopts CC Auto mode + 3rd-party MCPs (affects classifier behavior).
+**Action:** queued
+
+### [2026-04-25] routines-cloud-web-infrastructure
+**Source:** https://x.com/claudeai/status/2044095086460309790
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Anthropic positioning Routines as full cloud-side scheduled tasks ("don't need to keep your laptop open"). Triggers: schedule + API + GitHub event. Reinforces 15/day Max cap concern in `canonical/claude-state.md`.
+**Action:** queued
+
+### [2026-04-25] plan-with-opus-execute-with-sonnet
+**Source:** Aggregated X / Reddit community posts (April 2026)
+**Credibility:** COMMUNITY
+**Type:** TECHNIQUE
+**Summary:** Workflow advice circulating: plan with Opus 4.7, execute with Sonnet 4.6, toggle with Shift+Tab in CC. Matches existing `CLAUDE_CODE_SUBAGENT_MODEL=claude-sonnet-4-6` env var; candidate for `prompting-rules.md` graduation if 3+ citations accumulate.
+**Action:** queued
+
+### [2026-04-25] claude-cc-vs-codex-stack-pattern
+**Source:** https://dev.to/_46ea277e677b888e0cd13/claude-code-vs-codex-2026-what-500-reddit-developers-really-think-31pb
+**Credibility:** COMMUNITY
+**Type:** TECHNIQUE
+**Summary:** Community consensus: "Codex for keystroke, Claude Code for commits" — light interactive sessions on CC, drafting/editing on Codex; preserves Max plan token budget under tighter peak-hour limits. Echoes 2026-04-23 routing-table refresh.
+**Action:** queued
+
+### [2026-04-25] config-stale-stack-cc-version
+**Source:** archive/intake/2026-04-25.md § D-1
+**Credibility:** OFFICIAL (measured)
+**Type:** BEHAVIOR
+**Summary:** `canonical/logan-current-stack.md:18` lists Claude Code `2.1.113`; current is `2.1.119`. Six minor versions behind. Causes Grok-scan novelty filter to misclassify already-deployed features as new. IMPACT: M | EFFORT: T | RISK: SAFE.
+**Action:** queued
+
+### [2026-04-25] config-stale-claude-design-status
+**Source:** archive/intake/2026-04-25.md § D-2
+**Credibility:** VERIFIED
+**Type:** BEHAVIOR
+**Summary:** `canonical/claude-state.md:57` tags Claude Design as "research preview"; TechCrunch (2026-04-17) describes it as a launched product. Verify status, then update tag in both `claude-state.md` and `logan-current-stack.md`. IMPACT: L | EFFORT: T | RISK: SAFE (verify before edit).
+**Action:** queued
+
+### [2026-04-25] config-scout-additions-stale
+**Source:** archive/intake/2026-04-25.md § D-5
+**Credibility:** OFFICIAL (measured)
+**Type:** BEHAVIOR
+**Summary:** `scheduled-tasks/scout-additions.md` Active Search Targets stamped 2026-04-20; some items shipped (Task Budgets in active use; Claude Design now launched). Curate decision needed on which targets to retire vs. refresh. IMPACT: M | EFFORT: L | RISK: TEST-FIRST.
+**Action:** queued
+
+### [2026-04-25] config-heartbeat-cloud-routine-clarification
+**Source:** archive/intake/2026-04-25.md § D-6
+**Credibility:** OFFICIAL (measured)
+**Type:** BEHAVIOR
+**Summary:** CLAUDE.md `.claudious-heartbeat/` description doesn't address cloud-routine execution (no machine identity). Documentation gap rather than bug; clarify that cloud-only routine runs are not heartbeat-eligible. IMPACT: L | EFFORT: T | RISK: SAFE.
 **Action:** queued
 
 ---

@@ -1,6 +1,6 @@
 # Claude Model Ecosystem — Current State
 
-**Last updated:** 2026-04-23
+**Last updated:** 2026-04-25
 **Status:** Opus 4.7 is the current flagship (launched April 16, 2026). Opus 4.6 retains specific use cases (cloud Ultraplan).
 
 **Key benchmarks (Opus 4.7 at launch):** SWE-Bench Verified 87.6%, SWE-Bench Pro 64.3%, CursorBench 70% (+12 pts from 4.6). Effective recall on 1M context ~600–700K tokens; plan accordingly for long-context work.
@@ -51,6 +51,16 @@ Treat these as **literal 400-error hazards**, not warnings:
 ## Managed Agents (Public Beta)
 
 Claude Managed Agents is in public beta behind the `managed-agents-2026-04-01` beta header. Anthropic-hosted agent runtime — alternative to self-hosted Routines and SDK loops. Evaluate before committing to a hosting model.
+
+**Memory** for Managed Agents added to public beta on 2026-04-23 under the same `managed-agents-2026-04-01` header — cross-session state persistence inside the managed agent runtime.
+
+## Advisor Tool (Public Beta)
+
+Launched 2026-04-09. Beta header `advisor-tool-2026-03-01`. Pair a faster executor model with a higher-intelligence advisor model that provides strategic guidance mid-generation, so long-horizon agentic workloads get close to advisor-solo quality while the bulk of token generation runs at executor-model rates.
+
+## Rate Limits API
+
+Released 2026-04-24. Admins can programmatically query rate limits configured for their organization and workspaces. Useful if Claudious starts gating routines on burn-rate forecasts.
 
 ## Claude.ai Features Logan Uses
 
