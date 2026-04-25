@@ -29,4 +29,5 @@
 - **/doctor now warns on MCP scope drift** — use before triaging MCP-break bugs.
 
 ## Orphan reconciliation
+- 2026-04-25T11:33:14.344Z — Reconciled 1 orphan branch(es): PR(s) #30 — run https://github.com/logancallen/Claudious/actions/runs/24929941315
 - 2026-04-24T16:46:29.695Z — Reconciled 2 orphan branch(es): PR(s) #28, #29 — run https://github.com/logancallen/Claudious/actions/runs/24901090611
