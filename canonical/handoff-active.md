@@ -1,224 +1,176 @@
-# HANDOFF: 2026-04-24 — PC-OPTIMIZATION — Domain 4 BIOS Complete, VBS Stuck Running
+# Handoff — Active Session State
 
-**Recommended next-chat title:** `2026-04-25 — PC-OPTIMIZATION — VBS Kill (25H2 Auto Device Encryption)`
-
-**Generated:** 2026-04-24 ~21:50 CDT
-**Session status:** Domain 4 BIOS pass executed and saved successfully on Logan's actual rig. All 11 BIOS changes committed cleanly. VBS post-BIOS verification is FAILING — `msinfo32` still reports `Virtualization-based security: Running` despite Memory Integrity Off in Windows Security GUI, three registry/bcdedit overrides applied, and three reboots. Logan is frustrated that VBS won't die. Receiving chat: solve the 25H2 VBS lock, do not re-do BIOS work.
-
----
-
-## TL;DR for receiving chat
-
-Logan's BIOS pass for Arc Raiders is done. Don't touch BIOS. The remaining problem is purely Windows-side: **Windows 11 Pro 25H2 build 26200 is keeping VBS Running despite multiple kill attempts.** Logan kept SVM Enabled in BIOS (per audit decision — preserves Docker Desktop / WSL2 for his full-stack dev work), so VBS must be killed at the OS layer. So far: GUI toggle Off, registry DeviceGuard EnableVirtualizationBasedSecurity=0, registry Lsa LsaCfgFlags=0, attempted `bcdedit /set hypervisorlaunchtype off`. None worked. The likely culprit is **Automatic Device Encryption** auto-re-enabling VBS on every boot (25H2 behavior). Receiving chat: walk Logan through identifying and disabling whatever is force-re-enabling VBS, then verify VBS = Not enabled, then resume verification protocol (CCD0 preferred-cores check + HWiNFO sensor check).
+**Updated:** 2026-04-25 PM
+**From chat:** Claude Mastery Lab — DISTILL 4-engine DR sweep, AI platform updates Jan–Apr 2026
+**Recommended next-chat title:** `2026-04-26 — MASTERY — DR-sweep implementation kickoff`
+**Status:** DISTILL synthesis complete. All decisions deferred to next chat per Logan.
 
 ---
 
-## Hardware lock (do not reinterpret — already verified by msinfo32)
+## Current Focus
 
-- CPU: AMD Ryzen 9 9950X3D 16C/32T
-- Mobo: ASUS ROG Strix B850-F Gaming WiFi
-- BIOS: AMI 2.22.1284, version 0401, dated 9/6/2024 (1644 flash deferred — DO NOT propose flash unless Logan invokes)
-- RAM: 64GB Corsair CMH64GX5M2B6000C30 (2x32GB DDR5-6000 CL30, Hynix A-die)
-- GPU: GIGABYTE RX 9070 XT GAMING OC 16G on Adrenalin 26.3.1 WHQL
-- Storage: WD_BLACK SN850X 4TB
-- OS: Windows 11 Pro 25H2 (Build 26200)
-- Display: LG UltraGear 34GS95QE 240Hz WOLED, DisplayPort, FreeSync Premium Pro
-- Controller: Scuf Envision Pro (iCUE-managed), wired
-- Game binary: `C:\Program Files (x86)\Steam\steamapps\common\Arc Raiders\PioneerGame\Binaries\Win64\PioneerGame.exe`
-- BitLocker: Only on external drive D:, system C: not encrypted (per Logan's session-start brief)
-- Secure Boot State: On
-- Kernel DMA Protection: Off
-- Automatic Device Encryption Status: **Elevation Required to View** ← THIS IS THE SUSPECTED CULPRIT
+Implement findings from completed 4-engine DR sweep (Claude DR, ChatGPT GPT-5.5 Pro DR, Grok DR, Perplexity Model Council). Synthesis identified 27 NEW + 14 UPGRADE + 14 REDUNDANT items across Anthropic, OpenAI, Perplexity, xAI, and cross-cutting tooling.
+
+Three time-sensitive deadlines drive sequencing:
+1. **5-DAY HARD DEADLINE — April 30, 2026:** Sonnet 4.5 / Sonnet 4 1M-context beta header becomes a no-op. Any pinned model ID handling >200K context will silently error.
+2. **11-DAY DEADLINE — May 5, 2026:** Pro/Max `/ultrareview` 3-free-runs trial closes.
+3. **36-DAY DEADLINE — May 31, 2026:** ChatGPT Pro 10× Codex usage promo closes.
 
 ---
 
-## What's DONE on this rig (do NOT redo, do NOT re-execute)
+## Decisions Deferred to Next Chat
 
-### BIOS changes saved at session-end commit (all 11 confirmed in Save Changes & Reset summary screen):
+Logan explicitly chose to defer all decisions to the next chat with fresh context. Next chat must decide:
 
-| # | Setting | From → To |
-|---|---|---|
-| 1 | Precision Boost Overdrive | Auto → Manual |
-| 2 | Precision Boost Overdrive Scalar | Auto → Manual |
-| 3 | Customized Precision Boost Overdrive Scalar | 2x → 1x |
-| 4 | CPU Boost Clock Override | Auto → Disabled |
-| 5 | Curve Optimizer | Auto → All Cores |
-| 6 | All Core Curve Optimizer Sign | Positive → Negative |
-| 7 | All Core Curve Optimizer Magnitude | 0 → 10 |
-| 8 | CPU SOC Voltage | Auto → Manual Mode |
-| 9 | VDDSOC Voltage Override | Auto → 1.15000V |
-| 10 | Global C-state Control | Auto → Enabled |
-| 11 | CPPC Dynamic Preferred Cores | Auto → Driver |
-
-PPT/TDC/EDC limits left at Auto (intentional, per safe-across-silicon plan).
-SVM Mode: **NOT changed, stays Enabled** (per GPT-5.5 audit recommendation — preserves Docker Desktop + WSL2).
-Above 4G Decoding + Resize BAR Support: verified Enabled (no changes needed).
-
-System POSTed cleanly after F10 Save & Exit. Cold boot worked. Display lost handshake briefly mid-reboot causing a hard-power, which triggered Windows Recovery → "Diagnosing your PC" → "couldn't be repaired" (only because online repair couldn't reach network — benign). Recovery → Continue → Windows desktop loaded normally. **BIOS is fine. System is stable.**
-
-### Windows-side commands run before this handoff was requested:
-
-```powershell
-# Run 1 (per first attempt — operation completed)
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\DeviceGuard" /v EnableVirtualizationBasedSecurity /t REG_DWORD /d 0 /f
-
-# Run 2 (per first attempt — operation completed)
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v LsaCfgFlags /t REG_DWORD /d 0 /f
-
-# Run 3 (FAILED — PowerShell parsed {current} as encodedCommand)
-bcdedit /enum {current}
-# Returned: "Invalid command line switch: /encodedCommand"
-# Should be: bcdedit /enum '{current}'  (single quotes)
-# OR run from cmd.exe instead of PowerShell where the braces parse cleanly.
-```
-
-Memory Integrity confirmed Off via Windows Security GUI before reg commands.
-Reboot completed after reg commands.
-Post-reboot msinfo32 still shows: **Virtualization-based security: Running**
-A hypervisor has been detected: present
-Virtualization-based security Av...: Base Virtualization Support, Secure Boot, DMA Protection, UEFI Code Readonly...
+1. **Routing table approval or override** — Phase 7 of the DISTILL output proposed 9 canonical updates, 11 new proposals, 2 graduations to queue, 3 alerts.md HIGH entries, 1 memory_user_edits, 1 calendar reminder. Full table is in chat transcript. Next chat reviews and approves or overrides per item.
+2. **Chat structure** — single implementation chat vs three-chat split (MASTERY canonical/userPrefs → CLAUDIOUS proposals → MASTERY architectural decisions). Recommend three-chat split; deferred.
+3. **Architectural decisions** — Managed Agents vs Claudious; Perplexity Agent API vs current FastAPI/multi-vendor SDK stack; Plugin Marketplace audit scope. All require Logan judgment.
+4. **Sequencing within Chat 1** — proposed order is alerts.md → Sonnet audit → CC v2.1.119 update → canonical batch → proposals batch. Re-evaluate after fresh-context review.
 
 ---
 
-## What's NOT done (in priority order for next chat)
+## Top 5 Items by Implementation Priority
 
-### 1. KILL VBS — primary blocker
+1. **DR-CC-101: Update Claude Code v2.1.113 → v2.1.119** on Mac Studio + Windows PC. Restores 3% coding quality lost to Apr 16 verbosity-prompt regression (fixed v2.1.116). Anthropic reset usage limits Apr 23. Highest ROI/effort ratio in entire sweep. Effort: TRIVIAL (`claude update`). Confidence: 99%.
 
-Receiving chat must solve this BEFORE any other verification work. The chain to walk:
+2. **DR-CC-113: Audit pinned Sonnet 4.5 / Sonnet 4 model IDs before April 30.** Run `grep -rn "claude-sonnet-4-2025\|claude-sonnet-4-5-2025\|claude-opus-4-2025" .` across active projects. Migrate any hits to `claude-sonnet-4-6` or `claude-opus-4-7`. Effort: LOW (~30 min). Confidence: 99%.
 
-**Step A — Confirm whether bcdedit ever set hypervisorlaunchtype to Off:**
-- Open **cmd.exe as Administrator** (not PowerShell — the brace parsing is cleaner)
-- Run: `bcdedit /enum {current}`
-- Look for `hypervisorlaunchtype` line. Logan never confirmed this was set to Off — first attempt failed because `bcdedit /set hypervisorlaunchtype off` was buried in advice but the actual /enum verification got eaten by PowerShell brace parsing. We do not know whether the `/set` ever ran successfully.
-- If `hypervisorlaunchtype` reads `Auto` or is missing: run `bcdedit /set hypervisorlaunchtype off` from elevated cmd.exe → verify success message → reboot → recheck msinfo32.
+3. **DR-CC-102: Wire `type:"mcp_tool"` hooks** into one highest-frequency MCP flow (likely Supabase migration safety or Netlify deploy verifier). 4-engine OFFICIAL consensus on Anthropic CHANGELOG. v2.1.118 added it. Effort: MEDIUM (~2 hr first migration). Confidence: 95%.
 
-**Step B — If Step A doesn't kill it, identify what's force-re-enabling VBS:**
-- 25H2 + 9950X3D + ASUS B850-F + clean Microsoft account login = high probability **Automatic Device Encryption** is on.
-- Settings → Privacy & Security → Device encryption → check status. If "Device encryption" toggle is ON, it's actively encrypting C: in the background which requires VBS, and Windows will refuse to disable VBS while AutoDE is provisioning or active.
-- Logan's Aut. Device Encryption Status row in msinfo32 = "Elevation Required to View" (suggests it's active, not just available).
-- Logan stated at session start: "BitLocker: only an external drive (D:) — system drive C: not encrypted, no recovery key needed for BIOS work." But 25H2 may have enabled AutoDE silently after install regardless. Verify with `manage-bde -status C:` from elevated cmd.
+4. **DR-CC-107: Replace `--dangerously-skip-permissions`** with Auto Mode (Max + Opus 4.7 default) in Claudious daily routines. Direct risk-surface reduction. Effort: TRIVIAL. Confidence: 95%.
 
-**Step C — Check Group Policy / DeviceGuard configured override:**
-- Run `gpresult /h c:\gpreport.html` then open the report. Look for any "Turn On Virtualization Based Security" policy from local GPO or domain.
-- Or check directly: `reg query "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard"` — any keys here with EnableVirtualizationBasedSecurity=1 will override the CurrentControlSet key Logan set.
-
-**Step D — Smart App Control / Reputation-based protection:**
-- 25H2 ties Smart App Control to VBS. If Smart App Control is "On" or "Evaluation," VBS cannot be disabled via standard means.
-- Settings → Privacy & Security → Windows Security → App & browser control → Smart App Control settings → if On or Evaluation → set Off (note: Off is permanent, cannot re-enable without Windows reinstall, so this is a real decision Logan should make consciously).
-
-**Step E — Last resort options if A-D all fail:**
-- **Option 1 (recommended fallback):** Accept VBS Running. The 5-14% FPS hit number from older benchmarks is likely 2-6% on RDNA 4 / 25H2 in UE5 titles. Move on to verification.
-- **Option 2:** Disable Auto Device Encryption (requires decrypting C: first if active — non-trivial, can take 30+ min, requires recovery key backup before).
-- **Option 3:** Go back to BIOS and disable SVM. Kills VBS at firmware. Trade: WSL2 + Docker Desktop break. Logan rejected this earlier per GPT audit. Don't propose unless A-D fail and Logan accepts the dev-environment hit.
-
-### 2. Verify CPPC=Driver actually steered preferred cores to CCD0
-- Task Manager → Performance → CPU → right-click graph → Change to → Logical processors
-- Idle activity should weight on cores 0–7 (CCD0, V-Cache CCD)
-- Bonus: Ryzen Master Home tab — gold stars should be on cores 0–7 (NOT cores 8/12 like the pre-BIOS baseline)
-- If gold stars still on CCD1: AMD 3D V-Cache Performance Optimizer service may need a kick. `services.msc` → find AMD 3D V-Cache Performance Optimizer → Restart.
-
-### 3. Verify HWiNFO sensors
-Logan should run HWiNFO64 in Sensors-only mode and confirm:
-- VDDCR_SoC under load: should be ≤1.18V (was 1.288V auto pre-BIOS)
-- CPU Vcore at idle: should be ~1.0-1.05V (was 1.287V from Scalar 10X effect)
-- Memory Clock: 3000 MHz
-- UCLK: 3000 MHz (1:1 with memory — critical, Zen 5 IMC running 1:1 confirms SoC undervolt didn't break IMC stability)
-- WHEA Errors: 0 after 30 min of normal use
-
-### 4. 30-min Arc Raiders gameplay test
-- Load into a raid (or two — Logan's flow is "one raid no expectations, two raids tune FOV/sens, five raids lock")
-- Watch HWiNFO during gameplay for WHEA increments, frame stutters, hitching
-- Check Event Viewer → System log after — look for any WHEA-Logger source events. Zero is target.
-
-### 5. Then resume the paused-chat checklist work (still left from prior session)
-- LG OSD config (~3 min, OSD_Checklist.md)
-- iCUE Scuf Envision Pro profile (~5 min, iCUE_Checklist.md)
-- In-game graphics sliders (~3 min, InGame_Sliders_Checklist.md, skip graphics tab — ini is locked)
-- Adrenalin Global Settings pass (~2 min)
-- Frame Rate Target 237 in per-game profile (~30 sec)
+5. **DR-PPX-101: Add Perplexity-as-MCP-server** to Claude Code. Bidirectional research↔build bridge. Effort: LOW (~20 min). Confidence: 88%.
 
 ---
 
-## Pending checklist corrections to commit (still unwritten as of this handoff)
+## Stale State Identified (must fix in next chat)
 
-`projects/pc-optimization/arcraiders/Adrenalin_Checklist.md` needs three patches:
-1. Binary name: change `ArcRaiders-Win64-Shipping.exe` → `PioneerGame.exe` at correct Steam path
-2. Anisotropic Filtering: change "off" → "Enabled, 16x driver-forced" (<0.5% perf cost on RX 9070 XT)
-3. AA Method row: add note "inert when AA = Use application settings — Supersampling or Multisampling both fine, no perf delta"
+**🔴 Hard contradictions with current reality:**
+- `userMemories` says: "Auto Mode (CC-009) is not available on the Max plan — Team/Enterprise/API only" → False as of Apr 16, 2026. Auto Mode is now Max + Opus 4.7 default. Fix via `memory_user_edits`.
+- `Mastery Lab project instructions` say: "Claude Code: v2.1.113" → 6 versions stale; current is v2.1.119.
+- `Mastery Lab project instructions` say: "Custom Claude.ai skills (8): logan-os, operating-system, ..." → 4 skills (logan-os, operating-system, financial-modeler, legal-scanner) are Claude desktop-app skills only, not visible to Claude Code CLI per superpowers-trial-log.md. CLI surface is 4 skills, not 8.
+- `canonical/toolchain.md` "MCP Servers Connected (12)" → URLs likely stale on at least 3 of 12: Linear (OAuth 2.1 / SSE→HTTP migration required), Cloudflare (Code Mode swap available at mcp.cloudflare.com), Stripe (v0.3.x at mcp.stripe.com).
+- `mastery-lab/logan-current-setup-v4.md` — alerts.md flagged stale 2026-04-22 on 6 dimensions; v5 not yet shipped.
 
-Receiving chat at session-end: draft Claude Code prompt to patch these + commit with rationale message.
+**🟡 Framing stale, content not yet wrong:**
+- `canonical/toolchain.md` "Cowork… research preview" → Cowork GA on Mac + Windows since April 9, 2026.
+- `mastery-lab/claude-mastery-playbook-v2.md` CC-007 `/ultraplan` description → "30-min cloud planning via Opus 4.6 on CCR" framing pre-GA; now auto-creates cloud env, supports remote/local execution.
+- `canonical/active-findings.md` `ant-cli-launch` MEDIUM "evaluation candidate" → Managed Agents public beta elevates to architectural-decision tier.
+- `canonical/prompting-rules.md` missing entries: `/ultrareview`, `/ultraplan`, `/loop`, `/team-onboarding`, `/recap`, `/undo`. None currently documented.
+- `archive/proposals/compile-time-feature-flags-radar.md` — KAIROS/BRIDGE_MODE/CHICAGO_MCP have moved closer to or into GA via Remote Control + Dispatch + `--channels` (Claude DR CC-21) and Computer Use (Claude DR CL-002 / CC-105). Watchlist needs update.
 
----
-
-## Decisions made this session (for context)
-
-1. **VDDSOC = 1.15V instead of 1.10V** (audit-driven). GPT-5.5 audit pushed for 1.20V; Claude pushed back at 1.15V as the right safe-across-silicon point per Hynix A-die canonical doc. Currently committed at 1.15V. If 1.15V WHEAs in 30 min gameplay, walk to 1.18V first before going higher.
-
-2. **CO All-Core -10 held** despite GPT-5.5 audit suggesting -5 first. Rationale: -5 captures only ~50% of the boost/thermal benefit; -10 is the AMD-community safe-across-silicon line; failure mode is benign (Arc Raiders crash within first hour → dial back to -5). Logan accepted the ~15-20% probability of weak-silicon walk-back.
-
-3. **PBO Scalar = Manual 1X (not Disabled).** ASUS BIOS dropdown only exposed Auto / Manual on the Scalar field — "Disabled" was described in help text but not selectable. Manual + value 1 produces same 1X behavior.
-
-4. **PBO mode = Manual (not "Advanced").** ASUS uses "Manual" terminology where AGESA reference uses "Advanced." Same behavior — exposes PPT/TDC/EDC limit fields below.
-
-5. **CPPC Dynamic Preferred Cores = Driver (not Cache, not Frequency).** Driver hands authority to AMD 3D V-Cache Performance Optimizer service which is game-aware. Cache forces CCD0 always (hurts non-gaming workloads). Frequency forces CCD1 (wrong CCD for X3D gaming).
-
-6. **SVM stays Enabled, kill VBS via Windows.** Per GPT-5.5 audit. Preserves Docker Desktop / WSL2. Trade is the current pain point — Windows 25H2 isn't cooperating.
-
-7. **BIOS 0401 not flashed to 1644.** Project-locked deferred decision. CPPC=Driver works on 0401 per canonical doc.
-
-8. **Skip stress testing, validate via gameplay + WHEA monitoring.** Per Logan's session-start constraint.
+**🟡 Reconciliation pending:**
+- MCP count inconsistency (5+ / 7 / 12) — open proposal `reconcile-mcp-count-inconsistency.md`. Claude DR adds Cowork-side surface (~30+ connectors) as distinct from Claude Code MCPs, strengthens the surface-split solution.
+- Three "routine" features conflated: Claude Code Routines vs `/loop` vs Cowork Scheduled Tasks. Logan's "3 daily cloud routines" are most likely Claude Code Routines specifically — needs explicit confirmation.
+- ASF Migrations 026-028 employee-permissions break — alerts.md flagged 2026-04-22; still uncleared 8+ days. Drift report and Pioneer report both flagged it; no asf-graphics-app session held.
+- Proposals backlog: 40 items as of 2026-04-22, at least 6 over 8 days old. Mid-month report warned ≥30 = bulge; 45-min graduate-or-archive batch overdue.
 
 ---
 
-## Frustration signals (do not repeat in next chat)
+## Critical Alerts to Land in alerts.md
 
-- Logan called out that VBS is the single point of failure and asked for handoff explicitly: "you can't seem to fix this." Receiving chat: do NOT propose another speculative reg key without first running diagnostics (gpresult, manage-bde -status, bcdedit /enum from cmd.exe). One concrete diagnostic per turn, not three speculative writes.
-- Logan was clear earlier: bullets, no walkthrough narration, one BIOS page at a time, terminology that matches what's on screen. Apply the same to Windows-side work — don't suggest "navigate to Settings → Privacy → ..." without confirming the path is current for 25H2 (Microsoft moves these around).
-- Earlier in session: Claude used wrong terminology ("Advanced" for PBO mode when ASUS exposes "Manual"). Logan corrected. Receiving chat: when uncertain about exact 25H2 menu names, ask Logan to send a screenshot of the current screen rather than guess.
-- Earlier in session: Logan can't take screenshots while doing PC work — uses phone pics of monitor. Receiving chat: same rule.
-- Logan rejected a `bcdedit` block written with `{current}` un-escaped. PowerShell ate the braces. Use elevated cmd.exe for bcdedit going forward, or escape with single quotes in PowerShell.
+Recommend dropping these into alerts.md immediately on next chat open, before any other work:
 
----
-
-## Files / commits state (current canonical)
-
-- `4e9de43`: 6-file kit (Deploy-ArcRaidersConfig.ps1, 4 checklists, README.md)
-- `543f2d3`: 12 prior artifacts (briefs/walkthroughs/decided-settings)
-- `66b021c`: docs/learnings.md em-dash encoding gotcha
-- Graphics ini: 25 values written to `%LOCALAPPDATA%\PioneerGame\Saved\Config\WindowsClient\GameUserSettings.ini`, read-only, backup `.bak-20260422-234523`
-- Adrenalin per-game profile: 7 settings corrected live (prior session)
-- BIOS: all 11 changes from this session committed via F10 Save & Exit, system stable post-reboot
-
-No new files committed this session. Adrenalin_Checklist.md corrections still pending.
+1. 🔴 5-DAY DEADLINE: Sonnet 4.5/4 1M context retires April 30, 2026. Audit pinned model IDs.
+2. 🟡 11-DAY DEADLINE: `/ultrareview` Pro/Max 3-free-runs trial closes May 5, 2026.
+3. 🟡 36-DAY DEADLINE: ChatGPT Pro 10× Codex promo closes May 31, 2026.
+4. 🔴 BREAKING: Linear MCP SSE→HTTP migration required (final SSE removal date TBD by Linear; verify next session).
+5. 🟡 SECURITY WATCHLIST: Cowork/Comet prompt-injection vulnerabilities flagged by Zenity Labs, LayerX, Guardio (March 2026). Defensive posture for sensitive accounts (banking, tax, Stripe production keys).
 
 ---
 
-## User Preferences changes surfaced this session (defer to Mastery Lab)
+## Findings Inventory (full DISTILL output is in chat transcript)
 
-- None this session. Logan's existing preferences for confidence-stating, terminology-on-screen, one-step-at-a-time all worked well. No drift requested.
+**27 NEW techniques identified. Highlights:**
+- Claude Code v2.1.119 release bundle (settings persistence, parallel MCP for subagents, agent permissionMode, multi-platform PR, prUrlTemplate)
+- Hooks invoke MCP tools directly (`type:"mcp_tool"`)
+- Auto Mode GA (Max + Opus 4.7 default)
+- Claude Code Routines (HTTP/GitHub triggers, `experimental-cc-routine-2026-04-01` header)
+- Advisor tool (`advisor-tool-2026-03-01` header — executor + advisor pair)
+- Managed Agents public beta + `ant` CLI + memory beta (`managed-agents-2026-04-01`)
+- Claude Code on the web (`--remote` / `--teleport`)
+- Compaction API beta + adaptive thinking GA
+- Cowork plugins ecosystem (11 first-party + 13 connectors)
+- `/team-onboarding` 30-day session self-audit
+- Remote Control + Dispatch + `--channels`
+- Anthropic Plugin Marketplaces (101 plugins; 33 Anthropic + 68 partner)
+- GPT-5.5 / GPT-5.5 Pro launch (1M API context, $5/$30 and $30/$180)
+- ChatGPT Pro $100 tier (additive to $200, 5x Plus usage, 10x Codex promo)
+- GPT-5.3-Codex-Spark (Pro-tier-only, 1000+ TPS research preview)
+- Codex pay-as-you-go + Codex-only seats
+- ChatGPT Projects upgrades (project-only memory)
+- Agents SDK native sandbox + Manifest abstraction
+- OpenAI Deep Research overhaul on GPT-5.2-base + MCP integration
+- Responses API + Conversations API (Assistants sunset Aug 26, 2026)
+- Perplexity custom MCP connectors
+- Perplexity Computer as orchestration layer (~20 routed models, 400+ apps)
+- Perplexity Personal Computer Mac GA (Apr 16, Mac-only)
+- Perplexity Agent API + Embeddings API + Sandbox API
+- Perplexity Spaces with scheduled tasks + Computer-in-Spaces
+- Perplexity Model Council documented in canonical
+- Linear Agent + MCP OAuth 2.1 (BREAKING SSE migration)
+- Cloudflare Code Mode MCP at mcp.cloudflare.com (~2500 endpoints in ~1k tokens)
+- VS Code Copilot 1.110–1.115 Agent Plugins + Hooks + Autopilot
+- MCP Apps framework SEP-1865 (interactive UI)
+- Stripe MCP v0.3.x at mcp.stripe.com (OAuth remote, 25 tools)
+- Hugging Face official remote MCP at huggingface.co/mcp
+- Cursor 3.0 Agents Window + /multitask + Design Mode
+- claude-code-router proxy (cost lever, COMMUNITY)
+- Sonnet 4.5/4 1M context retire Apr 30, 2026 (HARD DEADLINE)
+- Cowork/Comet prompt-injection vulnerabilities (3rd-party security)
+
+**14 UPGRADE techniques** apply to existing canonical entries — full Phase 4 detail in chat transcript.
+
+**Disagreement resolution log (Phase 2):** all 11 disagreements resolved or appropriately deferred. Two notable corrections: (a) ChatGPT Pro $100 was *added* alongside existing $200, not a replacement — Logan should confirm which tier in ChatGPT settings; (b) Auto Mode availability — userMemory was wrong, Auto Mode IS on Max + Opus 4.7.
 
 ---
 
-## Quick-paste opener for receiving chat
+## Proposed Routing Table (for next-chat approval)
 
-> I paused mid-session. Read `canonical/handoff-active.md` for full context — do NOT ask me to re-explain.
->
-> **What's done:** All 11 BIOS changes committed and saved. System POSTs cleanly. Windows desktop loads. Memory Integrity Off. Two reg key overrides applied. VBS still shows Running in msinfo32 after 3 reboots.
->
-> **The blocker:** Windows 11 Pro 25H2 (build 26200) is force-re-enabling VBS. Likely culprit is Automatic Device Encryption per AutoDE row showing "Elevation Required to View" in msinfo32, but this is unconfirmed.
->
-> **Start here:** Walk me through diagnostics in this order — bcdedit verification from cmd.exe (not PowerShell), then `manage-bde -status C:`, then check `HKLM\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard`, then Smart App Control state. ONE diagnostic per turn. I'll run + send output. Don't write speculative fix-blocks.
->
-> **Hardware lock unchanged:** 9950X3D / B850-F BIOS 0401 / 64GB DDR5-6000 / RX 9070 XT / SN850X 4TB / 25H2 Pro. Already-completed BIOS changes are in the handoff — don't re-do them.
->
-> **Rules:**
-> - Bullets, no walkthrough narration
-> - Terminology that matches what's on screen
-> - When uncertain about 25H2 menu paths, ask for a screenshot
-> - Use elevated cmd.exe for bcdedit, not PowerShell
->
-> Start with the bcdedit /enum verification step. Go.
+Next chat reviews Phase 7 in transcript. High-level summary:
+
+- 9 canonical updates: claude-code-state.md (state changes for v2.1.119, Routines, Auto Mode, /ultrareview, /ultraplan, Computer Use, /team-onboarding, third surface), toolchain.md (Cowork GA, Cowork plugins, MCP swaps for Linear/Cloudflare/Stripe/HF, Perplexity Personal Computer Mac, Perplexity-as-MCP, Perplexity Computer, Perplexity Model Council, Plugin marketplaces), prompting-rules.md (Diagnostic Commands section), claude-state.md (deprecation schedule update for Sonnet 4.5/4)
+- 11 new proposals: hooks-mcp-tool-direct-trial, advisor-tool-cost-quality-trial, managed-agents-vs-claudious-decision, claude-code-setup-plugin-evaluation, openai-responses-migration-audit, exa-mcp-evaluation, portable-vault-mcp-decision (SKIP recommendation), cloudflare-enterprise-mcp-watchlist, linear-mcp-oauth-2-1-migration, perplexity-api-as-fastapi-backend-decision, plugin-marketplace-audit
+- 2 graduations to queue: skill-description-1536-chars-audit (third citation reached); session-checkpointing-before-autonomous-runs (also third citation)
+- 3 alerts.md HIGH: Sonnet retirement, /ultrareview trial close, Linear SSE migration
+- 1 memory_user_edits: fix Auto Mode availability statement
+- 1 calendar reminder: May 24, 2026 — re-evaluate ChatGPT Pro $100 vs $200
 
 ---
 
-## END HANDOFF
+## Files Recently Changed This Session
+
+None — DISTILL session was synthesis only. No file writes.
+
+---
+
+## Frustration Signals (do not repeat)
+
+- Claude Deep Research froze twice during the parallel sweep. For implementation chats, do NOT depend on long-running multi-engine reasoning chains. Sequence work in batches small enough to survive a frozen response without losing state.
+- Logan pushed back on long DISTILL explanations. Brief findings + system-staleness sweep was the format he wanted. Next chat: lead with action items, not synthesis. Implementation work, not re-explanation.
+- "Just briefly tell me what the findings are" — keep responses scoped to what's being decided right now, not full justification.
+
+---
+
+## User Preferences Changes Pending
+
+None pending User Preferences edits this session. The only preference-adjacent change is the userMemory fix (Auto Mode availability), routed via memory_user_edits not userPreferences. No reproduction of the full preferences document needed this handoff.
+
+---
+
+## Unresolved Questions
+
+1. Routing table approval — pending fresh-context review
+2. Chat structure — single chat vs three-chat split — deferred
+3. Architectural decision proposals (Managed Agents, Perplexity Agent API, Plugin Marketplace audit) — write proposals first or after time-sensitive items ship?
+4. Linear SSE final removal date — Linear hasn't announced; verify before scheduling migration
+
+---
+
+## First Action for Next Chat
+
+1. Read this handoff (auto via SessionStart hook).
+2. Drop the 5 critical alerts into canonical/alerts.md before anything else (5-day Sonnet deadline is the controlling constraint).
+3. Decide: single chat or three-chat split. Recommend three-chat split.
+4. If single chat: sequence is alerts → Sonnet audit → CC update → canonical batch → proposals batch. If three-chat split: this chat handles alerts + Sonnet audit + CC update + canonical batch only; spawn fresh chat for proposals batch and another for architectural decisions.
+5. Approve or override Phase 7 routing table per item.
