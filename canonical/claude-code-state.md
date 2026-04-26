@@ -1,23 +1,41 @@
 # Claude Code — Current State
 
-**Last updated:** 2026-04-24
-**Version:** 2.1.118 (released 2026-04-23)
+**Last updated:** 2026-04-26
+**Version:** 2.1.119 (released 2026-04-23)
 **Default model:** Opus 4.7
 
 ---
 
-## Features Shipped 2.1.114 → 2.1.118 (Logan-relevant)
+## Features Shipped 2.1.114 → 2.1.119 (Logan-relevant)
 
-- **Vim visual mode** — `v` enters character-wise visual mode, `V` enters visual-line mode, with selection, operators, and visual feedback.
-- **`/usage` merge** — `/cost` and `/stats` combined into a single `/usage` command.
-- **Custom named themes via `/theme`** — create and switch between user-defined themes.
-- **Hooks can invoke MCP tools directly** — no shell-out intermediary needed. Cleaner path for Claudious preflight/heartbeat hooks.
-- **`DISABLE_UPDATES` env var** — opt out of background update checks.
-- **WSL managed settings inheritance** — WSL-on-Windows now inherits Windows-side managed settings.
-- **Stdio MCP non-JSON stdout no longer disconnects** — servers that print stray non-JSON lines to stdout are no longer dropped.
-- **Headless/SDK session auto-title requests fixed** — directly relevant to Claudious scheduled routines.
-- **Piped-output memory bug fixed** — excessive memory allocation on piped output resolved.
-- **Minor fixes** — `/skills` menu scrolling; Remote Control session bugs; Homebrew install update-prompt loop; ctrl+e in multiline prompts; fullscreen scrolling; Write tool diff compute speed on large files.
+- **Settings persistence** (2.1.119) — `/config` settings (theme, editor mode, verbose, etc.) now persist to `~/.claude/settings.json` and participate in project/local/policy override precedence.
+- **`--print` mode honors agent frontmatter** (2.1.119) — `--print` mode honors agent `tools:` and `disallowedTools:` frontmatter, matching interactive-mode behavior.
+- **`--agent` honors built-in `permissionMode`** (2.1.119) — `--agent <name>` now honors the agent definition's `permissionMode` for built-in agents.
+- **Hook duration tracking** (2.1.119) — `PostToolUse` and `PostToolUseFailure` hook inputs include `duration_ms` (excludes permission prompts and PreToolUse hooks).
+- **Parallel MCP reconfig** (2.1.119) — subagent and SDK MCP server reconfiguration connects servers in parallel instead of serially.
+- **Headless status line additions** (2.1.119) — stdin JSON now includes `effort.level` and `thinking.enabled` (relevant to Claudious scheduled routines).
+- **OpenTelemetry richer events** (2.1.119) — `tool_result` and `tool_decision` events include `tool_use_id`; `tool_result` also includes `tool_input_size_bytes`.
+- **Agent `mcpServers` for main thread** (2.1.117) — agent frontmatter `mcpServers` are now loaded for main-thread agent sessions via `--agent`.
+- **Model selection persists across restarts** (2.1.117) — selections persist even when project pins a different model.
+- **Concurrent MCP connect default** (2.1.117) — faster startup when both local and claude.ai MCP servers configured.
+- **Plugin install fills missing dependencies** (2.1.117) — `plugin install` on already-installed plugin now installs missing dependencies instead of stopping.
+- **Managed-settings marketplace enforcement** (2.1.117) — `blockedMarketplaces` and `strictKnownMarketplaces` enforced on plugin install, update, refresh, and autoupdate. Pair with MCP RCE supply-chain audit.
+- **`/resume` 67% faster on 40MB+ sessions** (2.1.116) — handles many dead-fork entries efficiently.
+- **MCP startup optimization** (2.1.116) — `resources/templates/list` deferred to first `@`-mention; faster startup with multiple stdio servers.
+- **Thinking spinner inline progress** (2.1.116) — replaces separate hint row with inline "still thinking" → "almost done thinking".
+- **`/doctor` opens mid-response** (2.1.116) — no longer waits for current turn.
+- **Vim visual mode** (2.1.118) — `v` enters character-wise visual mode, `V` enters visual-line mode, with selection, operators, and visual feedback.
+- **`/usage` merge** (2.1.118) — `/cost` and `/stats` combined into a single `/usage` command.
+- **Custom named themes via `/theme`** (2.1.118) — create and switch between user-defined themes.
+- **Hooks can invoke MCP tools directly** (2.1.118) — no shell-out intermediary needed. Cleaner path for Claudious preflight/heartbeat hooks.
+- **`DISABLE_UPDATES` env var** (2.1.118) — opt out of background update checks.
+- **WSL managed settings inheritance** (2.1.118) — WSL-on-Windows now inherits Windows-side managed settings.
+- **Stdio MCP non-JSON stdout no longer disconnects** (2.1.118) — servers that print stray non-JSON lines to stdout are no longer dropped.
+- **Headless/SDK session auto-title requests fixed** (2.1.118) — directly relevant to Claudious scheduled routines.
+- **Piped-output memory bug fixed** (2.1.118) — excessive memory allocation on piped output resolved.
+- **`/powerup`** (2.1.90, 2026-04-01) — first-party in-terminal interactive learning system with animated demonstrations of features. Available all tiers.
+- **`/buddy`** (2.1.89, 2026-04-01) — terminal Tamagotchi (18 species, 5 rarity tiers, deterministic per-user). Pro+ subscription. Easter-egg / morale feature.
+- **Minor fixes** — `/skills` menu scrolling; Remote Control session bugs; Homebrew install update-prompt loop; ctrl+e in multiline prompts; fullscreen scrolling; Write tool diff compute speed on large files; permission dialog crash with agent teams teammate (2.1.114).
 
 ## Features Shipped 2.1.105 → 2.1.113 (Logan-relevant)
 

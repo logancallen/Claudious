@@ -1,6 +1,6 @@
 # Active Findings — Last 7 Days
 
-**Last updated:** 2026-04-23
+**Last updated:** 2026-04-26
 **Scope:** Intake findings captured in the last 7 days that have not yet graduated to `prompting-rules.md` / `antipatterns.md` or been archived.
 **Refresh:** Maintained by the `intake` routine — new findings appended, items graduated or >7 days old removed.
 
@@ -342,6 +342,129 @@
 **Credibility:** OFFICIAL
 **Type:** TECHNIQUE
 **Summary:** Re-seed of constitutional-rule draft: prompts that request verification outputs (commit SHAs, file contents, git status) must explicitly instruct CC to suppress the Confidence/Assumptions/Context-health self-report block, otherwise the self-report overrides the requested literal output. Target `canonical/prompting-rules.md`. IMPACT: H | EFFORT: T | RISK: SAFE.
+**Action:** queued
+
+---
+
+## 2026-04-26 Intake (Scout + Config, novelty=high)
+
+### [2026-04-26] cc-2-1-119-release
+**Source:** https://code.claude.com/docs/en/changelog
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.119 (2026-04-23) — `/config` settings persist to `~/.claude/settings.json` with project/local/policy override precedence; `--print` mode honors agent `tools:`/`disallowedTools:` frontmatter; `--agent <name>` honors built-in `permissionMode`; `PostToolUse` + `PostToolUseFailure` hooks include `duration_ms` (excludes permission prompts and PreToolUse); subagent + SDK MCP reconfiguration connects in parallel; OpenTelemetry adds `tool_use_id` and `tool_input_size_bytes`; headless status line stdin JSON includes `effort.level` and `thinking.enabled`.
+**Action:** queued
+
+### [2026-04-26] cc-2-1-117-release
+**Source:** https://code.claude.com/docs/en/changelog
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.117 (2026-04-22) — agent frontmatter `mcpServers` loaded for main-thread agent sessions via `--agent`; model selections persist across restarts; concurrent MCP connect now default; `plugin install` installs missing dependencies even when plugin already installed; managed-settings `blockedMarketplaces` + `strictKnownMarketplaces` now enforced on plugin install/update/refresh/autoupdate; OpenTelemetry `user_prompt` events include `command_name` and `command_source`.
+**Action:** queued
+
+### [2026-04-26] cc-2-1-116-resume-perf-and-mcp
+**Source:** https://code.claude.com/docs/en/changelog
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** Claude Code 2.1.116 (2026-04-20) — `/resume` up to 67% faster on 40MB+ sessions; faster MCP startup with multiple stdio servers (defers `resources/templates/list` to first `@`-mention); thinking spinner inline progress; `/config` search matches option values; `/doctor` opens mid-response; `/reload-plugins` and background plugin auto-update auto-install missing dependencies.
+**Action:** queued
+
+### [2026-04-26] april-23-claude-code-postmortem
+**Source:** https://www.anthropic.com/engineering/april-23-postmortem
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Anthropic postmortem covers ~month-long Claude Code quality regression with three distinct issues — Claude Code, Agent SDK, and Cowork affected; API not impacted: (1) March 4 default reasoning effort dropped high→medium for UI-freeze mitigation, reverted April 7. (2) March 26 caching change to clear idle-session thinking had a per-turn re-clear bug, fixed April 10. (3) April 16 system prompt verbosity instruction degraded coding quality, reverted April 20 (v2.1.116). Resolution: usage limits reset for all subscribers April 23.
+**Action:** queued
+
+### [2026-04-26] claude-charts-diagrams-inline-ga
+**Source:** https://claude.com/blog/claude-builds-visuals
+**Credibility:** OFFICIAL
+**Type:** TOOL
+**Summary:** Custom visuals (interactive charts/diagrams/visualizations rendered inline in chat and Cowork) GA on all paid plans 2026-04-22 (announced 2026-03-12 as "Imagine with Claude" preview). Implementation is HTML + SVG (not raster image generation) — interactive, scales cleanly, faster than image-gen. Beta tag remains; web + desktop, chat + Cowork.
+**Action:** queued
+
+### [2026-04-26] claude-excel-powerpoint-shared-context-skills
+**Source:** https://claude.com/blog/claude-excel-powerpoint-updates
+**Credibility:** OFFICIAL
+**Type:** TOOL
+**Summary:** Claude for Excel and Claude for PowerPoint share full conversation context across all open files as of 2026-04-10 — actions in one app are informed by activity in the other. Skills now usable inside Excel and PowerPoint add-ins on all paid plans. Add-ins available via Amazon Bedrock, Google Cloud Vertex AI, Microsoft Foundry, or LLM gateway (LiteLLM, Portkey, Kong) without a Claude account.
+**Action:** queued
+
+### [2026-04-26] mcp-rce-supply-chain-vulnerability
+**Source:** https://www.ox.security/blog/the-mother-of-all-ai-supply-chains-critical-systemic-vulnerability-at-the-core-of-the-mcp/
+**Credibility:** VERIFIED
+**Type:** NEWS
+**Summary:** OX Security (April 16-20) disclosed systemic command-injection / RCE vulnerability in MCP protocol affecting >150M downloads. Cursor, VS Code, Windsurf, Claude Code, and Gemini-CLI vulnerable to MCP-based prompt injection / RCE chains. Windsurf zero-interaction CVE-2026-30615. Adversa AI scan: ~38% of 500+ surveyed MCP servers lack authentication. Microsoft separately patched Azure MCP Server SSRF CVE-2026-26118 on March 10 (managed identity token exposure).
+**Action:** queued
+
+### [2026-04-26] claude-powerup-interactive-lessons
+**Source:** https://claudefa.st/blog/guide/mechanics/claude-powerup
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** `/powerup` released v2.1.90 on 2026-04-01 — first-party in-terminal interactive learning system with animated demonstrations of features. Available all tiers regardless of subscription.
+**Action:** queued
+
+### [2026-04-26] claude-buddy-tamagotchi
+**Source:** https://claudefa.st/blog/guide/mechanics/claude-buddy
+**Credibility:** OFFICIAL
+**Type:** CC-STATE
+**Summary:** `/buddy` released v2.1.89 on 2026-04-01 — terminal Tamagotchi with 18 species, 5 rarity tiers, deterministic per-user via FNV-1a→Mulberry32 PRNG. Pro+ subscription required. Easter-egg / morale feature.
+**Action:** queued
+
+### [2026-04-26] anthropic-amazon-25b-investment
+**Source:** https://techcrunch.com/2026/04/20/anthropic-takes-5b-from-amazon-and-pledges-100b-in-cloud-spending-in-return/
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Amazon to invest up to additional $25B in Anthropic (on top of $8B prior). Anthropic commits $100B AWS spend over 10 years. Indirect signal that Bedrock + AWS-hosted Claude products may receive priority feature parity.
+**Action:** queued
+
+### [2026-04-26] anthropic-broadcom-tpu-3-5gw
+**Source:** https://www.cnbc.com/2026/04/06/broadcom-agrees-to-expanded-chip-deals-with-google-anthropic.html
+**Credibility:** OFFICIAL
+**Type:** NEWS
+**Summary:** Anthropic secured 3.5GW next-generation Broadcom TPU capacity, delivery 2027; CoreWeave multi-year NVIDIA GPU cloud capacity deal for Claude production. Capacity story; not immediately actionable.
+**Action:** queued
+
+### [2026-04-26] anthropic-revenue-9b-to-30b
+**Source:** Multi-source (Releasebot consolidation + Fortune coverage)
+**Credibility:** VERIFIED
+**Type:** NEWS
+**Summary:** Anthropic annual revenue run-rate grew from $9B late 2025 to $30B April 2026; enterprise customers ($1M+/yr) doubled from ~500 to 1000+. Context for likelihood of further pricing/tier shifts (cf. April 21 Pro Claude Code removal).
+**Action:** queued
+
+### [2026-04-26] config-learnings-platforms-claude-stale-on-opus-4-7
+**Source:** archive/intake/2026-04-26.md § Section D
+**Credibility:** OFFICIAL
+**Type:** TECHNIQUE
+**Summary:** `learnings/platforms/claude.md:8` describes Claude Max as $100/month, lists Opus 4.6 only (not 4.7), references AutoDream, omits Cowork Computer Use + Persistent Agent Thread. Multi-dimensional drift overlap with 2026-04-22 PIONEER mastery-lab v4 staleness alert. Refresh proposed.
+**Action:** queued
+
+### [2026-04-26] config-toolchain-stale-scout-additions-description
+**Source:** archive/intake/2026-04-26.md § Section D
+**Credibility:** OFFICIAL
+**Type:** TECHNIQUE
+**Summary:** `canonical/toolchain.md:87` describes scout-additions.md as "named watchlist (KAIROS, Chyros, Opus 4.7 updates, AutoDream)". KAIROS / Chyros / AutoDream are RETIRED targets in scout-additions.md. Toolchain description should match the file's actual Active Search Targets.
+**Action:** queued
+
+### [2026-04-26] config-scout-additions-hardcoded-mcp-server-list
+**Source:** archive/intake/2026-04-26.md § Section D
+**Credibility:** OFFICIAL
+**Type:** TECHNIQUE
+**Summary:** `scheduled-tasks/scout-additions.md:21` hardcodes `Google Drive, Supabase, Stripe, Linear, Cloudflare, Hugging Face` as MCP server search targets — constitutional-rule violation per re-seeded no-hardcoded-entities-in-routines. Extract to canonical config or convert to role-based query referencing `canonical/logan-current-stack.md`.
+**Action:** queued
+
+### [2026-04-26] config-routine-prompts-hardcoded-operator-email
+**Source:** archive/intake/2026-04-26.md § Section D
+**Credibility:** OFFICIAL
+**Type:** TECHNIQUE
+**Summary:** Three routine prompts (`scheduled-tasks/intake.md:23`, `process.md:21`, `curate.md:21`) hardcode `loganallensf@gmail.com` in `git config user.email`. Constitutional-rule violation; low priority since single email with low rotation rate. Defer until any other operator-identity field surfaces.
+**Action:** queued
+
+### [2026-04-26] config-mcp-rce-supply-chain-audit
+**Source:** archive/intake/2026-04-26.md § Section D
+**Credibility:** OFFICIAL
+**Type:** TECHNIQUE
+**Summary:** Audit Logan's 12 MCPs (per `canonical/toolchain.md`) for: (a) authentication enabled/disabled per server, (b) marketplace source eligibility for `blockedMarketplaces`/`strictKnownMarketplaces` enforcement (functional in CC 2.1.117). Cross-finding action item from MCP-RCE vulnerability + 2.1.117 release. Schedule dedicated 30-min CC session before next cloud routine run.
 **Action:** queued
 
 ---
