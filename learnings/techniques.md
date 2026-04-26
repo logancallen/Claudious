@@ -148,4 +148,10 @@
 
 <!-- PROMOTE TO CLAUDIOUS: N/A — this IS Claudious. Cross-project pattern: commit hook config + centralize logic. -->
 
+### 2026-04-22 — TECHNIQUE — Bundled Prompt-Skills (`/simplify`, `/batch`, `/debug`, `/loop`, `/claude-api`)
+**Severity:** HIGH
+**Context:** Claude Code W16 bundled five prompt-skills as first-class slash commands. Run `/help` to verify the command list in any current session.
+**Learning:** `/simplify` condenses over-engineered responses back to the core answer; `/batch` queues multiple independent asks into one execution pass; `/debug` runs a structured error-diagnosis prompt scaffold; `/loop` self-paces a multi-turn session without manual re-prompting; `/claude-api` spins up API-specific helpers (headers, streaming, tool_use). These replace ad-hoc prompt patterns Logan already uses — reach for the built-in first. Add `/loop` and `/debug` references to `canonical/prompting-rules.md` on next curate pass so they surface in prompting guidance, not just technique log.
+**Applies to:** All Claude Code sessions — ASF Graphics, Courtside Pro, Claudious, Claude Mastery Lab
+
 ## Archive
