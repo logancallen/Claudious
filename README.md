@@ -1,63 +1,26 @@
-# Claudious — Autonomous Claude Nervous System
+# Claudious
 
-**Owner:** logancallen
-**Purpose:** Self-maintaining shared knowledge layer across Logan's 8 Claude Projects.
+Shared state store for Logan's Claude Projects. Three manually-maintained canonical files attached as project knowledge across every Claude Project.
 
----
+## The three files
 
-## What this repo is
+| File | Contents |
+|---|---|
+| `canonical/state.md` | Current Claude models, Claude Code, toolchain (MCPs, skills, plugins) |
+| `canonical/playbook.md` | Prompting rules + antipatterns |
+| `canonical/changelog.md` | What changed and when |
 
-Claudious is the global brain for Logan's Claude ecosystem. Every Claude Project (ASF Graphics, Courtside Pro, Genesis Advisory, Claude Mastery Lab, etc.) attaches `canonical/` as project knowledge. Three daily cloud routines keep canonical current without manual tending.
+## Updating
 
-## Repo layout
+1. Edit the relevant file.
+2. Bump `Last updated:` at the top.
+3. Add a one-line entry to `changelog.md`.
+4. `git add canonical/ && git commit -m "canonical: <file> — <what>" && git push`
+5. Click Sync in each connected Claude Project.
 
-| Path | Purpose | Attached to Projects? |
-|---|---|---|
-| `.claudious-heartbeat/` | Per-machine state (SHA, dirty, ahead/behind) for cross-machine drift detection | No |
-| `canonical/` | Current-state truth (9 signal-dense files) | **Yes** |
-| `archive/` | Dated history (intake, runs, digests, proposals, queue, scout, retrospectives, snapshots, evaluations, project-learnings, research) | No — reference only |
-| `scheduled-tasks/` | Cloud routine prompts (intake, process, curate, scout-additions) | No |
-| `learnings/` | Raw capture stream; graduates into `canonical/` | No |
-| `skills/` | Claude Code skill definitions | No (loaded by Claude Code directly) |
-| `mastery-lab/` | Prompting research vault | No |
-| `scripts/` | Sync, backup, rollback tooling | No |
-| `.github/workflows/` | Auto-merge and daily-briefing email | — |
+No pipeline, no routines, no autonomous writes. State is current because Logan keeps it current.
 
-## Daily pipeline
-
-```
-06:00  Intake   → archive/intake/YYYY-MM-DD.md   + canonical/active-findings.md
-                                                  + canonical/claude-state.md (on OFFICIAL MODEL-STATE)
-                                                  + canonical/claude-code-state.md (on OFFICIAL CC-STATE)
-
-07:00  Process  → archive/queue/*.md              (auto-deploy candidates)
-                  archive/proposals/*.md          (judgment calls)
-                  learnings/*.md + canonical/prompting-rules.md | canonical/antipatterns.md
-                                                  (SAFE+HIGH+TRIVIAL auto-deploys, mirrored)
-                  canonical/open-decisions.md     (full regeneration)
-
-20:00  Curate   → archive/digest/YYYY-MM-DD.md    (verbose daily digest)
-                  canonical/briefing-today.md     (phone-readable overwrite)
-                  canonical/active-findings.md    (prune >7d or graduated)
-                  canonical/open-decisions.md     (prune >30d proposals)
-                  archive/retrospectives/...      (Sundays — graduation + grading)
-```
-
-## Observability
-
-Every push to `main` that changes `canonical/briefing-today.md` triggers `.github/workflows/daily-briefing.yml`, which emails the brief to `loganallensf@gmail.com` via Gmail SMTP. A BROKEN brief is written even when routines fail — the email pipeline is the tripwire.
-
-## Routine details
-
-Each routine file in `scheduled-tasks/` declares:
-- `Effort:` — `high` or `xhigh`
-- `Task Budget:` — explicit token ceiling (`task-budgets-2026-03-13` beta)
-- `Model:` — `claude-opus-4-7`
-- `Writes to:` — the file allowlist
-
-Opus 4.7 interprets prompts literally; routines include an explicit literal-interpretation guardrail to prevent silent synthesis.
-
-## Emergency rollback
+## Rollback
 
 ```bash
 # Windows
@@ -68,9 +31,3 @@ bash ~/Projects/claudious/scripts/rollback-config.sh YYYY-MM-DD
 ```
 
 Or `git revert <sha>` on the offending commit.
-
-## Related
-
-- Alerts: `alerts.md` (session-start surfaces CRITICAL items)
-- Global Claude Code instructions: `~/.claude/CLAUDE.md` (session-lifecycle + response-self-check)
-- Claudious-specific rules: `CLAUDE.md` (this repo)

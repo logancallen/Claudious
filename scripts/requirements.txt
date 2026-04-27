@@ -1,2 +1,0 @@
-# fetch_grok_scan.py uses Python stdlib only (imaplib, email, socket).
-# No third-party dependencies required.
